@@ -48,7 +48,7 @@
                         yAxis = d3.svg.axis().scale(y).orient('left').tickSize(0);
 
 					tip = d3.tip()
-						.attr('class', 'd3-tip')
+						.attr('class', 'horizontal-barchart-cls d3-tip')
 						.offset([-10, 0])
 						.html(function(d) {
 							return 	'<strong>Occurrences:</strong> <span style="color:yellow">' + d[xField] + '</span>'+
