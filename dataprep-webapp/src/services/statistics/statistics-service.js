@@ -10,7 +10,6 @@
      * @requires data-prep.services.utils.service:TextFormatService
      */
     function StatisticsService($timeout, DatagridService, FilterService, ConverterService, TextFormatService) {
-        var selectedColumn;
 
         var service = {
             boxplotData: null,
@@ -331,7 +330,7 @@
          * @description Remove the previous charts data and set the map chart
          */
         function processMapData(column) {
-            selectedColumn = column;
+            service.selectedColumn = column;
             //remove the boxplot
             service.boxplotData = null;
             //remove the barchart
