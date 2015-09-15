@@ -152,11 +152,10 @@ public class StatisticsUtils {
     protected static TreeSet<Range> computeRangeFromBucketSize(double min, double max, double bucketSize) {
         TreeSet<Range> toReturn = new TreeSet<>();
 
-        double from = computeBottom(bucketSize, min);
-
-        for (double first = from; first < max; first += bucketSize) {
+        for (double first = computeBottom(bucketSize, min); first < max; first += bucketSize) {
             toReturn.add(new Range(first, first + bucketSize));
         }
+
         return toReturn;
     }
 
