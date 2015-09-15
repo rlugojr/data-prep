@@ -131,15 +131,6 @@ public class StatisticsUtils {
     }
 
     private static boolean isBucketSizeValid(double min, double max, int maxBuckets, double bucketSize) {
-        // ========================================================
-        // The following block tests if the bucket size is a multiple of 10, 100, 1000, ... depending on its value.
-        // ie: size < 100 should be multiple of 10, size between 100 & 1000 must be multiple of 100, etc...
-        // ========================================================
-        double sq = Math.pow(bucketSize, 1 / 10);
-        if (!isMultiple(bucketSize, Math.pow(10, sq)))
-            return false;
-        // ========================================================
-
         return (bucketSize * maxBuckets > max - min);
     }
 
