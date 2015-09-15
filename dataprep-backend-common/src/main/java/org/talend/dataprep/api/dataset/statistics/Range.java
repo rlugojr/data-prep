@@ -4,13 +4,21 @@ import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Range implements Serializable {
+public class Range implements Serializable, Comparable<Range> {
 
     @JsonProperty("min")
     double min;
 
     @JsonProperty("max")
     double max;
+
+    public Range() {
+    }
+
+    public Range(double min, double max) {
+        this.min = min;
+        this.max = max;
+    }
 
     public double getMin() {
         return min;
@@ -26,6 +34,11 @@ public class Range implements Serializable {
 
     public void setMax(double max) {
         this.max = max;
+    }
+
+    @Override
+    public String toString() {
+        return "Range{" + "min=" + min + ", max=" + max + '}';
     }
 
     @Override
@@ -54,5 +67,10 @@ public class Range implements Serializable {
         temp = Double.doubleToLongBits(max);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;
+    }
+
+    @Override
+    public int compareTo(Range o) {
+        return Double.compare(min, o.getMin());
     }
 }

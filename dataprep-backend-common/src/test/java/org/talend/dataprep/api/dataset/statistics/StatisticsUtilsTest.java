@@ -3,6 +3,7 @@ package org.talend.dataprep.api.dataset.statistics;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Collections;
+import java.util.TreeSet;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -144,4 +145,154 @@ public class StatisticsUtilsTest {
         assertEquals(30, stringColumn.getStatistics().getTextLengthSummary().getMaximalLength(), 0);
         assertEquals(8, stringColumn.getStatistics().getTextLengthSummary().getAverageLength(), 0);
     }
+
+    @Test
+    public void testComputeRange1() {
+        final int maxBuckets = 20;
+        TreeSet<Range> result = StatisticsUtils.computeRange(0, 15, maxBuckets);
+        assertEquals(15, result.size());
+        assertEquals(0, result.first().getMin(), 0);
+        assertEquals(1, result.first().getMax(), 0);
+        assertEquals(14, result.last().getMin(), 0);
+        assertEquals(15, result.last().getMax(), 0);
+    }
+
+    @Test
+    public void testComputeRange1_bis() {
+        final int maxBuckets = 20;
+        TreeSet<Range> result = StatisticsUtils.computeRange(12, 350, maxBuckets);
+        System.out.println(result);
+        assertEquals(18, result.size());
+        assertEquals(0, result.first().getMin(), 0);
+        assertEquals(20, result.first().getMax(), 0);
+        assertEquals(340, result.last().getMin(), 0);
+        assertEquals(360, result.last().getMax(), 0);
+    }
+
+    @Test
+    public void testComputeRange1_ter() {
+        final int maxBuckets = 20;
+        TreeSet<Range> result = StatisticsUtils.computeRange(16.7, 217.1, maxBuckets);
+        System.out.println(result);
+        assertEquals(11, result.size());
+        assertEquals(0, result.first().getMin(), 0);
+        assertEquals(20, result.first().getMax(), 0);
+        assertEquals(200, result.last().getMin(), 0);
+        assertEquals(220, result.last().getMax(), 0);
+    }
+
+    @Test
+    public void testComputeRange2() {
+        final int maxBuckets = 20;
+        TreeSet<Range> result = StatisticsUtils.computeRange(4_512, 58_130, maxBuckets);
+        System.out.println(result);
+        assertEquals(19, result.size());
+        assertEquals(3_000, result.first().getMin(), 0);
+        assertEquals(6_000, result.first().getMax(), 0);
+        assertEquals(57_000, result.last().getMin(), 0);
+        assertEquals(60_000, result.last().getMax(), 0);
+    }
+
+    @Test
+    public void testComputeRange3() {
+        final int maxBuckets = 20;
+        TreeSet<Range> result = StatisticsUtils.computeRange(10_000, 22_000, maxBuckets);
+        System.out.println(result);
+        assertEquals(12, result.size());
+        assertEquals(10_000, result.first().getMin(), 0);
+        assertEquals(11_000, result.first().getMax(), 0);
+        assertEquals(21_000, result.last().getMin(), 0);
+        assertEquals(22_000, result.last().getMax(), 0);
+    }
+
+    @Test
+    public void testComputeRange4() {
+        final int maxBuckets = 20;
+        TreeSet<Range> result = StatisticsUtils.computeRange(9_800, 220_015, maxBuckets);
+        System.out.println(result);
+        assertEquals(12, result.size());
+        assertEquals(0, result.first().getMin(), 0);
+        assertEquals(20_000, result.first().getMax(), 0);
+        assertEquals(220_000, result.last().getMin(), 0);
+        assertEquals(240_000, result.last().getMax(), 0);
+    }
+
+
+    @Test
+    public void testComputeRange5() {
+        final int maxBuckets = 20;
+        TreeSet<Range> result = StatisticsUtils.computeRange(9_800, 2_015_221, maxBuckets);
+        System.out.println(result);
+        assertEquals(11, result.size());
+        assertEquals(0, result.first().getMin(), 0);
+        assertEquals(200_000, result.first().getMax(), 0);
+        assertEquals(2_000_000, result.last().getMin(), 0);
+        assertEquals(2_200_000, result.last().getMax(), 0);
+    }
+
+    @Test
+    public void testComputeRange6() {
+        final int maxBuckets = 20;
+        TreeSet<Range> result = StatisticsUtils.computeRange(159_800, 2_015_221, maxBuckets);
+        System.out.println(result);
+        assertEquals(20, result.size());
+        assertEquals(100_000, result.first().getMin(), 0);
+        assertEquals(200_000, result.first().getMax(), 0);
+        assertEquals(2_000_000, result.last().getMin(), 0);
+        assertEquals(2_100_000, result.last().getMax(), 0);
+    }
+
+    @Test
+    public void testComputeRange7() {
+        final int maxBuckets = 20;
+        TreeSet<Range> result = StatisticsUtils.computeRange(12, 80, maxBuckets);
+        System.out.println(result);
+        assertEquals(7, result.size());
+        assertEquals(10, result.first().getMin(), 0);
+        assertEquals(20, result.first().getMax(), 0);
+        assertEquals(70, result.last().getMin(), 0);
+        assertEquals(80, result.last().getMax(), 0);
+    }
+
+    @Test
+    public void testComputeRange7_bis() {
+        final int maxBuckets = 20;
+        TreeSet<Range> result = StatisticsUtils.computeRange(12, 82, maxBuckets);
+        System.out.println(result);
+        assertEquals(8, result.size());
+        assertEquals(10, result.first().getMin(), 0);
+        assertEquals(20, result.first().getMax(), 0);
+        assertEquals(80, result.last().getMin(), 0);
+        assertEquals(90, result.last().getMax(), 0);
+    }
+
+    @Test
+    public void testComputeRangeFromBucketSize1() {
+        final int bucketSize = 1;
+        TreeSet<Range> result = StatisticsUtils.computeRangeFromBucketSize(0, 15, bucketSize);
+        assertEquals(15, result.size());
+        assertEquals(0, result.first().getMin(), 0);
+        assertEquals(1, result.first().getMax(), 0);
+        assertEquals(14, result.last().getMin(), 0);
+        assertEquals(15, result.last().getMax(), 0);
+    }
+
+    @Test
+    public void testComputeRangeFromBucketSize2() {
+        final int bucketSize = 12;
+        TreeSet<Range> result = StatisticsUtils.computeRangeFromBucketSize(0, 100, bucketSize);
+        assertEquals(9, result.size());
+        assertEquals(0, result.first().getMin(), 0);
+        assertEquals(12, result.first().getMax(), 0);
+        assertEquals(96, result.last().getMin(), 0);
+        assertEquals(108, result.last().getMax(), 0);
+    }
+
+    @Test
+    public void testComputeBottom() {
+        assertEquals(0, StatisticsUtils.computeBottom(5_000, 4_512), 0);
+        assertEquals(10_000, StatisticsUtils.computeBottom(5_000, 14_512), 0);
+        assertEquals(10_000, StatisticsUtils.computeBottom(1_000, 10_000), 0);
+    }
+
 }

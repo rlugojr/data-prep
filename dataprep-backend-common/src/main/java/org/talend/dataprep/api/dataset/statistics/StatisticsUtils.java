@@ -1,8 +1,6 @@
 package org.talend.dataprep.api.dataset.statistics;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.talend.dataprep.api.dataset.ColumnMetadata;
 import org.talend.dataprep.api.type.Type;
@@ -98,4 +96,90 @@ public class StatisticsUtils {
             }
         }
     }
+
+    /**
+     * Computes the better set of range to represents a number distribution.
+     *
+     * It will assure that the number of buckets is less or equal to maxBuckets, but it could be less.
+     *
+     * The main goal of this method is to render "meaningfull" range for an end-user. ie: min=4_512, max=58_130, max
+     * bucket=20, will render 19 buckets, each with a size of 3_000 (3_000->6_000, 6_000->12_000, etc...)
+     *
+     * @return an ordered set of ranges (order is assured by Range.compareTo())
+     *
+     * TODO manage negative numbers
+     */
+    public static TreeSet<Range> computeRange(double min, double max, int maxBuckets) {
+        if (max - min <= maxBuckets) {
+            return computeRangeFromBucketSize(min, max, 1);
+        }
+
+        // This algo is built in a empiric way, and is quite hard to explain, to improve...
+        for (int j = 1; j <= 10; j++) {
+            for (int i = 1; i <= 5; i++) {
+                double bucketSize = Math.pow(10, j) * i;
+                if (isBucketSizeValid(min, max, maxBuckets, bucketSize)) {
+                    return computeRangeFromBucketSize(min, max, bucketSize);
+                }
+            }
+        }
+
+        // TODO add tests that use this brutal way
+
+        // If none of the previous work, use the brutal algo:
+        return computeRangeFromBucketSize(min, max, (max - min) / maxBuckets);
+    }
+
+    private static boolean isBucketSizeValid(double min, double max, int maxBuckets, double bucketSize) {
+        // ========================================================
+        // The following block tests if the bucket size is a multiple of 10, 100, 1000, ... depending on its value.
+        // ie: size < 100 should be multiple of 10, size between 100 & 1000 must be multiple of 100, etc...
+        // ========================================================
+        double sq = Math.pow(bucketSize, 1 / 10);
+        if (!isMultiple(bucketSize, Math.pow(10, sq)))
+            return false;
+        // ========================================================
+
+        return (bucketSize * maxBuckets > max - min);
+    }
+
+    /**
+     * Checks if a is a multiple of b.
+     * 
+     * @return true if a/b is an integer
+     */
+    private static boolean isMultiple(double a, double b) {
+        Double realValue = a / b;
+        int intValue = realValue.intValue();
+        return realValue == intValue;
+    }
+
+    /**
+     * Computes all the range objects to represent a number distribution, regarding min, max and the bucket size. No
+     * smartness here, it's just an utility method.
+     */
+    protected static TreeSet<Range> computeRangeFromBucketSize(double min, double max, double bucketSize) {
+        TreeSet<Range> toReturn = new TreeSet<>();
+
+        double from = computeBottom(bucketSize, min);
+
+        for (double first = from; first < max; first += bucketSize) {
+            toReturn.add(new Range(first, first + bucketSize));
+        }
+        return toReturn;
+    }
+
+    /**
+     * Computes what should be the lower range of the first bucket.
+     * 
+     * Basically, is just about determine if we should start at 0 or to another value.
+     * 
+     * @param bucketSize size of the bucket
+     * @param min minimal value in all distribution
+     * @return a double saying which is the lower range of the first bucket
+     */
+    protected static double computeBottom(double bucketSize, double min) {
+        return (min <= bucketSize ? 0 : Math.floor(min / bucketSize) * bucketSize);
+    }
+
 }
