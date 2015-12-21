@@ -8,7 +8,7 @@
     </scm>
     <modelVersion>4.0.0</modelVersion>
 
-    <version>1.0.RC1-SNAPSHOT</version>
+    <version>1.0.RC1</version>
     <name>dataprep-backend-common</name>
     <packaging>jar</packaging>
     <artifactId>dataprep-backend-common</artifactId>
@@ -16,7 +16,7 @@
     <parent>
         <groupId>org.talend.dataprep</groupId>
         <artifactId>dataprep-backend</artifactId>
-        <version>1.0.RC1-SNAPSHOT</version>
+        <version>1.0.RC1</version>
         <relativePath>../dataprep-backend/pom.xml</relativePath>
     </parent>
 
