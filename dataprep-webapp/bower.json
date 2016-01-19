@@ -37,7 +37,8 @@
     "x-slickgrid": "3.0.0",
     "bg-splitter": "*",
     "angular-translate-once": "~1.0.2",
-    "moment-jdateformatparser": "~1.0.0"
+    "moment-jdateformatparser": "~1.0.0",
+    "BigRational":"git@github.com:peterolson/BigRational.js.git"
   },
   "devDependencies": {
     "angular-mocks": "~1.4.x"
@@ -88,6 +89,11 @@
       "main": [
         "js/splitter.js",
         "css/style.css"
+      ]
+    },
+    "BigRational": {
+      "main": [
+        "BigInt_BigRat.min.js"
       ]
     }
   }
