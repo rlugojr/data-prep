@@ -19,6 +19,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -59,6 +62,21 @@ public class InMemoryDataSetMetadataRepository extends DataSetMetadataRepository
     public Iterable<DataSetMetadata> list() {
         final Collection<DataSetMetadata> values = store.values();
         LOG.debug("list {} dataset metadata", values.size());
+        return values;
+    }
+
+    @Override
+    public Iterable<DataSetMetadata> listCompatible(String id) {
+        LOG.info("Looking for data set #{} in the system", id);
+        final DataSetMetadata metadata = get(id);
+
+        if (metadata == null) {
+            LOG.info("Similar schemas could not be found for data set #{}", id);
+            return Collections.emptyList();
+        }
+        final Collection<DataSetMetadata> values = store.values().stream()
+                .filter(m -> (m != null && !metadata.equals(m) && metadata.compatible(m))).collect(Collectors.toList());
+        LOG.debug("list similar {} data set metadata", values.size());
         return values;
     }
 

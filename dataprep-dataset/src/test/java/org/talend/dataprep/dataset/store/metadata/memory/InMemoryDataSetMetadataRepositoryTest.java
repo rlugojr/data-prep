@@ -61,4 +61,10 @@ public class InMemoryDataSetMetadataRepositoryTest {
         assertTrue(obj.zeObject == Defaults.defaultValue(Object.class));// cause it is null
         assertTrue(Defaults.defaultValue(boolean.class).equals(obj.zeStaticBoolean));
     }
+
+    @Test
+    public void shouldOnlyReturnCompatibleDataSets() {
+        InMemoryDataSetMetadataRepository inMemoryDataSetMetadataRepository = new InMemoryDataSetMetadataRepository();
+        DataSetMetadataRepositoryTestUtils.ensureThatOnlyCompatibleDataSetsAreReturned(inMemoryDataSetMetadataRepository);
+    }
 }
