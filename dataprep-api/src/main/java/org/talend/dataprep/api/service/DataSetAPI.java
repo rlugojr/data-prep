@@ -302,7 +302,7 @@ public class DataSetAPI extends APIService {
      * Returns a list containing all data sets metadata that are compatible with the data set with id <tt>id</tt>. If no
      * compatible data set is found an empty list is returned. The data set with id <tt>dataSetId</tt> is never returned
      * in the list.
-     * 
+     *
      * @param id the specified data set id
      * @param sort the sort criterion: either name or date.
      * @param order the sorting order: either asc or desc
