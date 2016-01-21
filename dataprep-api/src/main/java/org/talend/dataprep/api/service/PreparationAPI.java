@@ -19,6 +19,7 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringWriter;
 
 import javax.validation.Valid;
 
@@ -77,7 +78,7 @@ public class PreparationAPI extends APIService {
      * Returns a list containing all data sets metadata that are compatible with a preparation identified by
      * <tt>preparationId</tt>: its id. If no compatible data set is found an empty list is returned. The base data set
      * of the preparation with id <tt>preparationId</tt> is never returned in the list.
-     * 
+     *
      * @param preparationId the specified preparation id
      * @param sort the sort criterion: either name or date.
      * @param order the sorting order: either asc or desc
