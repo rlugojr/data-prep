@@ -4,7 +4,7 @@
     var datasetTour = [
         {
             element: '.no-js',
-            title: '<center>Welcome to</br>Talend Data Preparation</center>',
+            title: '<center>Welcome to</br>Talend Data Preparation</br>Free Desktop</center>',
             content: 'To quickly learn how to use it, click <b>Next</b>.',
             position: 'right'
         },
