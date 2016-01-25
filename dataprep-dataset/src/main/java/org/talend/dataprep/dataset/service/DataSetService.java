@@ -230,10 +230,10 @@ public class DataSetService {
     @RequestMapping(value = "/datasets", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "List all data sets", notes = "Returns the list of data sets the current user is allowed to see. Creation date is a Epoch time value (in UTC time zone).")
     @Timed
-    public Iterable<DataSetMetadata> list(@ApiParam(value = "Sort key (by name or date).") @RequestParam(defaultValue = "DATE", required = false) String sort,
-                                          @ApiParam(value = "Order for sort key (desc or asc).") @RequestParam(defaultValue = "DESC", required = false) String order,
-                                          @ApiParam(value = "Folder id to search datasets") @RequestParam(defaultValue = "", required = false) String folder) {
-
+    public Iterable<DataSetMetadata> list(
+            @ApiParam(value = "Sort key (by name or date).") @RequestParam(defaultValue = "DATE", required = false) String sort,
+            @ApiParam(value = "Order for sort key (desc or asc).") @RequestParam(defaultValue = "DESC", required = false) String order,
+            @ApiParam(value = "Folder id to search datasets") @RequestParam(defaultValue = "", required = false) String folder) {
 
         Spliterator<DataSetMetadata> iterator;
         if (StringUtils.isNotEmpty(folder)) {
@@ -290,7 +290,6 @@ public class DataSetService {
             @PathVariable(value = "id") @ApiParam(name = "id", value = "Id of the data set metadata") String dataSetId,
             @ApiParam(value = "Sort key (by name or date).") @RequestParam(defaultValue = "DATE", required = false) String sort,
             @ApiParam(value = "Order for sort key (desc or asc).") @RequestParam(defaultValue = "DESC", required = false) String order) {
-
 
         Spliterator<DataSetMetadata> iterator = dataSetMetadataRepository.listCompatible(dataSetId).spliterator();
 

@@ -19,7 +19,6 @@ import static org.springframework.web.bind.annotation.RequestMethod.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.StringWriter;
 
 import javax.validation.Valid;
 
@@ -49,6 +48,9 @@ import io.swagger.annotations.ApiParam;
 
 @RestController
 public class PreparationAPI extends APIService {
+
+    @Autowired
+    private Jackson2ObjectMapperBuilder builder;
 
     @RequestMapping(value = "/api/preparations", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get all preparations.", notes = "Returns the list of preparations the current user is allowed to see.")

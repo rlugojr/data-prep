@@ -188,15 +188,6 @@ public class PreparationService {
         return getDetails(preparation);
     }
 
-    @RequestMapping(value = "/preparations/{id}/basedataset", method = GET, produces = APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Get the id of the base data set of a preparation", notes = "Return the id of the base data set of a preparation provided id.")
-    @Timed
-    public String baseDataSet(@ApiParam("id") @PathVariable("id") String id) {
-        LOGGER.debug("Get the id of the base data set details for #{}.", id);
-        final Preparation preparation = preparationRepository.get(id, Preparation.class);
-        return preparation != null ? preparation.getDataSetId(): StringUtils.EMPTY;
-    }
-
     @RequestMapping(value = "/preparations/clone/{id}", method = PUT, produces = TEXT_PLAIN_VALUE)
     @ApiOperation(value = "Clone preparation", notes = "Clone of the preparation with provided id. The new name will the previous one concat with ' Copy', "
             + "Return the id of the new preparation ")

@@ -165,25 +165,6 @@ public class FileSystemDataSetMetadataRepository extends DataSetMetadataReposito
         return stream::iterator;
     }
 
-    @Override
-    public Iterable<DataSetMetadata> listCompatible(String id) {
-        LOG.info("Looking for data set #{} in file system", id);
-        final DataSetMetadata metadata = get(id);
-        if (metadata == null) {
-            LOG.info("Similar schemas could not be found for data set #{}", id);
-            return Collections.emptyList();
-        }
-        final File folder = getRootFolder();
-        final File[] files = folder.listFiles();
-        if (files == null) {
-            return Collections.emptyList();
-        }
-
-        final Stream<DataSetMetadata> stream = Arrays.stream(files).map(f -> get(f.getName()))
-                .filter(m -> m != null && !metadata.equals(m) && metadata.compatible(m));
-        return stream::iterator;
-    }
-
     /**
      * @see DataSetMetadataRepository#clear()
      */
