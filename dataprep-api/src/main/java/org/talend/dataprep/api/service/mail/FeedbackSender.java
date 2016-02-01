@@ -10,6 +10,8 @@ public interface FeedbackSender {
      * 
      * @param subject A subject to be included in sent email.
      * @param body A body to be included in sent email.
+     * @param sender Email adress of sender.
      */
-    void send(String subject, String body);
+    void send(String subject, String body, String sender);
+
 }

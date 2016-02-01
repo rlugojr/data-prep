@@ -38,7 +38,7 @@ public class MailToCommand extends HystrixCommand<Void> {
             body += "Severity=" + mailDetails.getSeverity() + "<br/>";
             body += "Description=" + mailDetails.getDescription() + "<br/>";
             body += "Version=" + versionService.version() + "<br/>";
-            feedbackSender.send(mailDetails.getTitle(), body);
+            feedbackSender.send(mailDetails.getTitle(), body, mailDetails.getMail());
         } catch (Exception e) {
             throw new TDPException(APIErrorCodes.UNABLE_TO_SEND_MAIL, e);
         }

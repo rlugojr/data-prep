@@ -32,11 +32,11 @@ public class NoOpFeedbackSender implements FeedbackSender {
     private String fromAddress;
 
     @Override
-    public void send(String subject, String body) {
+    public void send(String subject, String body, String sender) {
         if (LOGGER.isDebugEnabled()) {
             try {
                 String recipientList = StringUtils.join((new HashSet<>(Arrays.asList(recipients))).toArray(), ',');
-                InternetAddress from = new InternetAddress(fromAddress);
+                InternetAddress from = new InternetAddress(sender);
                 String builder = "***** Sending mail" + //
                         "from: " + from.toString() + //
                         "username: " + userName + //
