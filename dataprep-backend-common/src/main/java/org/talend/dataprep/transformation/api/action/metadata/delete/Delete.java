@@ -16,6 +16,9 @@ package org.talend.dataprep.transformation.api.action.metadata.delete;
 import static org.talend.dataprep.transformation.api.action.metadata.category.ActionCategory.DATA_CLEANSING;
 import static org.talend.dataprep.transformation.api.action.metadata.category.ScopeCategory.LINE;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
@@ -39,7 +42,7 @@ public class Delete extends ActionMetadata implements RowAction {
     public static final String DELETE_SINGLE_LINE = "delete_single_line";
     public static final String DELETE_COLUMN = "delete_column";
     private final ScopeCategory scope;
-    
+
     @Autowired
     private ApplicationContext applicationContext;
 
@@ -98,5 +101,10 @@ public class Delete extends ActionMetadata implements RowAction {
     @Override
     public ActionMetadata adapt(ScopeCategory scope) {
         return applicationContext.getBean(getClass(), scope);
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.VALUES_ALL);
     }
 }

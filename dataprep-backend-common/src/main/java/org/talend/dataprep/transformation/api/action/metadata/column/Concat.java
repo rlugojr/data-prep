@@ -13,8 +13,10 @@
 
 package org.talend.dataprep.transformation.api.action.metadata.column;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
@@ -115,11 +117,26 @@ public class Concat extends ActionMetadata implements ColumnAction, OtherColumnP
     }
 
     @Override
-    public void compile(ActionContext actionContext) {
-        super.compile(actionContext);
-        if (actionContext.getActionStatus() == ActionContext.ActionStatus.OK) {
-            checkSelectedColumnParameter(actionContext.getParameters(), actionContext.getInputRowMetadata());
-            actionContext.setActionStatus(ActionContext.ActionStatus.OK);
+    public void compile(ActionContext context) {
+        super.compile(context);
+        if (context.getActionStatus() == ActionContext.ActionStatus.OK) {
+            checkSelectedColumnParameter(context.getParameters(), context.getRowMetadata());
+            // Create concat result column
+            final RowMetadata rowMetadata = context.getRowMetadata();
+            final String columnId = context.getColumnId();
+            final Map<String, String> parameters = context.getParameters();
+            final ColumnMetadata sourceColumn = rowMetadata.getById(columnId);
+            final String newColumnName = evalNewColumnName(sourceColumn.getName(), rowMetadata, parameters);
+            context.column(newColumnName, (r) -> {
+                final ColumnMetadata c = ColumnMetadata.Builder //
+                        .column() //
+                        .name(newColumnName) //
+                        .type(Type.STRING) //
+                        .build();
+                rowMetadata.insertAfter(columnId, c);
+                return c;
+            });
+            context.setActionStatus(ActionContext.ActionStatus.OK);
         }
     }
 
@@ -128,29 +145,17 @@ public class Concat extends ActionMetadata implements ColumnAction, OtherColumnP
      */
     @Override
     public void applyOnColumn(DataSetRow row, ActionContext context) {
-        final RowMetadata rowMetadata = row.getRowMetadata();
+        final RowMetadata rowMetadata = context.getRowMetadata();
         final String columnId = context.getColumnId();
         final Map<String, String> parameters = context.getParameters();
         final ColumnMetadata sourceColumn = rowMetadata.getById(columnId);
 
-
         final String newColumnName = evalNewColumnName(sourceColumn.getName(), rowMetadata, parameters);
-
-        String concatColumn = context.column(newColumnName, (r) -> {
-            final ColumnMetadata c = ColumnMetadata.Builder //
-                    .column() //
-                    .name(newColumnName) //
-                    .type(Type.STRING) //
-                    .build();
-            rowMetadata.insertAfter(columnId, c);
-            return c;
-        });
+        String concatColumn = context.column(newColumnName);
 
         // Set new column value
         String sourceValue = row.get(columnId);
-
         String newValue = getParameter(parameters, PREFIX_PARAMETER, StringUtils.EMPTY);
-
         newValue += sourceValue;
 
         if (parameters.get(MODE_PARAMETER).equals(OTHER_COLUMN_MODE)) {
@@ -206,6 +211,11 @@ public class Concat extends ActionMetadata implements ColumnAction, OtherColumnP
             value = defaultValue;
         }
         return value;
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.METADATA_CREATE_COLUMNS);
     }
 
 }

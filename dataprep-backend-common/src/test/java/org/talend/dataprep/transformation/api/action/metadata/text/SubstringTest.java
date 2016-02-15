@@ -82,8 +82,8 @@ public class SubstringTest extends BaseDateTests {
         expectedValues.put("0003", " ipsum ");
         expectedValues.put("0002", "01/01/2015");
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -104,8 +104,8 @@ public class SubstringTest extends BaseDateTests {
         expectedValues.put("0003", " ip");
         expectedValues.put("0002", "01/01/2015");
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -126,8 +126,8 @@ public class SubstringTest extends BaseDateTests {
         expectedValues.put("0003", "");
         expectedValues.put("0002", "01/01/2015");
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -151,8 +151,8 @@ public class SubstringTest extends BaseDateTests {
         expectedValues.put("0003", "Bac");
         expectedValues.put("0002", "01/01/2015");
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -175,8 +175,8 @@ public class SubstringTest extends BaseDateTests {
         expectedValues.put("0003", "");
         expectedValues.put("0002", "01/01/2015");
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -201,8 +201,8 @@ public class SubstringTest extends BaseDateTests {
         expectedValues.put("0003", "");
         expectedValues.put("0002", "01/01/2015");
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -228,8 +228,8 @@ public class SubstringTest extends BaseDateTests {
         expectedValues.put("0003", "Baco");
         expectedValues.put("0002", "01/01/2015");
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -253,8 +253,8 @@ public class SubstringTest extends BaseDateTests {
         expectedValues.put("0003", "");
         expectedValues.put("0002", "01/01/2015");
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -276,12 +276,12 @@ public class SubstringTest extends BaseDateTests {
         expectedValues.put("0003", " ipsum ");
         expectedValues.put("0002", "01/01/2015");
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         parameters.put(FROM_INDEX_PARAMETER, "1");
         parameters.put(TO_INDEX_PARAMETER, "6");
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -304,8 +304,8 @@ public class SubstringTest extends BaseDateTests {
         expectedValues.put("0003", "Bacon ipsum ");
         expectedValues.put("0002", "01/01/2015");
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -328,8 +328,8 @@ public class SubstringTest extends BaseDateTests {
         expectedValues.put("0003", " ipsum dolor amet swine leberkas pork belly");
         expectedValues.put("0002", "01/01/2015");
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -354,8 +354,8 @@ public class SubstringTest extends BaseDateTests {
         expectedValues.put("0003", "belly");
         expectedValues.put("0002", "01/01/2015");
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -381,8 +381,8 @@ public class SubstringTest extends BaseDateTests {
         expectedValues.put("0003", "ips");
         expectedValues.put("0002", "01/01/2015");
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -408,8 +408,8 @@ public class SubstringTest extends BaseDateTests {
         expectedValues.put("0003", "ipsu");
         expectedValues.put("0002", "01/01/2015");
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -435,8 +435,8 @@ public class SubstringTest extends BaseDateTests {
         expectedValues.put("0003", "ipsu");
         expectedValues.put("0002", "01/01/2015");
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -458,14 +458,14 @@ public class SubstringTest extends BaseDateTests {
         expectedValues.put("0004", "ips");
         expectedValues.put("0002", "01/01/2015");
 
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // when
         parameters.put("column_id", "0003");
         parameters.put(FROM_INDEX_PARAMETER, "1");
         parameters.put(TO_INDEX_PARAMETER, "4");
         parameters.put(ImplicitParameters.COLUMN_ID.getKey().toLowerCase(), "0003");
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -486,8 +486,8 @@ public class SubstringTest extends BaseDateTests {
         expected.add(createMetadata("0003", "steps_substring"));
         expected.add(createMetadata("0002", "last update"));
 
-        // when
-        ActionTestWorkbench.test(rowMetadata, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(rowMetadata, action.create(parameters));
 
         // then
         assertEquals(expected, rowMetadata.getColumns());
@@ -510,8 +510,8 @@ public class SubstringTest extends BaseDateTests {
         expected.add(createMetadata("0003", "steps_substring"));
         expected.add(createMetadata("0002", "last update"));
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction(), action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters), action.create(parameters));
 
         // then
         assertEquals(expected, row.getRowMetadata().getColumns());

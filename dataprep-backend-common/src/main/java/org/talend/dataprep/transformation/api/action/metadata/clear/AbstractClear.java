@@ -13,6 +13,9 @@
 
 package org.talend.dataprep.transformation.api.action.metadata.clear;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.apache.commons.lang.StringUtils;
 import org.talend.dataprep.api.dataset.ColumnMetadata;
 import org.talend.dataprep.api.dataset.DataSetRow;
@@ -29,7 +32,7 @@ public abstract class AbstractClear extends ActionMetadata implements ColumnActi
     public void applyOnColumn(DataSetRow row, ActionContext context) {
         final String columnId = context.getColumnId();
         final String value = row.get(columnId);
-        final ColumnMetadata colMetadata = row.getRowMetadata().getById(columnId);
+        final ColumnMetadata colMetadata = context.getRowMetadata().getById(columnId);
         if (toClear(colMetadata, value, context)) {
             row.set(columnId, StringUtils.EMPTY);
         }
@@ -43,5 +46,10 @@ public abstract class AbstractClear extends ActionMetadata implements ColumnActi
      * @return return <code>true</code> if the column must be cleared
      */
     protected abstract boolean toClear(ColumnMetadata colMetadata, String value, ActionContext context);
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.VALUES_COLUMN);
+    }
 
 }

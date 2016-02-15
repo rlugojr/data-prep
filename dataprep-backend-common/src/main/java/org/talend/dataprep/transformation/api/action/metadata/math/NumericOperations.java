@@ -1,15 +1,15 @@
-//  ============================================================================
+// ============================================================================
 //
-//  Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
-//  This source code is available under agreement available at
-//  https://github.com/Talend/data-prep/blob/master/LICENSE
+// This source code is available under agreement available at
+// https://github.com/Talend/data-prep/blob/master/LICENSE
 //
-//  You should have received a copy of the agreement
-//  along with this program; if not, write to Talend SA
-//  9 rue Pages 92150 Suresnes, France
+// You should have received a copy of the agreement
+// along with this program; if not, write to Talend SA
+// 9 rue Pages 92150 Suresnes, France
 //
-//  ============================================================================
+// ============================================================================
 
 package org.talend.dataprep.transformation.api.action.metadata.math;
 
@@ -17,8 +17,10 @@ import static java.math.RoundingMode.HALF_UP;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.context.annotation.Scope;
@@ -48,30 +50,26 @@ import org.talend.dataprep.transformation.api.action.parameters.SelectParameter;
 @Scope("prototype")
 public class NumericOperations extends ActionMetadata implements ColumnAction, OtherColumnParameters {
 
-    private static final String PLUS = "+";
-    private static final String MINUS = "-";
-    private static final String MULTIPLY = "x";
-    private static final String DIVIDE = "/";
-
     /**
      * The action name.
      */
     public static final String ACTION_NAME = "numeric_ops"; //$NON-NLS-1$
-
     /**
      * Mode: tells if operand is taken from another column or is a constant
      */
     public static final String MODE_PARAMETER = "mode"; //$NON-NLS-1$
-
     /**
      * The operator to use.
      */
     public static final String OPERATOR_PARAMETER = "operator"; //$NON-NLS-1$
-
     /**
      * The operand to use.
      */
     public static final String OPERAND_PARAMETER = "operand"; //$NON-NLS-1$
+    private static final String PLUS = "+";
+    private static final String MINUS = "-";
+    private static final String MULTIPLY = "x";
+    private static final String DIVIDE = "/";
 
     /**
      * @see ActionMetadata#getName()
@@ -131,10 +129,33 @@ public class NumericOperations extends ActionMetadata implements ColumnAction, O
     }
 
     @Override
-    public void compile(ActionContext actionContext) {
-        super.compile(actionContext);
-        if (actionContext.getActionStatus() == ActionContext.ActionStatus.OK) {
-            checkParameters(actionContext.getParameters(), actionContext.getInputRowMetadata());
+    public void compile(ActionContext context) {
+        super.compile(context);
+        if (context.getActionStatus() == ActionContext.ActionStatus.OK) {
+            checkParameters(context.getParameters(), context.getRowMetadata());
+            // Create column
+            final Map<String, String> parameters = context.getParameters();
+            final String columnId = context.getColumnId();
+            final RowMetadata rowMetadata = context.getRowMetadata();
+            final ColumnMetadata sourceColumn = rowMetadata.getById(columnId);
+            final String operator = parameters.get(OPERATOR_PARAMETER);
+            String operandName;
+            if (parameters.get(MODE_PARAMETER).equals(CONSTANT_MODE)) {
+                operandName = parameters.get(OPERAND_PARAMETER);
+            } else {
+                final ColumnMetadata selectedColumn = rowMetadata.getById(parameters.get(SELECTED_COLUMN_PARAMETER));
+                operandName = selectedColumn.getName();
+            }
+            context.column("result", (r) -> {
+                final ColumnMetadata c = ColumnMetadata.Builder //
+                        .column() //
+                        .name(sourceColumn.getName() + " " + operator + " " + operandName) //
+                        .type(Type.DOUBLE) //
+                        .build();
+                rowMetadata.insertAfter(columnId, c);
+                return c;
+            });
+
         }
     }
 
@@ -146,34 +167,20 @@ public class NumericOperations extends ActionMetadata implements ColumnAction, O
         final Map<String, String> parameters = context.getParameters();
         final String columnId = context.getColumnId();
 
-        final RowMetadata rowMetadata = row.getRowMetadata();
-        final ColumnMetadata sourceColumn = rowMetadata.getById(columnId);
+        final RowMetadata rowMetadata = context.getRowMetadata();
 
         // extract transformation parameters
         final String operator = parameters.get(OPERATOR_PARAMETER);
         String operand;
-        String operandName;
         if (parameters.get(MODE_PARAMETER).equals(CONSTANT_MODE)) {
             operand = parameters.get(OPERAND_PARAMETER);
-            operandName = operand;
         } else {
             final ColumnMetadata selectedColumn = rowMetadata.getById(parameters.get(SELECTED_COLUMN_PARAMETER));
             operand = row.get(selectedColumn.getId());
-            operandName = selectedColumn.getName();
         }
 
         // column creation
-        final String newColumnId = context.column("result",
-                (r) -> {
-                    final ColumnMetadata c = ColumnMetadata.Builder //
-                            .column() //
-                            .name(sourceColumn.getName() + " " + operator + " " + operandName) //
-                            .type(Type.DOUBLE) //
-                            .build();
-                    rowMetadata.insertAfter(columnId, c);
-                    return c;
-                }
-        );
+        final String newColumnId = context.column("result");
 
         // set new column value
         final String sourceValue = row.get(columnId);
@@ -192,26 +199,25 @@ public class NumericOperations extends ActionMetadata implements ColumnAction, O
             final RoundingMode rm = HALF_UP;
 
             switch (operator) {
-                case PLUS:
+            case PLUS:
                 toReturn = operandOne.add(operandTwo);
-                    break;
-                case MULTIPLY:
+                break;
+            case MULTIPLY:
                 toReturn = operandOne.multiply(operandTwo);
-                    break;
-                case MINUS:
+                break;
+            case MINUS:
                 toReturn = operandOne.subtract(operandTwo);
-                    break;
-                case DIVIDE:
+                break;
+            case DIVIDE:
                 toReturn = operandOne.divide(operandTwo, scale, rm);
-                    break;
-                default:
-                    return "";
+                break;
+            default:
+                return "";
             }
 
             // Format result:
             return toReturn.setScale(scale, rm).stripTrailingZeros().toPlainString();
-        }
-        catch (NumberFormatException | ArithmeticException | NullPointerException e) {
+        } catch (NumberFormatException | ArithmeticException | NullPointerException e) {
             return "";
         }
     }
@@ -221,18 +227,22 @@ public class NumericOperations extends ActionMetadata implements ColumnAction, O
      * the parameter is invalid, an exception is thrown.
      *
      * @param parameters where to look the parameter value.
-     * @param rowMetadata        the row where to look for the column.
+     * @param rowMetadata the row where to look for the column.
      */
     private void checkParameters(Map<String, String> parameters, RowMetadata rowMetadata) {
         if (parameters.get(MODE_PARAMETER).equals(CONSTANT_MODE) && !parameters.containsKey(OPERAND_PARAMETER)) {
-            throw new TDPException(CommonErrorCodes.BAD_ACTION_PARAMETER, ExceptionContext.build().put("paramName",
-                    OPERAND_PARAMETER));
+            throw new TDPException(CommonErrorCodes.BAD_ACTION_PARAMETER,
+                    ExceptionContext.build().put("paramName", OPERAND_PARAMETER));
+        } else if (!parameters.get(MODE_PARAMETER).equals(CONSTANT_MODE) && (!parameters.containsKey(SELECTED_COLUMN_PARAMETER)
+                || rowMetadata.getById(parameters.get(SELECTED_COLUMN_PARAMETER)) == null)) {
+            throw new TDPException(CommonErrorCodes.BAD_ACTION_PARAMETER,
+                    ExceptionContext.build().put("paramName", SELECTED_COLUMN_PARAMETER));
         }
-        else if (!parameters.get(MODE_PARAMETER).equals(CONSTANT_MODE) &&
-                (!parameters.containsKey(SELECTED_COLUMN_PARAMETER) || rowMetadata.getById(parameters.get(SELECTED_COLUMN_PARAMETER)) == null)) {
-            throw new TDPException(CommonErrorCodes.BAD_ACTION_PARAMETER, ExceptionContext.build().put("paramName",
-                    SELECTED_COLUMN_PARAMETER));
-        }
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.METADATA_CREATE_COLUMNS);
     }
 
 }

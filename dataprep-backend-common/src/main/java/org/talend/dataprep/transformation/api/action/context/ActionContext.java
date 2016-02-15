@@ -33,6 +33,10 @@ public class ActionContext {
 
     public enum ActionStatus {
         /**
+         * Indicates action has not yet been executed.
+         */
+        NOT_EXECUTED,
+        /**
          * Indicate action is good for usage and transformation process should continue using this action.
          */
         OK,
@@ -53,17 +57,15 @@ public class ActionContext {
     /** A map of object (used to reuse objects across row process). */
     protected Map<String, Object> context = new HashMap<>();
 
-    private RowMetadata outputRowMetadata;
-
-    private RowMetadata inputRowMetadata;
+    private RowMetadata rowMetadata;
 
     private Map<String, String> parameters = Collections.emptyMap();
 
-    private ActionStatus actionStatus;
+    private ActionStatus actionStatus = ActionStatus.NOT_EXECUTED;
 
     public ActionContext(TransformationContext parent, RowMetadata rowMetadata) {
         this.parent = parent;
-        this.inputRowMetadata = rowMetadata;
+        this.rowMetadata = rowMetadata;
     }
 
     /**
@@ -102,12 +104,21 @@ public class ActionContext {
         if (context.containsKey(key)) {
             return ((ColumnMetadata) context.get(key)).getId();
         } else {
-            final ColumnMetadata columnMetadata = create.apply(inputRowMetadata);
+            final ColumnMetadata columnMetadata = create.apply(rowMetadata);
             if (columnMetadata == null) {
                 throw new IllegalArgumentException("Cannot use a null column for '" + name + "'");
             }
             context.put(key, columnMetadata);
             return columnMetadata.getId();
+        }
+    }
+
+    public String column(String name) {
+        String key = getColumnKey(name);
+        if (context.containsKey(key)) {
+            return ((ColumnMetadata) context.get(key)).getId();
+        } else {
+            throw new IllegalArgumentException("Column '" + name + "' does not exist in action.");
         }
     }
 
@@ -170,20 +181,12 @@ public class ActionContext {
         return new ImmutableActionContext(this);
     }
 
-    public RowMetadata getInputRowMetadata() {
-        return inputRowMetadata;
+    public RowMetadata getRowMetadata() {
+        return rowMetadata;
     }
 
-    public void setOutputRowMetadata(RowMetadata outputRowMetadata) {
-        this.outputRowMetadata = outputRowMetadata;
-    }
-
-    public RowMetadata getOutputRowMetadata() {
-        return outputRowMetadata;
-    }
-
-    public void setInputRowMetadata(RowMetadata inputRowMetadata) {
-        this.inputRowMetadata = inputRowMetadata;
+    public void setRowMetadata(RowMetadata rowMetadata) {
+        this.rowMetadata = rowMetadata;
     }
 
     public void setParameters(Map<String, String> parameters) {
@@ -249,17 +252,7 @@ public class ActionContext {
         }
 
         @Override
-        public void setOutputRowMetadata(RowMetadata outputRowMetadata) {
-            // No op: unable to modify metadata once immutable.
-        }
-
-        @Override
-        public RowMetadata getOutputRowMetadata() {
-            return delegate.getOutputRowMetadata();
-        }
-
-        @Override
-        public void setInputRowMetadata(RowMetadata inputRowMetadata) {
+        public void setRowMetadata(RowMetadata rowMetadata) {
             // No op: unable to modify metadata once immutable.
         }
 
@@ -337,8 +330,8 @@ public class ActionContext {
         }
 
         @Override
-        public RowMetadata getInputRowMetadata() {
-            return delegate.getInputRowMetadata();
+        public RowMetadata getRowMetadata() {
+            return delegate.getRowMetadata();
         }
     }
 }

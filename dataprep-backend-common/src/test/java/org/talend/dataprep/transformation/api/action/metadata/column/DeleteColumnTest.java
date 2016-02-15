@@ -18,11 +18,7 @@ import static org.junit.Assert.*;
 import static org.talend.dataprep.api.dataset.ColumnMetadata.Builder.column;
 import static org.talend.dataprep.transformation.api.action.metadata.ActionMetadataTestUtils.getColumn;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -30,9 +26,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.talend.dataprep.api.dataset.ColumnMetadata;
 import org.talend.dataprep.api.dataset.DataSetRow;
 import org.talend.dataprep.api.dataset.RowMetadata;
+import org.talend.dataprep.api.preparation.Action;
 import org.talend.dataprep.api.type.Type;
 import org.talend.dataprep.transformation.api.action.ActionTestWorkbench;
-import org.talend.dataprep.transformation.api.action.DataSetRowAction;
 import org.talend.dataprep.transformation.api.action.metadata.common.ImplicitParameters;
 import org.talend.dataprep.transformation.api.action.metadata.date.BaseDateTests;
 
@@ -81,13 +77,11 @@ public class DeleteColumnTest extends BaseDateTests {
         parameters.put(ImplicitParameters.COLUMN_ID.getKey().toLowerCase(), "0002");
 
         // when
-        ActionTestWorkbench.test(row, deleteColumn.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, deleteColumn.create(parameters));
 
         // then
         final int rowSize = row.getRowMetadata().getColumns().size();
         assertEquals(1, rowSize);
-        assertFalse(row.values().containsKey("0002"));
-        assertEquals(1, row.values().size());
     }
 
     @Test
@@ -105,7 +99,7 @@ public class DeleteColumnTest extends BaseDateTests {
 
         // when
         parameters.put(ImplicitParameters.COLUMN_ID.getKey().toLowerCase(), "0002");
-        final DataSetRowAction rowAction = deleteColumn.create(parameters).getRowAction();
+        final Action rowAction = deleteColumn.create(parameters);
         ActionTestWorkbench.test(Arrays.asList(row, row2), rowAction);
 
         // then
@@ -113,10 +107,6 @@ public class DeleteColumnTest extends BaseDateTests {
         final int row2Size = row2.getRowMetadata().getColumns().size();
         assertEquals(1, rowSize);
         assertEquals(1, row2Size);
-        assertFalse(row.values().containsKey("0002"));
-        assertFalse(row2.values().containsKey("0002"));
-        assertEquals(1, row.values().size());
-        assertEquals(1, row2.values().size());
     }
 
     @Test
@@ -134,9 +124,9 @@ public class DeleteColumnTest extends BaseDateTests {
 
         // when
         parameters.put(ImplicitParameters.COLUMN_ID.getKey().toLowerCase(), "0002");
-        final DataSetRowAction action1 = deleteColumn.create(parameters).getRowAction();
+        final Action action1 = deleteColumn.create(parameters);
         parameters.put(ImplicitParameters.COLUMN_ID.getKey().toLowerCase(), "0001");
-        final DataSetRowAction action2 = deleteColumn.create(parameters).getRowAction();
+        final Action action2 = deleteColumn.create(parameters);
         ActionTestWorkbench.test(row, action1, action2);
         ActionTestWorkbench.test(row2, action1, action2);
 
@@ -145,10 +135,6 @@ public class DeleteColumnTest extends BaseDateTests {
         final int row2Size = row2.getRowMetadata().getColumns().size();
         assertEquals(0, rowSize);
         assertEquals(0, row2Size);
-        assertFalse(row.values().containsKey("0002"));
-        assertFalse(row2.values().containsKey("0002"));
-        assertEquals(0, row.values().size());
-        assertEquals(0, row2.values().size());
     }
 
     @Test

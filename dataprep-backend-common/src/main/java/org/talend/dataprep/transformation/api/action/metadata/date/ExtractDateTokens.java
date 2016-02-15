@@ -16,9 +16,7 @@ package org.talend.dataprep.transformation.api.action.metadata.date;
 import java.time.DateTimeException;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.annotation.Nonnull;
 
@@ -130,13 +128,40 @@ public class ExtractDateTokens extends AbstractDate implements ColumnAction {
         return ACTION_NAME;
     }
 
+    @Override
+    public void compile(ActionContext context) {
+        super.compile(context);
+        if (context.getActionStatus() == ActionContext.ActionStatus.OK) {
+            final RowMetadata rowMetadata = context.getRowMetadata();
+            final String columnId = context.getColumnId();
+            final Map<String, String> parameters = context.getParameters();
+            final ColumnMetadata column = rowMetadata.getById(columnId);
+            for (DateFieldMappingBean date_field : DATE_FIELDS) {
+                if (Boolean.valueOf(parameters.get(date_field.key))) {
+                    context.column(column.getName() + SEPARATOR + date_field.key, (r) -> {
+                        final ColumnMetadata c = ColumnMetadata.Builder //
+                                .column() //
+                                .name(column.getName() + SEPARATOR + date_field.key) //
+                                .type(Type.INTEGER) //
+                                .empty(column.getQuality().getEmpty()) //
+                                .invalid(column.getQuality().getInvalid()) //
+                                .valid(column.getQuality().getValid()) //
+                                .headerSize(column.getHeaderSize()) //
+                                .build();
+                        rowMetadata.insertAfter(columnId, c);
+                        return c;
+                    });
+                }
+            }
+        }
+    }
 
     /**
      * @see ColumnAction#applyOnColumn(DataSetRow, ActionContext)
      */
     @Override
     public void applyOnColumn(DataSetRow row, ActionContext context) {
-        final RowMetadata rowMetadata = row.getRowMetadata();
+        final RowMetadata rowMetadata = context.getRowMetadata();
         final String columnId = context.getColumnId();
         final Map<String, String> parameters = context.getParameters();
         final ColumnMetadata column = rowMetadata.getById(columnId);
@@ -145,22 +170,7 @@ public class ExtractDateTokens extends AbstractDate implements ColumnAction {
         final Map<String, String> dateFieldColumns = new HashMap<>();
         for (DateFieldMappingBean date_field : DATE_FIELDS) {
             if (Boolean.valueOf(parameters.get(date_field.key))) {
-                final String newColumn = context.column(column.getName() + SEPARATOR + date_field.key,
-                        (r) -> {
-                            final ColumnMetadata c = ColumnMetadata.Builder //
-                                    .column() //
-                                    .name(column.getName() + SEPARATOR + date_field.key) //
-                                    .type(Type.INTEGER) //
-                                    .empty(column.getQuality().getEmpty()) //
-                                    .invalid(column.getQuality().getInvalid()) //
-                                    .valid(column.getQuality().getValid()) //
-                                    .headerSize(column.getHeaderSize()) //
-                                    .build();
-                            rowMetadata.insertAfter(columnId, c);
-                            return c;
-                        }
-                );
-
+                final String newColumn = context.column(column.getName() + SEPARATOR + date_field.key);
                 dateFieldColumns.put(date_field.key, newColumn);
             }
         }
@@ -172,7 +182,7 @@ public class ExtractDateTokens extends AbstractDate implements ColumnAction {
         }
         TemporalAccessor temporalAccessor = null;
         try {
-            temporalAccessor = dateParser.parse(value, row.getRowMetadata().getById(columnId));
+            temporalAccessor = dateParser.parse(value, context.getRowMetadata().getById(columnId));
         } catch (DateTimeException e) {
             // temporalAccessor is left null, this will be used bellow to set empty new value for all fields
             LOGGER.debug("Unable to parse date {}.", value, e);
@@ -189,6 +199,11 @@ public class ExtractDateTokens extends AbstractDate implements ColumnAction {
                 row.set(dateFieldColumns.get(date_field.key), newValue);
             }
         }
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.METADATA_CREATE_COLUMNS);
     }
 
     private static class DateFieldMappingBean {

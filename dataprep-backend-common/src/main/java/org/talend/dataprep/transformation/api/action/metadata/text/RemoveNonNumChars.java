@@ -13,6 +13,9 @@
 
 package org.talend.dataprep.transformation.api.action.metadata.text;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import org.talend.dataprep.api.dataset.ColumnMetadata;
@@ -70,5 +73,10 @@ public class RemoveNonNumChars extends ActionMetadata implements ColumnAction {
             return StringUtils.EMPTY;
         }
         return from.replaceAll("[^0-9., -]", "");
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.VALUES_COLUMN);
     }
 }

@@ -79,8 +79,8 @@ public class DeleteInvalidTest extends BaseDateTests {
 
         final DataSetRow row = new DataSetRow(rowMetadata, values);
 
-        // when
-        ActionTestWorkbench.test(row, deleteInvalid.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, deleteInvalid.create(parameters));
 
         // then
         assertTrue(row.isDeleted());
@@ -108,7 +108,7 @@ public class DeleteInvalidTest extends BaseDateTests {
         final DataSetRow row = new DataSetRow(rowMetadata, values);
 
         // when
-        ActionTestWorkbench.test(row, deleteInvalid.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, deleteInvalid.create(parameters));
 
         // then row is deleted...
         assertTrue(row.isDeleted());
@@ -140,7 +140,7 @@ public class DeleteInvalidTest extends BaseDateTests {
         final DataSetRow row = new DataSetRow(rowMetadata, values);
 
         // when
-        ActionTestWorkbench.test(row, deleteInvalid.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, deleteInvalid.create(parameters));
 
         // then row is deleted...
         assertTrue(row.isDeleted());

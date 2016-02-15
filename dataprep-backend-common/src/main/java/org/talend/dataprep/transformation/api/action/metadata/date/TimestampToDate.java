@@ -16,8 +16,10 @@ package org.talend.dataprep.transformation.api.action.metadata.date;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
@@ -81,24 +83,15 @@ public class TimestampToDate extends ActionMetadata implements ColumnAction, Dat
     }
 
     @Override
-    public void compile(ActionContext actionContext) {
-        super.compile(actionContext);
-        compileDatePattern(actionContext);
-    }
-
-    /**
-     * @see ColumnAction#applyOnColumn(DataSetRow, ActionContext)
-     */
-    @Override
-    public void applyOnColumn(DataSetRow row, ActionContext context) {
+    public void compile(ActionContext context) {
+        super.compile(context);
+        compileDatePattern(context);
+        // create new column and append it after current column
         final String columnId = context.getColumnId();
         final Map<String, String> parameters = context.getParameters();
-
-        // create new column and append it after current column
-        final RowMetadata rowMetadata = row.getRowMetadata();
+        final RowMetadata rowMetadata = context.getRowMetadata();
         final ColumnMetadata column = rowMetadata.getById(columnId);
-
-        final String newColumn = context.column(column.getName() + APPENDIX, (r) -> {
+        context.column(column.getName() + APPENDIX, (r) -> {
             final Type type;
             if ("custom".equals(parameters.get(NEW_PATTERN))) {
                 // Custom pattern might not be detected as a valid date, create the new column as string for the most
@@ -116,6 +109,19 @@ public class TimestampToDate extends ActionMetadata implements ColumnAction, Dat
             rowMetadata.insertAfter(columnId, c);
             return c;
         });
+    }
+
+    /**
+     * @see ColumnAction#applyOnColumn(DataSetRow, ActionContext)
+     */
+    @Override
+    public void applyOnColumn(DataSetRow row, ActionContext context) {
+        final String columnId = context.getColumnId();
+
+        // create new column and append it after current column
+        final RowMetadata rowMetadata = context.getRowMetadata();
+        final ColumnMetadata column = rowMetadata.getById(columnId);
+        final String newColumn = context.column(column.getName() + APPENDIX);
         
         final String value = row.get(columnId);
         row.set(newColumn, getTimeStamp(value, context.<DatePattern>get(COMPILED_DATE_PATTERN).getFormatter()));
@@ -129,6 +135,11 @@ public class TimestampToDate extends ActionMetadata implements ColumnAction, Dat
             // empty value if the date cannot be parsed
             return StringUtils.EMPTY;
         }
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.METADATA_CREATE_COLUMNS);
     }
 
 }

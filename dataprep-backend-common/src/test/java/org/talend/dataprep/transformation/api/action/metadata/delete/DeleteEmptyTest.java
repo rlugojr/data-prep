@@ -76,8 +76,8 @@ public class DeleteEmptyTest extends BaseDateTests {
         values.put("name", "David Bowie");
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertTrue(row.isDeleted());
@@ -92,8 +92,8 @@ public class DeleteEmptyTest extends BaseDateTests {
         values.put("city", null);
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertTrue(row.isDeleted());
@@ -107,8 +107,8 @@ public class DeleteEmptyTest extends BaseDateTests {
         values.put("city", "");
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertTrue(row.isDeleted());
@@ -122,8 +122,8 @@ public class DeleteEmptyTest extends BaseDateTests {
         values.put("city", " ");
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertTrue(row.isDeleted());
@@ -137,8 +137,8 @@ public class DeleteEmptyTest extends BaseDateTests {
         values.put("city", "-");
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertFalse(row.isDeleted());
@@ -154,8 +154,8 @@ public class DeleteEmptyTest extends BaseDateTests {
         values.put("city", " a value ");
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertFalse(row.isDeleted());
@@ -169,8 +169,8 @@ public class DeleteEmptyTest extends BaseDateTests {
         values.put("city", "true");
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertFalse(row.isDeleted());
@@ -184,8 +184,8 @@ public class DeleteEmptyTest extends BaseDateTests {
         values.put("city", "45");
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertFalse(row.isDeleted());
@@ -199,8 +199,8 @@ public class DeleteEmptyTest extends BaseDateTests {
         values.put("city", "-12");
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertFalse(row.isDeleted());
@@ -214,8 +214,8 @@ public class DeleteEmptyTest extends BaseDateTests {
         values.put("city", "0.001");
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertFalse(row.isDeleted());

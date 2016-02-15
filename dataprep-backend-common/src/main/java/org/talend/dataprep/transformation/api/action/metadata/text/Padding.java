@@ -13,8 +13,10 @@
 
 package org.talend.dataprep.transformation.api.action.metadata.text;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
@@ -130,6 +132,11 @@ public class Padding extends ActionMetadata implements ColumnAction {
         } else {
             return Strings.padEnd(from, size, paddingChar);
         }
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.VALUES_COLUMN);
     }
 
 }

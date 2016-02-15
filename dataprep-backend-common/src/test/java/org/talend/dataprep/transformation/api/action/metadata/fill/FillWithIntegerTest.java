@@ -81,7 +81,7 @@ public class FillWithIntegerTest extends BaseDateTests {
                 this.getClass().getResourceAsStream("fillEmptyIntegerAction.json"));
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         Assert.assertEquals("25", row.get("0002"));
@@ -108,7 +108,7 @@ public class FillWithIntegerTest extends BaseDateTests {
                 this.getClass().getResourceAsStream("fillEmptyIntegerAction.json"));
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         Assert.assertEquals("25", row.get("0002"));
@@ -135,7 +135,7 @@ public class FillWithIntegerTest extends BaseDateTests {
         // when
         parameters.put(FillIfEmpty.MODE_PARAMETER, FillIfEmpty.OTHER_COLUMN_MODE);
         parameters.put(FillIfEmpty.SELECTED_COLUMN_PARAMETER, "0003");
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         Assert.assertEquals("10", row.get("0002"));

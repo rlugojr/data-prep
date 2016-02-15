@@ -18,8 +18,10 @@ import static org.talend.dataprep.api.type.Type.STRING;
 import static org.talend.dataprep.transformation.api.action.metadata.category.ActionCategory.STRINGS;
 import static org.talend.dataprep.transformation.api.action.parameters.ParameterType.REGEX;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -121,5 +123,10 @@ public class Cut extends ActionMetadata implements ColumnAction {
             }
         }
     }
-    
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.VALUES_COLUMN);
+    }
+
 }

@@ -76,7 +76,7 @@ public class TypeChangeTest extends BaseDateTests {
         final DataSetRow row = new DataSetRow(rowMetadata, values);
 
         // when
-        ActionTestWorkbench.test(row, typeChange.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, typeChange.create(parameters));
 
         // then
         final ColumnMetadata column = row.getRowMetadata().getColumns().get(0);
@@ -97,7 +97,7 @@ public class TypeChangeTest extends BaseDateTests {
         final DataSetRow row = new DataSetRow(rowMetadata, values);
 
         // when
-        ActionTestWorkbench.test(row, typeChange.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, typeChange.create(parameters));
 
         // then
         final ColumnMetadata column = row.getRowMetadata().getColumns().get(0);
@@ -120,7 +120,7 @@ public class TypeChangeTest extends BaseDateTests {
         final DataSetRow row = new DataSetRow(rowMetadata, values);
 
         // when
-        ActionTestWorkbench.test(row, typeChange.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, typeChange.create(parameters));
 
         // then
         assertThat(row.getRowMetadata().getById("0002").isTypeForced()).isTrue();

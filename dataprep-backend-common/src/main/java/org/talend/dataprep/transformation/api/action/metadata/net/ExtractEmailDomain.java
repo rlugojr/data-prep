@@ -16,6 +16,9 @@ package org.talend.dataprep.transformation.api.action.metadata.net;
 import static org.talend.dataprep.api.dataset.ColumnMetadata.Builder.column;
 import static org.talend.dataprep.api.type.Type.STRING;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import org.talend.dataprep.api.dataset.ColumnMetadata;
@@ -78,6 +81,33 @@ public class ExtractEmailDomain extends ActionMetadata implements ColumnAction {
         return STRING.equals(Type.get(column.getType())) && StringUtils.equalsIgnoreCase("email", column.getDomain());
     }
 
+    @Override
+    public void compile(ActionContext context) {
+        super.compile(context);
+        if (context.getActionStatus() == ActionContext.ActionStatus.OK) {
+            final String columnId = context.getColumnId();
+            final RowMetadata rowMetadata = context.getRowMetadata();
+            final ColumnMetadata column = rowMetadata.getById(columnId);
+            // Perform metadata level actions (add local + domain columns).
+            final String local = context.column(
+                    column.getName() + LOCAL,
+                    (r) -> {
+                        final ColumnMetadata newColumn = column().name(column.getName() + LOCAL).type(Type.STRING).build();
+                        rowMetadata.insertAfter(columnId, newColumn);
+                        return newColumn;
+                    }
+            );
+            context.column(
+                    column.getName() + DOMAIN,
+                    (r) -> {
+                        final ColumnMetadata newColumn = column().name(column.getName() + DOMAIN).type(Type.STRING).build();
+                        rowMetadata.insertAfter(local, newColumn);
+                        return newColumn;
+                    }
+            );
+        }
+    }
+
     /**
      * @see ColumnAction#applyOnColumn(DataSetRow, ActionContext)
      */
@@ -85,25 +115,11 @@ public class ExtractEmailDomain extends ActionMetadata implements ColumnAction {
     public void applyOnColumn(DataSetRow row, ActionContext context) {
         final String columnId = context.getColumnId();
         final String originalValue = row.get(columnId);
-        final RowMetadata rowMetadata = row.getRowMetadata();
+        final RowMetadata rowMetadata = context.getRowMetadata();
         final ColumnMetadata column = rowMetadata.getById(columnId);
         // Perform metadata level actions (add local + domain columns).
-        final String local = context.column(
-                column.getName() + LOCAL,
-                (r) -> {
-                    final ColumnMetadata newColumn = column().name(column.getName() + LOCAL).type(Type.STRING).build();
-                    rowMetadata.insertAfter(columnId, newColumn);
-                    return newColumn;
-                }
-        );
-        final String domain = context.column(
-                column.getName() + DOMAIN,
-                (r) -> {
-                    final ColumnMetadata newColumn = column().name(column.getName() + DOMAIN).type(Type.STRING).build();
-                    rowMetadata.insertAfter(local, newColumn);
-                    return newColumn;
-                }
-        );
+        final String local = context.column(column.getName() + LOCAL);
+        final String domain = context.column(column.getName() + DOMAIN);
         // Set the values in newly created columns
         if (originalValue == null) {
             return;
@@ -113,6 +129,11 @@ public class ExtractEmailDomain extends ActionMetadata implements ColumnAction {
         row.set(local, localPart);
         final String domainPart = split.length >= 2 ? split[1] : StringUtils.EMPTY;
         row.set(domain, domainPart);
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.METADATA_CREATE_COLUMNS);
     }
 
 }

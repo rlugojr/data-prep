@@ -87,8 +87,8 @@ public class ComputeLengthTest extends BaseDateTests {
         expectedValues.put("0003", "5");
         expectedValues.put("0002", "01/01/2015");
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -112,8 +112,8 @@ public class ComputeLengthTest extends BaseDateTests {
         expectedValues.put("0003", "0");
         expectedValues.put("0002", "01/01/2015");
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -138,8 +138,8 @@ public class ComputeLengthTest extends BaseDateTests {
         expectedValues.put("0003", "5");
         expectedValues.put("0002", "01/01/2015");
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction(), action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters), action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -163,8 +163,8 @@ public class ComputeLengthTest extends BaseDateTests {
         expected.add(createMetadata("0003", "steps_length", Type.INTEGER));
         expected.add(createMetadata("0002", "last update"));
 
-        // when
-        ActionTestWorkbench.test(rowMetadata, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(rowMetadata, action.create(parameters));
 
         // then
         assertEquals(expected, rowMetadata.getColumns());
@@ -189,8 +189,8 @@ public class ComputeLengthTest extends BaseDateTests {
         expected.add(createMetadata("0003", "steps_length", Type.INTEGER));
         expected.add(createMetadata("0002", "last update"));
 
-        // when
-        ActionTestWorkbench.test(rowMetadata, action.create(parameters).getRowAction(), action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(rowMetadata, action.create(parameters), action.create(parameters));
 
         // then
         assertEquals(expected, rowMetadata.getColumns());

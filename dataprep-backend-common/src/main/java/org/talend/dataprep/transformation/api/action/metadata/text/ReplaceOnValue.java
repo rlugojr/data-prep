@@ -17,8 +17,10 @@ import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.talend.dataprep.transformation.api.action.parameters.ParameterType.*;
 
 import java.security.InvalidParameterException;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -193,6 +195,11 @@ public class ReplaceOnValue extends ActionMetadata implements ColumnAction, Cell
         } catch (InvalidParameterException e) {
             return originalValue;
         }
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.VALUES_COLUMN);
     }
 
 }

@@ -14,7 +14,6 @@ package org.talend.dataprep.transformation.api.action.metadata.text;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertFalse;
 import static org.talend.dataprep.transformation.api.action.metadata.ActionMetadataTestUtils.getColumn;
 
 import java.io.IOException;
@@ -80,7 +79,7 @@ public class FuzzyMatchingTest extends AbstractMetadataBaseTest {
         parameters.put(OtherColumnParameters.MODE_PARAMETER, OtherColumnParameters.CONSTANT_MODE);
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         Assertions.assertThat(row.values()) //
@@ -101,7 +100,7 @@ public class FuzzyMatchingTest extends AbstractMetadataBaseTest {
         parameters.put(OtherColumnParameters.MODE_PARAMETER, OtherColumnParameters.CONSTANT_MODE);
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         Assertions.assertThat(row.values()) //
@@ -122,7 +121,7 @@ public class FuzzyMatchingTest extends AbstractMetadataBaseTest {
         parameters.put(OtherColumnParameters.MODE_PARAMETER, OtherColumnParameters.CONSTANT_MODE);
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         Assertions.assertThat(row.values()) //
@@ -144,7 +143,7 @@ public class FuzzyMatchingTest extends AbstractMetadataBaseTest {
         parameters.put(OtherColumnParameters.MODE_PARAMETER, OtherColumnParameters.OTHER_COLUMN_MODE);
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         Assertions.assertThat(row.values()) //
@@ -167,7 +166,7 @@ public class FuzzyMatchingTest extends AbstractMetadataBaseTest {
         parameters.put(OtherColumnParameters.MODE_PARAMETER, OtherColumnParameters.OTHER_COLUMN_MODE);
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         Assertions.assertThat(row.values()) //
@@ -190,7 +189,7 @@ public class FuzzyMatchingTest extends AbstractMetadataBaseTest {
         parameters.put(OtherColumnParameters.MODE_PARAMETER, OtherColumnParameters.OTHER_COLUMN_MODE);
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         Assertions.assertThat(row.values()) //

@@ -79,8 +79,8 @@ public class NegateTest extends BaseDateTests {
         values.put("active", "true");
         DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertThat(row.get("active"), is("False"));
@@ -95,8 +95,8 @@ public class NegateTest extends BaseDateTests {
         values.put("active", "false");
         DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertThat(row.get("active"), is("True"));

@@ -20,10 +20,7 @@ import static org.talend.dataprep.transformation.api.action.parameters.Parameter
 import static org.talend.dataprep.transformation.api.action.parameters.ParameterType.STRING;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,13 +145,37 @@ public class Lookup extends ActionMetadata implements DataSetAction {
     }
 
     @Override
-    public void compile(ActionContext actionContext) {
-        super.compile(actionContext);
-        if (actionContext.getActionStatus() == ActionContext.ActionStatus.OK) {
-            List<LookupSelectedColumnParameter> colsToAdd = getColsToAdd(actionContext.getParameters());
+    public void compile(ActionContext context) {
+        super.compile(context);
+        if (context.getActionStatus() == ActionContext.ActionStatus.OK) {
+            List<LookupSelectedColumnParameter> colsToAdd = getColsToAdd(context.getParameters());
             if (colsToAdd.isEmpty()) {
-                actionContext.setActionStatus(ActionContext.ActionStatus.CANCELED);
+                context.setActionStatus(ActionContext.ActionStatus.CANCELED);
             }
+            //
+            LookupRowMatcher rowMatcher = context.get("rowMatcher", (p) -> {
+                String dsUrl = getDataSetUrl(p.get(LOOKUP_DS_ID.getKey()));
+                return applicationContext.getBean(LookupRowMatcher.class, dsUrl);
+            });
+            // Create lookup result columns
+            final Map<String, String> parameters = context.getParameters();
+            final String columnId = parameters.get(COLUMN_ID.getKey());
+            final RowMetadata lookupRowMetadata = rowMatcher.getRowMetadata();
+            final RowMetadata rowMetadata = context.getRowMetadata();
+            colsToAdd.forEach(toAdd -> {
+                // create the new column
+                final String toAddColumnId = toAdd.getId();
+                final ColumnMetadata metadata = lookupRowMetadata.getById(toAddColumnId);
+                context.column(toAddColumnId, r -> {
+                    final ColumnMetadata colMetadata = ColumnMetadata.Builder //
+                            .column() //
+                            .copy(metadata) //
+                            .computedId(null) // id should be set by the insertAfter method
+                            .build();
+                    rowMetadata.insertAfter(columnId, colMetadata);
+                    return colMetadata;
+                });
+            });
         }
     }
 
@@ -171,37 +192,19 @@ public class Lookup extends ActionMetadata implements DataSetAction {
         String joinOn = parameters.get(LOOKUP_JOIN_ON.getKey());
 
         // get the rowMatcher from context
-        LookupRowMatcher rowMatcher = context.get("rowMatcher",
- (p) -> {
-            String dsUrl = getDataSetUrl(p.get(LOOKUP_DS_ID.getKey()));
-            return applicationContext.getBean(LookupRowMatcher.class, dsUrl);
-        });
+        LookupRowMatcher rowMatcher = context.get("rowMatcher");
 
         // get the matching lookup row
         DataSetRow matchingRow = rowMatcher.getMatchingRow(joinOn, joinValue);
 
         // get the columns to add
         List<LookupSelectedColumnParameter> colsToAdd = getColsToAdd(parameters);
-
-        final RowMetadata rowMetadata = row.getRowMetadata();
         colsToAdd.forEach(toAdd -> {
-
-            // create the new column
-            String newColId = context.column(matchingRow.getRowMetadata().getById(toAdd.getId()).getName(),
-                    (r) -> {
-                final ColumnMetadata colMetadata = ColumnMetadata.Builder //
-                        .column() //
-                        .copy(matchingRow.getRowMetadata().getById(toAdd.getId())) //
-                        .computedId(null) // id should be set by the insertAfter method
-                        .build();
-                rowMetadata.insertAfter(columnId, colMetadata);
-                return colMetadata;
-            });
-
+            // get the new column
+            String newColId = context.column(toAdd.getId());
             // insert new row value
             row.set(newColId, matchingRow.get(toAdd.getId()));
         });
-
     }
 
     /**
@@ -227,6 +230,11 @@ public class Lookup extends ActionMetadata implements DataSetAction {
             LOGGER.debug("Unable to parse parameter.", e);
             return Collections.emptyList();
         }
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.METADATA_CREATE_COLUMNS);
     }
 
 }

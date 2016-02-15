@@ -423,7 +423,7 @@ public class PreparationServiceTest {
         final Step head = repository.get(expectedStepId, Step.class);
         final PreparationActions headAction = repository.get(head.getContent(), PreparationActions.class);
         assertThat(headAction.getActions(), hasSize(1));
-        assertThat(headAction.getActions().get(0).getAction(), is("copy"));
+        assertThat(headAction.getActions().get(0).getName(), is("copy"));
     }
 
     @Test
@@ -449,7 +449,7 @@ public class PreparationServiceTest {
         final PreparationActions headAction = repository.get(head.getContent(), PreparationActions.class);
         assertThat(headAction.getActions(), hasSize(1));
         final Action copyAction = headAction.getActions().get(0);
-        assertThat(copyAction.getAction(), is("copy"));
+        assertThat(copyAction.getName(), is("copy"));
         assertThat(copyAction.getParameters().get(ImplicitParameters.FILTER.getKey()),
                 is("{\"eq\":{\"field\":\"0001\",\"value\":\"value\"}}"));
     }
@@ -643,8 +643,8 @@ public class PreparationServiceTest {
         Step head = repository.get(secondStepId, Step.class);
         PreparationActions headActions = repository.get(head.getContent(), PreparationActions.class);
         assertThat(headActions.getActions(), hasSize(2));
-        assertThat(headActions.getActions().get(0).getAction(), is("uppercase"));
-        assertThat(headActions.getActions().get(1).getAction(), is("lowercase"));
+        assertThat(headActions.getActions().get(0).getName(), is("uppercase"));
+        assertThat(headActions.getActions().get(1).getName(), is("lowercase"));
 
         // when : delete second step in single mode
         when().delete("/preparations/{id}/actions/{action}", preparationId, firstStepId)//
@@ -658,7 +658,7 @@ public class PreparationServiceTest {
         head = repository.get(headId, Step.class);
         headActions = repository.get(head.getContent(), PreparationActions.class);
         assertThat(headActions.getActions(), hasSize(1));
-        assertThat(headActions.getActions().get(0).getAction(), is("lowercase"));
+        assertThat(headActions.getActions().get(0).getName(), is("lowercase"));
     }
 
     @Test
@@ -673,10 +673,10 @@ public class PreparationServiceTest {
         Step head = repository.get(headStepId, Step.class);
         PreparationActions headActions = repository.get(head.getContent(), PreparationActions.class);
         assertThat(headActions.getActions(), hasSize(4));
-        assertThat(headActions.getActions().get(0).getAction(), is("uppercase"));
-        assertThat(headActions.getActions().get(1).getAction(), is("copy"));
-        assertThat(headActions.getActions().get(2).getAction(), is("rename_column"));
-        assertThat(headActions.getActions().get(3).getAction(), is("lowercase"));
+        assertThat(headActions.getActions().get(0).getName(), is("uppercase"));
+        assertThat(headActions.getActions().get(1).getName(), is("copy"));
+        assertThat(headActions.getActions().get(2).getName(), is("rename_column"));
+        assertThat(headActions.getActions().get(3).getName(), is("lowercase"));
 
         // when : delete second step in single mode
         when().delete("/preparations/{id}/actions/{action}", preparationId, copyStepId)//
@@ -690,8 +690,8 @@ public class PreparationServiceTest {
         head = repository.get(newHeadStepId, Step.class);
         headActions = repository.get(head.getContent(), PreparationActions.class);
         assertThat(headActions.getActions(), hasSize(2));
-        assertThat(headActions.getActions().get(0).getAction(), is("uppercase"));
-        assertThat(headActions.getActions().get(1).getAction(), is("lowercase"));
+        assertThat(headActions.getActions().get(0).getName(), is("uppercase"));
+        assertThat(headActions.getActions().get(1).getName(), is("lowercase"));
     }
 
     @Test
@@ -708,12 +708,12 @@ public class PreparationServiceTest {
         Step head = repository.get(headStepId, Step.class);
         PreparationActions headActions = repository.get(head.getContent(), PreparationActions.class);
         assertThat(headActions.getActions(), hasSize(6));
-        assertThat(headActions.getActions().get(0).getAction(), is("uppercase"));
-        assertThat(headActions.getActions().get(1).getAction(), is("copy"));
-        assertThat(headActions.getActions().get(2).getAction(), is("rename_column"));
-        assertThat(headActions.getActions().get(3).getAction(), is("copy"));
-        assertThat(headActions.getActions().get(4).getAction(), is("rename_column"));
-        assertThat(headActions.getActions().get(5).getAction(), is("lowercase"));
+        assertThat(headActions.getActions().get(0).getName(), is("uppercase"));
+        assertThat(headActions.getActions().get(1).getName(), is("copy"));
+        assertThat(headActions.getActions().get(2).getName(), is("rename_column"));
+        assertThat(headActions.getActions().get(3).getName(), is("copy"));
+        assertThat(headActions.getActions().get(4).getName(), is("rename_column"));
+        assertThat(headActions.getActions().get(5).getName(), is("lowercase"));
 
         // when : delete second step in single mode
         when().delete("/preparations/{id}/actions/{action}", preparationId, copyStepId)//
@@ -727,10 +727,10 @@ public class PreparationServiceTest {
         head = repository.get(newHeadStepId, Step.class);
         headActions = repository.get(head.getContent(), PreparationActions.class);
         assertThat(headActions.getActions(), hasSize(4));
-        assertThat(headActions.getActions().get(0).getAction(), is("uppercase"));
-        assertThat(headActions.getActions().get(1).getAction(), is("copy"));
-        assertThat(headActions.getActions().get(2).getAction(), is("rename_column"));
-        assertThat(headActions.getActions().get(3).getAction(), is("lowercase"));
+        assertThat(headActions.getActions().get(0).getName(), is("uppercase"));
+        assertThat(headActions.getActions().get(1).getName(), is("copy"));
+        assertThat(headActions.getActions().get(2).getName(), is("rename_column"));
+        assertThat(headActions.getActions().get(3).getName(), is("lowercase"));
 
         final Map<String, String> renameColumnFirstnameParameters = headActions.getActions().get(2).getParameters();
         assertThat(renameColumnFirstnameParameters.get("column_name"), is("firstname")); // check we have the rename

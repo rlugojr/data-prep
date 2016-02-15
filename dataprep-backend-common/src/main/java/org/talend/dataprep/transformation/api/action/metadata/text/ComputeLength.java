@@ -13,6 +13,9 @@
 
 package org.talend.dataprep.transformation.api.action.metadata.text;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.springframework.stereotype.Component;
 import org.talend.dataprep.api.dataset.ColumnMetadata;
 import org.talend.dataprep.api.dataset.DataSetRow;
@@ -60,32 +63,48 @@ public class ComputeLength extends ActionMetadata implements ColumnAction {
         return ActionCategory.STRINGS.getDisplayName();
     }
 
+    @Override
+    public void compile(ActionContext context) {
+        super.compile(context);
+        if (context.getActionStatus() == ActionContext.ActionStatus.OK) {
+            final RowMetadata rowMetadata = context.getRowMetadata();
+            final String columnId = context.getColumnId();
+            final ColumnMetadata column = rowMetadata.getById(columnId);
+            context.column(column.getName() + APPENDIX, (r) -> {
+                final ColumnMetadata c = ColumnMetadata.Builder //
+                        .column() //
+                        .name(column.getName() + APPENDIX) //
+                        .type(Type.INTEGER) //
+                        .empty(column.getQuality().getEmpty()) //
+                        .invalid(column.getQuality().getInvalid()) //
+                        .valid(column.getQuality().getValid()) //
+                        .headerSize(column.getHeaderSize()) //
+                        .build();
+                rowMetadata.insertAfter(columnId, c);
+                return c;
+            });
+
+        }
+    }
+
     /**
      * @see ColumnAction#applyOnColumn(DataSetRow, ActionContext)
      */
     @Override
     public void applyOnColumn(DataSetRow row, ActionContext context) {
         // create new column and append it after current column
-        final RowMetadata rowMetadata = row.getRowMetadata();
+        final RowMetadata rowMetadata = context.getRowMetadata();
         final String columnId = context.getColumnId();
         final ColumnMetadata column = rowMetadata.getById(columnId);
-        final String lengthColumn = context.column(column.getName() + APPENDIX, (r) -> {
-            final ColumnMetadata c = ColumnMetadata.Builder //
-                    .column() //
-                    .name(column.getName() + APPENDIX) //
-                    .type(Type.INTEGER) //
-                    .empty(column.getQuality().getEmpty()) //
-                    .invalid(column.getQuality().getInvalid()) //
-                    .valid(column.getQuality().getValid()) //
-                    .headerSize(column.getHeaderSize()) //
-                    .build();
-            rowMetadata.insertAfter(columnId, c);
-            return c;
-        });
+        final String lengthColumn = context.column(column.getName() + APPENDIX);
 
         // Set length value
         final String value = row.get(columnId);
         row.set(lengthColumn, value == null ? "0" : String.valueOf(value.length()));
     }
 
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.METADATA_CREATE_COLUMNS);
+    }
 }

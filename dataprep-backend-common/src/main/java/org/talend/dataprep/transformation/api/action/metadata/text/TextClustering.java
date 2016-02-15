@@ -13,6 +13,9 @@
 
 package org.talend.dataprep.transformation.api.action.metadata.text;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.springframework.stereotype.Component;
 import org.talend.dataprep.api.dataset.ColumnMetadata;
 import org.talend.dataprep.api.dataset.DataSetRow;
@@ -75,5 +78,10 @@ public class TextClustering extends ActionMetadata implements ColumnAction {
         if (replaceValue != null) {
             row.set(columnId, replaceValue);
         }
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.VALUES_COLUMN);
     }
 }

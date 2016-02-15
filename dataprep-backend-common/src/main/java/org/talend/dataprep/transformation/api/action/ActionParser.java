@@ -14,6 +14,7 @@
 package org.talend.dataprep.transformation.api.action;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -33,11 +34,6 @@ import org.talend.dataprep.transformation.api.action.metadata.common.ActionMetad
 @Component
 public class ActionParser {
 
-    /** No op parsed actions. */
-    //@formatter:off
-    public static final ParsedActions IDLE_CONSUMER = new ParsedActions(Action.IDLE_ROW_ACTION);
-    //@formatter:on
-
     /** The dataprep ready jackson builder. */
     @Autowired
     private Jackson2ObjectMapperBuilder builder;
@@ -52,28 +48,29 @@ public class ActionParser {
      * @param actions the actions to be parsed as string.
      * @return the parsed actions.
      */
-    public ParsedActions parse(String actions) {
+    public List<Action> parse(String actions) {
         if (actions == null) {
             // Actions cannot be null (but can be empty string for no op actions).
             throw new IllegalArgumentException("Actions parameter can not be null.");
         }
         try {
             if (StringUtils.isEmpty(actions)) {
-                return IDLE_CONSUMER;
+                return Collections.emptyList();
             }
             // Parse action JSON
             final Actions parsedActions = builder.build().readerFor(Actions.class).readValue(actions);
             // Create closures from parsed actions
-            List<DataSetRowAction> rowActions = new ArrayList<>();
             final List<Action> allActions = parsedActions.getActions();
-            for (Action parsedAction : allActions) {
-                final String name = ActionMetadata.ACTION_BEAN_PREFIX + parsedAction.getAction().toLowerCase();
-                final ActionMetadata metadata = context.getBean(name, ActionMetadata.class);
-                final Action action = metadata.create(parsedAction.getParameters());
-                rowActions.add(action.getRowAction());
+            final List<Action> builtActions = new ArrayList<>(allActions.size() + 1);
+            for (Action parsedAction : parsedActions.getActions()) {
+                if (parsedAction != null && parsedAction.getName() != null) {
+                    final String name = ActionMetadata.ACTION_BEAN_PREFIX + parsedAction.getName().toLowerCase();
+                    final ActionMetadata metadata = context.getBean(name, ActionMetadata.class);
+                    builtActions.add(metadata.create(parsedAction.getParameters()));
+                }
             }
             // all set: wraps everything and return to caller
-            return new ParsedActions(allActions, rowActions);
+            return builtActions;
         } catch (Exception e) {
             throw new TDPException(CommonErrorCodes.UNABLE_TO_PARSE_JSON, e);
         }

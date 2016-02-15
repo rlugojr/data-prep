@@ -75,7 +75,7 @@ public class RoundCeilTest extends BaseDateTests {
         final DataSetRow row = new DataSetRow(values);
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expected, row.get("aNumber"));

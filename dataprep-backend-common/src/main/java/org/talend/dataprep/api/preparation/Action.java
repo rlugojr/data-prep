@@ -24,12 +24,15 @@ import org.talend.dataprep.transformation.api.action.DataSetRowAction;
 import org.talend.dataprep.transformation.api.action.context.ActionContext;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonRootName;
 
 /**
  * Class used to wrap DataSetRowAction into json.
  */
 @JsonRootName("action")
+@JsonPropertyOrder(value = {"action", "parameters"})
 public class Action implements Serializable {
 
     /** Serialization UID. */
@@ -67,14 +70,17 @@ public class Action implements Serializable {
     /**
      * @return the json description of the action.
      */
-    public String getAction() {
+    @JsonProperty("action")
+
+    public String getName() {
         return action;
     }
 
     /**
      * @param action the json description of the action to set.
      */
-    public void setAction(String action) {
+    @JsonProperty("action")
+    public void setName(String action) {
         this.action = action;
     }
 
@@ -137,6 +143,10 @@ public class Action implements Serializable {
 
         private Consumer<ActionContext> compile = ac -> ac.setActionStatus(ActionContext.ActionStatus.OK);
 
+        private Map<String, String> parameters;
+
+        private String name;
+
         /**
          * @return the Builder to use.
          */
@@ -168,11 +178,24 @@ public class Action implements Serializable {
                     compile.accept(actionContext);
                 }
             };
-            return new Action(newAction);
+            final Action builtAction = new Action(newAction);
+            builtAction.getParameters().putAll(parameters);
+            builtAction.setName(name);
+            return builtAction;
         }
 
         public Builder withCompile(Consumer<ActionContext> compile) {
             this.compile = compile;
+            return this;
+        }
+
+        public Builder withParameters(Map<String, String> parameters) {
+            this.parameters = parameters;
+            return this;
+        }
+
+        public Builder withName(String name) {
+            this.name = name;
             return this;
         }
     }

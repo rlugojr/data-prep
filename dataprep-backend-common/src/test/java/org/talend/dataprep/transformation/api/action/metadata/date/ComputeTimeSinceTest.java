@@ -94,7 +94,7 @@ public class ComputeTimeSinceTest extends BaseDateTests {
         expectedValues.put("0002", "Bacon");
 
         //when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         //then
         assertEquals(expectedValues, row.values());
@@ -116,7 +116,7 @@ public class ComputeTimeSinceTest extends BaseDateTests {
         expectedValues.put("0002", "Bacon");
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -138,7 +138,7 @@ public class ComputeTimeSinceTest extends BaseDateTests {
         expectedValues.put("0002", "Bacon");
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -165,7 +165,7 @@ public class ComputeTimeSinceTest extends BaseDateTests {
         parameters.put(TIME_UNIT_PARAMETER, DAYS.name());
 
         //when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         //then
         assertEquals(expectedValues, row.values());
@@ -192,7 +192,7 @@ public class ComputeTimeSinceTest extends BaseDateTests {
         parameters.put(TIME_UNIT_PARAMETER, HOURS.name());
 
         //when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         //then
         assertEquals(expectedValues, row.values());
@@ -219,7 +219,7 @@ public class ComputeTimeSinceTest extends BaseDateTests {
         parameters.put(TIME_UNIT_PARAMETER, HOURS.name());
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -244,7 +244,7 @@ public class ComputeTimeSinceTest extends BaseDateTests {
         parameters.put(TIME_UNIT_PARAMETER, HOURS.name());
 
         //when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction(), action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters), action.create(parameters));
 
         //then
         assertEquals(expectedValues, row.values());
@@ -269,10 +269,10 @@ public class ComputeTimeSinceTest extends BaseDateTests {
 
         //when
         parameters.put(TIME_UNIT_PARAMETER, YEARS.name());
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         parameters.put(TIME_UNIT_PARAMETER, MONTHS.name());
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         //then
         assertEquals(expectedValues, row.values());
@@ -295,7 +295,7 @@ public class ComputeTimeSinceTest extends BaseDateTests {
         parameters.put(TIME_UNIT_PARAMETER, DAYS.name());
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -316,7 +316,7 @@ public class ComputeTimeSinceTest extends BaseDateTests {
         expected.add(createMetadata("0002", "steps"));
 
         //when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         //then
         assertEquals(expected, row.getRowMetadata().getColumns());
@@ -338,7 +338,7 @@ public class ComputeTimeSinceTest extends BaseDateTests {
         expected.add(createMetadata("0002", "steps"));
 
         //when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction(), action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters), action.create(parameters));
 
         //then
         assertEquals(expected, row.getRowMetadata().getColumns());
@@ -361,10 +361,10 @@ public class ComputeTimeSinceTest extends BaseDateTests {
 
         //when
         parameters.put(TIME_UNIT_PARAMETER, YEARS.name());
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         parameters.put(TIME_UNIT_PARAMETER, DAYS.name());
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         //then
         assertEquals(expected, row.getRowMetadata().getColumns());

@@ -106,8 +106,8 @@ public class RenameTest extends BaseDateTests {
         final List<ColumnMetadata> expected = new ArrayList<>();
         expected.add(renamedMetadata);
 
-        // when
-        ActionTestWorkbench.test(rowMetadata, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(rowMetadata, action.create(parameters));
 
         // then
         assertEquals(expected, rowMetadata.getColumns());

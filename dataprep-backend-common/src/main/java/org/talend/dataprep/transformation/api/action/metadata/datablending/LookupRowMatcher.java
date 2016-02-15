@@ -164,6 +164,10 @@ public class LookupRowMatcher implements DisposableBean {
         return this.emptyRow;
     }
 
+    public RowMetadata getRowMetadata() {
+        return emptyRow.getRowMetadata();
+    }
+
     /**
      * Return an empty default row based on the given dataset metadata.
      *

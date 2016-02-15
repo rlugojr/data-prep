@@ -91,7 +91,7 @@ public class ExtractDateTokensTest extends BaseDateTests {
         expectedValues.put("0002", "tata");
 
         //when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -117,7 +117,7 @@ public class ExtractDateTokensTest extends BaseDateTests {
         expectedValues.put("0002", "tata");
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -146,7 +146,7 @@ public class ExtractDateTokensTest extends BaseDateTests {
         expectedValues.put("0002", "tata");
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -175,7 +175,7 @@ public class ExtractDateTokensTest extends BaseDateTests {
         expectedValues.put("0002", "tata");
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -194,7 +194,7 @@ public class ExtractDateTokensTest extends BaseDateTests {
         input.get(1).setStatistics(statistics);
 
         // when
-        ActionTestWorkbench.test(rowMetadata, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(rowMetadata, action.create(parameters));
 
         // then
         assertNotNull(rowMetadata.getById("0003"));

@@ -74,8 +74,8 @@ public class RoundHalfUpTest extends BaseDateTests {
         values.put("aNumber", input);
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expected, row.get("aNumber"));

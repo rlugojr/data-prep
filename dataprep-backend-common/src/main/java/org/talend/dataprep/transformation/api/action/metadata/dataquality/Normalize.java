@@ -14,6 +14,8 @@
 package org.talend.dataprep.transformation.api.action.metadata.dataquality;
 
 import java.text.Normalizer;
+import java.util.EnumSet;
+import java.util.Set;
 
 import org.springframework.stereotype.Component;
 import org.talend.dataprep.api.dataset.ColumnMetadata;
@@ -117,5 +119,10 @@ public class Normalize extends ActionMetadata implements ColumnAction {
         // we do not need to convert the string back to composed Unicode
         // before returning it.
         return result.toString().trim();
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.VALUES_COLUMN);
     }
 }

@@ -14,6 +14,8 @@ package org.talend.dataprep.transformation.api.action.metadata.math;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.EnumSet;
+import java.util.Set;
 
 import org.talend.daikon.number.BigDecimalParser;
 import org.talend.dataprep.api.dataset.ColumnMetadata;
@@ -65,5 +67,10 @@ public abstract class AbstractRound extends ActionMetadata implements ColumnActi
         Type columnType = Type.get(column.getType());
         // in order to 'clean' integer typed columns, this function needs to be allowed on any numeric types
         return Type.NUMERIC.isAssignableFrom(columnType);
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.VALUES_COLUMN);
     }
 }

@@ -13,6 +13,9 @@
 
 package org.talend.dataprep.transformation.api.action.metadata.text;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.apache.commons.lang.WordUtils;
 import org.springframework.stereotype.Component;
 import org.talend.dataprep.api.dataset.ColumnMetadata;
@@ -53,5 +56,10 @@ public class ProperCase extends ActionMetadata implements ColumnAction {
         if (toProperCase != null) {
             row.set(columnId, WordUtils.capitalizeFully(toProperCase));
         }
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.VALUES_COLUMN);
     }
 }

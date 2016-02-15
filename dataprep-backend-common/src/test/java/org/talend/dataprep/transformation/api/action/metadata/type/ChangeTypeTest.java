@@ -59,7 +59,7 @@ public class ChangeTypeTest extends BaseDateTests {
         parameters.put(ImplicitParameters.COLUMN_ID.getKey().toLowerCase(), "0002");
 
         // when
-        ActionTestWorkbench.test(row, typeChange.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, typeChange.create(parameters));
 
         // then
         Assertions.assertThat(row.getRowMetadata().getColumns().get(0).getDomain()).isEmpty();

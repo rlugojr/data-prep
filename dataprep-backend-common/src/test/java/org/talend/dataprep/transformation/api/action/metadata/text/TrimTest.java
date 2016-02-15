@@ -70,8 +70,8 @@ public class TrimTest extends BaseDateTests {
         values.put("band", " the beatles ");
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals("the beatles", row.get("band"));
@@ -84,8 +84,8 @@ public class TrimTest extends BaseDateTests {
         values.put("band", "The  Beatles");
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals("The  Beatles", row.get("band"));
@@ -98,8 +98,8 @@ public class TrimTest extends BaseDateTests {
         values.put("bando", "the beatles");
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals("the beatles", row.get("bando"));

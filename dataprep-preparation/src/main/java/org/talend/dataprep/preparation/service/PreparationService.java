@@ -481,7 +481,7 @@ public class PreparationService {
      */
     private void checkActionStepConsistency(final AppendStep step) {
         for (final Action stepAction : step.getActions()) {
-            validator.checkScopeConsistency(stepAction.getAction(), stepAction.getParameters());
+            validator.checkScopeConsistency(stepAction.getName(), stepAction.getParameters());
         }
     }
 

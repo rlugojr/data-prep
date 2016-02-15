@@ -80,8 +80,8 @@ public class MakeLineHeaderTest extends BaseDateTests {
         assertThat(row1.isDeleted(), is(false));
         assertThat(row2.isDeleted(), is(false));
 
-        // when
-        ActionTestWorkbench.test(row2, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row2, action.create(parameters));
 
         // then
         assertThat(row1.isDeleted(), is(false));
@@ -126,11 +126,11 @@ public class MakeLineHeaderTest extends BaseDateTests {
         upperCaseParameters.put(ImplicitParameters.SCOPE.getKey().toLowerCase(), "column");
         upperCaseParameters.put(ImplicitParameters.COLUMN_ID.getKey().toLowerCase(), "0000");
         final Action upperCase = new UpperCase().create(upperCaseParameters);
-        ActionTestWorkbench.test(Arrays.asList(row1, row2, row3), makeHeader.getRowAction(), upperCase.getRowAction());
+        ActionTestWorkbench.test(Arrays.asList(row1, row2, row3), makeHeader, upperCase);
 
         // then
-        assertEquals("0000", row1.getRowMetadata().getById("0000").getName());
-        assertEquals("0001", row1.getRowMetadata().getById("0001").getName());
+        assertEquals("John", row1.getRowMetadata().getById("0000").getName());
+        assertEquals("Lennon", row1.getRowMetadata().getById("0001").getName());
         assertEquals("John", row2.getRowMetadata().getById("0000").getName());
         assertEquals("Lennon", row2.getRowMetadata().getById("0001").getName());
         assertEquals("John", row3.getRowMetadata().getById("0000").getName());

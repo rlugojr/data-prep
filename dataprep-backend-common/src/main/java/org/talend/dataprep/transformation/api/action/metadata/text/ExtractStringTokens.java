@@ -18,10 +18,7 @@ import static org.talend.dataprep.transformation.api.action.metadata.category.Ac
 import static org.talend.dataprep.transformation.api.action.parameters.ParameterType.INTEGER;
 import static org.talend.dataprep.transformation.api.action.parameters.ParameterType.STRING;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -124,26 +121,52 @@ public class ExtractStringTokens extends ActionMetadata implements ColumnAction 
      * @see ActionMetadata#compile(ActionContext)
      */
     @Override
-    public void compile(ActionContext actionContext) {
-        super.compile(actionContext);
-        if (actionContext.getActionStatus() == ActionContext.ActionStatus.OK) {
+    public void compile(ActionContext context) {
+        super.compile(context);
+        if (context.getActionStatus() == ActionContext.ActionStatus.OK) {
 
-            final String regex = actionContext.getParameters().get(PARAMETER_REGEX);
+            final String regex = context.getParameters().get(PARAMETER_REGEX);
 
             // Validate the regex, and put it in context once for all lines:
             // Check 1: not null or empty
             if (StringUtils.isEmpty(regex)) {
                 LOGGER.debug("Empty pattern, action canceled");
-                actionContext.setActionStatus(ActionContext.ActionStatus.CANCELED);
+                context.setActionStatus(ActionContext.ActionStatus.CANCELED);
                 return;
             }
             // Check 2: valid regex
             try {
-                actionContext.get(PATTERN, (p) -> Pattern.compile(regex));
+                context.get(PATTERN, (p) -> Pattern.compile(regex));
             } catch (PatternSyntaxException e) {
-                LOGGER.debug("Invalid pattern {} --> {}, action canceled", regex, e.getMessage());
-                actionContext.setActionStatus(ActionContext.ActionStatus.CANCELED);
+                LOGGER.debug("Invalid pattern {} --> {}, action canceled", regex, e.getMessage(), e);
+                context.setActionStatus(ActionContext.ActionStatus.CANCELED);
             }
+            // Create result column
+            final Map<String, String> parameters = context.getParameters();
+            final String columnId = context.getColumnId();
+
+            // create the new columns
+            int limit = (parameters.get(MODE_PARAMETER).equals(MULTIPLE_COLUMNS_MODE) ? Integer.parseInt(parameters.get(LIMIT)) : 1);
+
+            final RowMetadata rowMetadata = context.getRowMetadata();
+            final ColumnMetadata column = rowMetadata.getById(columnId);
+            final List<String> newColumns = new ArrayList<>();
+            final Deque<String> lastColumnId = new ArrayDeque<>();
+            lastColumnId.push(columnId);
+            for (int i = 0; i < limit; i++) {
+                final int newColumnIndex = i + 1;
+                newColumns.add(context.column(column.getName() + APPENDIX + i, (r) -> {
+                    final ColumnMetadata c = ColumnMetadata.Builder //
+                            .column() //
+                            .type(Type.STRING) //
+                            .computedId(StringUtils.EMPTY) //
+                            .name(column.getName() + APPENDIX + newColumnIndex) //
+                            .build();
+                    lastColumnId.push(rowMetadata.insertAfter(lastColumnId.pop(), c));
+                    return c;
+                }));
+            }
+
         }
     }
 
@@ -158,23 +181,11 @@ public class ExtractStringTokens extends ActionMetadata implements ColumnAction 
         // create the new columns
         int limit = (parameters.get(MODE_PARAMETER).equals(MULTIPLE_COLUMNS_MODE) ? Integer.parseInt(parameters.get(LIMIT)) : 1);
 
-        final RowMetadata rowMetadata = row.getRowMetadata();
+        final RowMetadata rowMetadata = context.getRowMetadata();
         final ColumnMetadata column = rowMetadata.getById(columnId);
         final List<String> newColumns = new ArrayList<>();
-        final Stack<String> lastColumnId = new Stack<>();
-        lastColumnId.push(columnId);
         for (int i = 0; i < limit; i++) {
-            final int newColumnIndex = i + 1;
-            newColumns.add(context.column(column.getName() + APPENDIX + i, (r) -> {
-                final ColumnMetadata c = ColumnMetadata.Builder //
-                        .column() //
-                        .type(Type.STRING) //
-                        .computedId(StringUtils.EMPTY) //
-                        .name(column.getName() + APPENDIX + newColumnIndex) //
-                        .build();
-                lastColumnId.push(rowMetadata.insertAfter(lastColumnId.pop(), c));
-                return c;
-            }));
+            newColumns.add(context.column(column.getName() + APPENDIX + i));
         }
 
         // Set the split values in newly created columns
@@ -210,6 +221,11 @@ public class ExtractStringTokens extends ActionMetadata implements ColumnAction 
             strBuilder.appendWithSeparators(extractedValues, parameters.get(PARAMETER_SEPARATOR));
             row.set(newColumns.get(0), strBuilder.toString());
         }
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.METADATA_CREATE_COLUMNS);
     }
 
 }

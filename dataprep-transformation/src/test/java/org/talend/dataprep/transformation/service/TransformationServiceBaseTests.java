@@ -42,7 +42,7 @@ import com.jayway.restassured.response.Response;
  */
 public abstract class TransformationServiceBaseTests extends TransformationBaseTest {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(TransformationServiceBaseTests.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TransformationServiceBaseTests.class);
 
     @Autowired
     private TransformationServiceUrlRuntimeUpdater urlUpdater;

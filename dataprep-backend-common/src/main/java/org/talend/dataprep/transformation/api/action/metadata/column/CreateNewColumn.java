@@ -15,9 +15,7 @@ package org.talend.dataprep.transformation.api.action.metadata.column;
 
 import static org.talend.dataprep.transformation.api.action.metadata.category.ActionScope.COLUMN_METADATA;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
@@ -128,10 +126,24 @@ public class CreateNewColumn extends ActionMetadata implements ColumnAction {
     }
 
     @Override
-    public void compile(ActionContext actionContext) {
-        super.compile(actionContext);
-        if (actionContext.getActionStatus() == ActionContext.ActionStatus.OK) {
-            checkParameters(actionContext.getParameters(), actionContext.getInputRowMetadata());
+    public void compile(ActionContext context) {
+        super.compile(context);
+        if (context.getActionStatus() == ActionContext.ActionStatus.OK) {
+            checkParameters(context.getParameters(), context.getRowMetadata());
+            // Create new column
+            final RowMetadata rowMetadata = context.getRowMetadata();
+            final String columnId = context.getColumnId();
+            final Map<String, String> parameters = context.getParameters();
+            final String newColumnName = evalNewColumnName(rowMetadata, parameters);
+            context.column(newColumnName, (r) -> {
+                final ColumnMetadata c = ColumnMetadata.Builder //
+                        .column() //
+                        .name(newColumnName) //
+                        .type(Type.STRING) //
+                        .build();
+                rowMetadata.insertAfter(columnId, c);
+                return c;
+            });
         }
     }
 
@@ -140,20 +152,11 @@ public class CreateNewColumn extends ActionMetadata implements ColumnAction {
      */
     @Override
     public void applyOnColumn(DataSetRow row, ActionContext context) {
-        final RowMetadata rowMetadata = row.getRowMetadata();
-        final String columnId = context.getColumnId();
+        final RowMetadata rowMetadata = context.getRowMetadata();
         final Map<String, String> parameters = context.getParameters();
 
         final String newColumnName = evalNewColumnName(rowMetadata, parameters);
-        String newColumn = context.column(newColumnName, (r) -> {
-            final ColumnMetadata c = ColumnMetadata.Builder //
-                    .column() //
-                    .name(newColumnName) //
-                    .type(Type.STRING) //
-                    .build();
-            rowMetadata.insertAfter(columnId, c);
-            return c;
-        });
+        String newColumn = context.column(newColumnName);
 
         String newValue = "";
         switch (parameters.get(MODE_PARAMETER)){
@@ -204,6 +207,11 @@ public class CreateNewColumn extends ActionMetadata implements ColumnAction {
             throw new TDPException(CommonErrorCodes.BAD_ACTION_PARAMETER, ExceptionContext.build().put("paramName",
                     SELECTED_COLUMN_PARAMETER));
         }
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.METADATA_CREATE_COLUMNS);
     }
 
 }

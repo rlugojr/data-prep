@@ -74,8 +74,8 @@ public class DeleteLinesTest extends BaseDateTests {
         values.put("city", "Berlin");
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertTrue(row.isDeleted());
@@ -89,8 +89,8 @@ public class DeleteLinesTest extends BaseDateTests {
         values.put("city", "Paris");
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertFalse(row.isDeleted());

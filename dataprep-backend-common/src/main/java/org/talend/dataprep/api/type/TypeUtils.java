@@ -38,7 +38,7 @@ public class TypeUtils {
         DataTypeEnum[] types = new DataTypeEnum[columns.size()];
         for (int i = 0; i < columns.size(); i++) {
             final String suggestedType = columns.get(i).getQuality().getMostFrequentSubType();
-            final String type = suggestedType != null ? suggestedType : columns.get(i).getType();
+            final String type = suggestedType != null && !columns.get(i).isTypeForced() ? suggestedType : columns.get(i).getType();
             types[i] = convert(Type.get(type));
         }
         return types;

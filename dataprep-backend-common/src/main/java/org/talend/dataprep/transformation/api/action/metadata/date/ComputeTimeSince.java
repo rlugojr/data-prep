@@ -20,8 +20,10 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalUnit;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -90,6 +92,33 @@ public class ComputeTimeSince extends AbstractDate implements ColumnAction {
         return parameters;
     }
 
+    @Override
+    public void compile(ActionContext context) {
+        super.compile(context);
+        if (context.getActionStatus() == ActionContext.ActionStatus.OK) {
+            // Create new column
+            final Map<String, String> parameters = context.getParameters();
+            final String columnId = context.getColumnId();
+            final TemporalUnit unit = ChronoUnit.valueOf(parameters.get(TIME_UNIT_PARAMETER).toUpperCase());
+            final ColumnMetadata column = context.getRowMetadata().getById(columnId);
+            context.column(PREFIX + column.getName() + SUFFIX + unit.toString().toLowerCase(),
+                    (r) -> {
+                        final ColumnMetadata c = ColumnMetadata.Builder //
+                                .column() //
+                                .copy(column)//
+                                .computedId(StringUtils.EMPTY) //
+                                .name(PREFIX + column.getName() + SUFFIX + unit.toString().toLowerCase()) //
+                                .computedId(null) // remove the id
+                                .statistics(new Statistics()) // clear the statistics
+                                .type(INTEGER)//
+                                .build();
+                        context.getRowMetadata().insertAfter(columnId, c);
+                        return c;
+                    }
+            );
+        }
+    }
+
     /**
      * @see ColumnAction#applyOnColumn(DataSetRow, ActionContext)
      */
@@ -101,29 +130,15 @@ public class ComputeTimeSince extends AbstractDate implements ColumnAction {
         TemporalUnit unit = ChronoUnit.valueOf(parameters.get(TIME_UNIT_PARAMETER).toUpperCase());
         Temporal now = LocalDateTime.now();
 
-        final ColumnMetadata column = row.getRowMetadata().getById(columnId);
+        final ColumnMetadata column = context.getRowMetadata().getById(columnId);
 
         // create the new column and add the new column after the current one
-        String computeTimeSinceColumn = context.column(PREFIX + column.getName() + SUFFIX + unit.toString().toLowerCase(),
-                (r) -> {
-                final ColumnMetadata c = ColumnMetadata.Builder //
-                        .column() //
-                        .copy(column)//
-                        .computedId(StringUtils.EMPTY) //
-                        .name(PREFIX + column.getName() + SUFFIX + unit.toString().toLowerCase()) //
-                        .computedId(null) // remove the id
-                        .statistics(new Statistics()) // clear the statistics
-                        .type(INTEGER)//
-                        .build();
-                row.getRowMetadata().insertAfter(columnId, c);
-                return c;
-            }
-        );
+        String computeTimeSinceColumn = context.column(PREFIX + column.getName() + SUFFIX + unit.toString().toLowerCase());
 
         // parse the date
         final String value = row.get(columnId);
         try {
-            final LocalDateTime temporalAccessor = dateParser.parse(value, row.getRowMetadata().getById(columnId));
+            final LocalDateTime temporalAccessor = dateParser.parse(value, context.getRowMetadata().getById(columnId));
             final Temporal valueAsDate = LocalDateTime.from(temporalAccessor);
             final long newValue = unit.between(valueAsDate, now);
             row.set(computeTimeSinceColumn, String.valueOf(newValue));
@@ -132,6 +147,11 @@ public class ComputeTimeSince extends AbstractDate implements ColumnAction {
             LOGGER.debug("Unable to parse date {} for {} @ {}", value, columnId, row.getTdpId(), e);
             row.set(computeTimeSinceColumn, StringUtils.EMPTY);
         }
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.METADATA_CREATE_COLUMNS);
     }
 
 }

@@ -81,7 +81,7 @@ public class FillWithStringIfEmptyTest extends BaseDateTests {
                 this.getClass().getResourceAsStream("fillEmptyStringAction.json"));
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         Assert.assertEquals("beer", row.get("0002"));
@@ -108,7 +108,7 @@ public class FillWithStringIfEmptyTest extends BaseDateTests {
                 this.getClass().getResourceAsStream("fillEmptyStringAction.json"));
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         Assert.assertEquals("not empty", row.get("0002"));
@@ -136,7 +136,7 @@ public class FillWithStringIfEmptyTest extends BaseDateTests {
         parameters.put(AbstractFillWith.DEFAULT_VALUE_PARAMETER, "12.5");
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         Assert.assertEquals("12.5", row.get("0002"));
@@ -164,7 +164,7 @@ public class FillWithStringIfEmptyTest extends BaseDateTests {
         parameters.put(AbstractFillWith.DEFAULT_VALUE_PARAMETER, "12.5");
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         Assert.assertEquals("12.5", row.get("0002"));
@@ -191,7 +191,7 @@ public class FillWithStringIfEmptyTest extends BaseDateTests {
         // when
         parameters.put(FillIfEmpty.MODE_PARAMETER, FillIfEmpty.OTHER_COLUMN_MODE);
         parameters.put(FillIfEmpty.SELECTED_COLUMN_PARAMETER, "0003");
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         Assert.assertEquals("Something", row.get("0002"));

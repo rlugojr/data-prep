@@ -6,11 +6,7 @@ import static org.junit.Assert.assertTrue;
 import static org.talend.dataprep.transformation.api.action.metadata.ActionMetadataTestUtils.getColumn;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.data.MapEntry;
@@ -80,7 +76,7 @@ public class ClearMatchingTest extends AbstractMetadataBaseTest {
                 new DataSetRow(rowMetadata, secondRowValues));
 
         // when
-        ActionTestWorkbench.test(rows, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(rows, action.create(parameters));
 
         // then
         Assertions.assertThat(rows.get(0).values()) //
@@ -129,7 +125,7 @@ public class ClearMatchingTest extends AbstractMetadataBaseTest {
         parameters.put(ClearMatching.VALUE_PARAMETER, generateJson(".*Something", ReplaceOnValueHelper.REGEX_MODE));
 
         // when
-        ActionTestWorkbench.test(rows, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(rows, action.create(parameters));
 
         // then
         Assertions.assertThat(rows.get(0).values()) //
@@ -174,7 +170,7 @@ public class ClearMatchingTest extends AbstractMetadataBaseTest {
         parameters.put(ClearMatching.VALUE_PARAMETER, generateJson("Badibada", ReplaceOnValueHelper.REGEX_MODE));
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         Assertions.assertThat(row.values()) //
@@ -204,7 +200,7 @@ public class ClearMatchingTest extends AbstractMetadataBaseTest {
         parameters.put(ClearMatching.VALUE_PARAMETER, Boolean.TRUE.toString());
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         Assertions.assertThat(row.values()) //
@@ -234,7 +230,7 @@ public class ClearMatchingTest extends AbstractMetadataBaseTest {
         parameters.put(ClearMatching.VALUE_PARAMETER, Boolean.FALSE.toString());
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         Assertions.assertThat(row.values()) //
@@ -264,7 +260,7 @@ public class ClearMatchingTest extends AbstractMetadataBaseTest {
         parameters.put(ClearMatching.VALUE_PARAMETER, "tchoubidoo");
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         Assertions.assertThat(row.values()) //
@@ -306,7 +302,7 @@ public class ClearMatchingTest extends AbstractMetadataBaseTest {
         parameters.put(ClearMatching.VALUE_PARAMETER, generateJson(".*1234", ReplaceOnValueHelper.REGEX_MODE));
 
         // when
-        ActionTestWorkbench.test(rows, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(rows, action.create(parameters));
 
         // then
         Assertions.assertThat(rows.get(0).values()) //

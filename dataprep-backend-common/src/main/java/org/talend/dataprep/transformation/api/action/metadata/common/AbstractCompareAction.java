@@ -13,8 +13,6 @@
 
 package org.talend.dataprep.transformation.api.action.metadata.common;
 
-import static org.apache.commons.lang.BooleanUtils.toStringTrueFalse;
-
 import java.util.List;
 import java.util.Map;
 
@@ -35,11 +33,9 @@ import org.talend.dataprep.transformation.api.action.parameters.SelectParameter;
 
 public abstract class AbstractCompareAction extends ActionMetadata implements ColumnAction, OtherColumnParameters, CompareAction {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(getClass());
-    
     public static final int ERROR_COMPARE_RESULT = Integer.MIN_VALUE;
-
     public static final String ERROR_COMPARE_RESULT_LABEL = StringUtils.EMPTY;
+    private final Logger LOGGER = LoggerFactory.getLogger(getClass());
 
     @Override
     @Nonnull
@@ -63,9 +59,10 @@ public abstract class AbstractCompareAction extends ActionMetadata implements Co
 
     /**
      * can be overriden as keys can be different (date have different keys/labels)
+     * 
      * @return {@link SelectParameter}
      */
-    protected SelectParameter getCompareModeSelectParameter(){
+    protected SelectParameter getCompareModeSelectParameter() {
 
         //@formatter:off
         return SelectParameter.Builder.builder() //
@@ -86,9 +83,39 @@ public abstract class AbstractCompareAction extends ActionMetadata implements Co
      *
      * @return {@link Parameter} the default value (can be a different type/value)
      */
-    protected Parameter getDefaultConstantValue(){
+    protected Parameter getDefaultConstantValue() {
         // olamy no idea why this 2 but was here before so just keep backward compat :-)
         return new Parameter(CONSTANT_VALUE, ParameterType.STRING, "2");
+    }
+
+    @Override
+    public void compile(ActionContext context) {
+        super.compile(context);
+        if (context.getActionStatus() == ActionContext.ActionStatus.OK) {
+            final String columnId = context.getColumnId();
+            final RowMetadata rowMetadata = context.getRowMetadata();
+            final Map<String, String> parameters = context.getParameters();
+            final ColumnMetadata column = rowMetadata.getById(columnId);
+            final String compareMode = getCompareMode(parameters);
+
+            String compareToLabel;
+            if (parameters.get(MODE_PARAMETER).equals(CONSTANT_MODE)) {
+                compareToLabel = parameters.get(CONSTANT_VALUE);
+            } else {
+                final ColumnMetadata selectedColumn = rowMetadata.getById(parameters.get(SELECTED_COLUMN_PARAMETER));
+                compareToLabel = selectedColumn.getName();
+            }
+
+            context.column("result", (r) -> {
+                final ColumnMetadata c = ColumnMetadata.Builder //
+                        .column() //
+                        .name(column.getName() + "_" + compareMode + "_" + compareToLabel + "?") //
+                        .type(Type.BOOLEAN) //
+                        .build();
+                rowMetadata.insertAfter(columnId, c);
+                return c;
+            });
+        }
     }
 
     /**
@@ -97,30 +124,11 @@ public abstract class AbstractCompareAction extends ActionMetadata implements Co
     @Override
     public void applyOnColumn(DataSetRow row, ActionContext context) {
         final String columnId = context.getColumnId();
-        final RowMetadata rowMetadata = row.getRowMetadata();
         final Map<String, String> parameters = context.getParameters();
-
-        String compareMode = getCompareMode( parameters );
-
-        String compareToLabel;
-        if (parameters.get(MODE_PARAMETER).equals(CONSTANT_MODE)) {
-            compareToLabel = parameters.get(CONSTANT_VALUE);
-        } else {
-            final ColumnMetadata selectedColumn = rowMetadata.getById(parameters.get(SELECTED_COLUMN_PARAMETER));
-            compareToLabel = selectedColumn.getName();
-        }
+        final String compareMode = getCompareMode(parameters);
 
         // create new column and append it after current column
-        final ColumnMetadata column = rowMetadata.getById(columnId);
-        final String newColumnId = context.column("result", (r) -> {
-            final ColumnMetadata c = ColumnMetadata.Builder //
-                    .column() //
-                    .name(column.getName() + "_" + compareMode + "_" + compareToLabel + "?") //
-                    .type(Type.BOOLEAN) //
-                    .build();
-            rowMetadata.insertAfter(columnId, c);
-            return c;
-        });
+        final String newColumnId = context.column("result");
 
         ComparisonRequest comparisonRequest = new ComparisonRequest() //
                 .setMode(compareMode) //
@@ -129,11 +137,12 @@ public abstract class AbstractCompareAction extends ActionMetadata implements Co
                 // this can be null when comparing with a constant
                 .setColumnMetadata2(getColumnMetadataToCompareWith(parameters, row)) //
                 .setValue2(getValueToCompareWith(parameters, row));
-        row.set(newColumnId, toStringCompareResult( comparisonRequest ) );
+        row.set(newColumnId, toStringCompareResult(comparisonRequest));
     }
 
     /**
      * can be overriden as keys can be different (date have different keys/labels)
+     * 
      * @param parameters
      * @return
      */
@@ -164,9 +173,55 @@ public abstract class AbstractCompareAction extends ActionMetadata implements Co
      * do the real comparison
      * 
      * @param comparisonRequest
-     * @return same result as {@link Comparable#compareTo(Object)} if any type issue or any problem use #ERROR_COMPARE_RESULT
+     * @return same result as {@link Comparable#compareTo(Object)} if any type issue or any problem use
+     * #ERROR_COMPARE_RESULT
      */
     protected abstract int doCompare(ComparisonRequest comparisonRequest);
+
+    /**
+     *
+     * @param comparisonRequest
+     * @return transforming boolean to <code>true</code> or <code>false</code> as String in case of #doCompare returning
+     * #ERROR_COMPARE_RESULT the label #ERROR_COMPARE_RESULT_LABEL is returned
+     */
+    public String toStringCompareResult(ComparisonRequest comparisonRequest) {
+        boolean booleanResult;
+        try {
+
+            final int result = doCompare(comparisonRequest);
+
+            if (result == ERROR_COMPARE_RESULT) {
+                return ERROR_COMPARE_RESULT_LABEL;
+            }
+
+            booleanResult = compareResultToBoolean(result, comparisonRequest.mode);
+
+        } catch (NumberFormatException e) {
+            LOGGER.debug("Unable to compare values '{}' ", comparisonRequest, e);
+            return ERROR_COMPARE_RESULT_LABEL;
+        }
+
+        return BooleanUtils.toString(booleanResult, Boolean.TRUE.toString(), Boolean.FALSE.toString());
+    }
+
+    protected boolean compareResultToBoolean(final int result, String mode) {
+        switch (mode) {
+        case EQ:
+            return result == 0;
+        case NE:
+            return result != 0;
+        case GT:
+            return result > 0;
+        case GE:
+            return result >= 0;
+        case LT:
+            return result < 0;
+        case LE:
+            return result <= 0;
+        default:
+            return false;
+        }
+    }
 
     /**
      * bean to ease passing values to do comparison (easier adding fields than changing method parameters)
@@ -211,51 +266,6 @@ public abstract class AbstractCompareAction extends ActionMetadata implements Co
                     + ", value2='" + value2 + '\'' //
                     + ", colMetadata2=" + colMetadata2 //
                     + ", mode='" + mode + '\'' + '}';
-        }
-    }
-
-    /**
-     *
-     * @param comparisonRequest
-     * @return transforming boolean to <code>true</code> or <code>false</code> as String in case of #doCompare returning #ERROR_COMPARE_RESULT
-     *          the label #ERROR_COMPARE_RESULT_LABEL is returned
-     */
-    public String toStringCompareResult(ComparisonRequest comparisonRequest ) {
-        boolean booleanResult;
-        try {
-
-            final int result = doCompare(comparisonRequest);
-
-            if (result == ERROR_COMPARE_RESULT) {
-                return ERROR_COMPARE_RESULT_LABEL;
-            }
-
-            booleanResult = compareResultToBoolean( result, comparisonRequest.mode );
-
-        } catch (NumberFormatException e) {
-            LOGGER.debug("Unable to compare values '{}' ", comparisonRequest, e);
-            return ERROR_COMPARE_RESULT_LABEL;
-        }        
-
-        return BooleanUtils.toString( booleanResult, Boolean.TRUE.toString(), Boolean.FALSE.toString());
-    }
-
-    protected boolean compareResultToBoolean(final int result, String mode) {
-        switch (mode) {
-        case EQ:
-            return result == 0;
-        case NE:
-            return result != 0;
-        case GT:
-            return result > 0;
-        case GE:
-            return result >= 0;
-        case LT:
-            return result < 0;
-        case LE:
-            return result <= 0;
-        default:
-            return false;
         }
     }
 

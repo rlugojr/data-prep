@@ -79,7 +79,7 @@ public class NormalizeTest {
         expectedValues.put("joined", "May 20th 2015");
 
         //when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         //then
         assertEquals(expectedValues, row.values());
@@ -101,7 +101,7 @@ public class NormalizeTest {
         expectedValues.put("joined", "May 20th 2015");
 
         //when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         //then
         assertEquals(expectedValues, row.values());

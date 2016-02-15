@@ -109,7 +109,7 @@ public class DeleteTest extends AbstractMetadataBaseTest {
         assertThat(row.isDeleted(), is(false));
 
         //when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         //then
         assertThat(row.isDeleted(), is(true));
@@ -134,7 +134,7 @@ public class DeleteTest extends AbstractMetadataBaseTest {
         assertThat(row.isDeleted(), is(false));
 
         //when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         //then
         assertThat(row.isDeleted(), is(false));

@@ -58,7 +58,7 @@ public class TextClusteringTest extends BaseDateTests {
         rows.add(createRow(columnId, "Tata"));
 
         // when
-        ActionTestWorkbench.test(rows, textClustering.create(parameters).getRowAction());
+        ActionTestWorkbench.test(rows, textClustering.create(parameters));
 
         // then
         rows.stream().map(row -> row.get(columnId)).forEach(uglyState -> Assertions.assertThat(uglyState).isEqualTo("Tata"));
@@ -95,7 +95,7 @@ public class TextClusteringTest extends BaseDateTests {
         rows.add(createRow(columnId, "Tata1"));
 
         // when
-        ActionTestWorkbench.test(rows, textClustering.create(parameters).getRowAction());
+        ActionTestWorkbench.test(rows, textClustering.create(parameters));
 
         // then
         rows.stream().map((row) -> row.get(columnId)).forEach(uglyState -> Assertions.assertThat(uglyState).isNotEqualTo("Tata"));

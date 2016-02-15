@@ -13,6 +13,9 @@
 
 package org.talend.dataprep.transformation.api.action.metadata.text;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.springframework.stereotype.Component;
 import org.talend.dataprep.api.dataset.ColumnMetadata;
 import org.talend.dataprep.api.dataset.DataSetRow;
@@ -67,5 +70,10 @@ public class Trim extends ActionMetadata implements ColumnAction {
         if (toTrim != null) {
             row.set(columnId, toTrim.trim());
         }
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.VALUES_COLUMN);
     }
 }

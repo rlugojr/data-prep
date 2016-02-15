@@ -232,7 +232,7 @@ public class PreparationUtilsTest {
 
     public static List<Action> getSimpleAction(final String actionName, final String paramKey, final String paramValue) {
         final Action action = new Action();
-        action.setAction(actionName);
+        action.setName(actionName);
         action.getParameters().put(paramKey, paramValue);
 
         final List<Action> actions = new ArrayList<>();

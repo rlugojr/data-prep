@@ -16,7 +16,9 @@ package org.talend.dataprep.transformation.api.action.metadata.column;
 import static org.talend.dataprep.transformation.api.action.metadata.category.ActionScope.COLUMN_METADATA;
 
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +83,13 @@ public class DeleteColumn extends ActionMetadata implements ColumnAction {
     public void applyOnColumn(DataSetRow row, ActionContext context) {
         final String columnId = context.getColumnId();
         LOGGER.debug("DeleteColumn for columnId {}", columnId);
-        row.deleteColumnById(columnId);
+        context.getRowMetadata().deleteColumnById(columnId);
+        context.setActionStatus(ActionContext.ActionStatus.DONE);
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.METADATA_DELETE_COLUMNS);
     }
 
 }

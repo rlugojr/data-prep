@@ -13,6 +13,9 @@
 
 package org.talend.dataprep.transformation.api.action.metadata.text;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
 import org.talend.dataprep.api.dataset.ColumnMetadata;
@@ -70,5 +73,10 @@ public class RemoveNonAlphaNumChars extends ActionMetadata implements ColumnActi
             return StringUtils.EMPTY;
         }
         return from.replaceAll("[\\p{Punct}£µ§€¥]", "");
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.VALUES_COLUMN);
     }
 }

@@ -17,11 +17,12 @@ import static org.talend.dataprep.transformation.api.action.metadata.category.Ac
 import static org.talend.dataprep.transformation.api.action.metadata.category.ActionScope.INVALID;
 
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Component;
 import org.talend.dataprep.api.dataset.ColumnMetadata;
-import org.talend.dataprep.api.dataset.DataSetRow;
 import org.talend.dataprep.transformation.api.action.context.ActionContext;
 import org.talend.dataprep.transformation.api.action.metadata.common.ActionMetadata;
 import org.talend.dataprep.transformation.api.action.metadata.common.ActionMetadataUtils;
@@ -70,6 +71,7 @@ public class ClearInvalid extends AbstractClear implements ColumnAction {
         return ACTION_SCOPE;
     }
 
+    @Override
     public boolean toClear(ColumnMetadata colMetadata, String value, ActionContext context) {
         // update invalid values of column metadata to prevent unnecessary future analysis
         if (ActionMetadataUtils.checkInvalidValue(colMetadata, value)) {
@@ -79,4 +81,10 @@ public class ClearInvalid extends AbstractClear implements ColumnAction {
         return false;
     }
 
+    @Override
+    public Set<Behavior> getBehavior() {
+        final EnumSet<Behavior> behaviors = EnumSet.copyOf(super.getBehavior());
+        behaviors.add(Behavior.NEED_STATISTICS);
+        return behaviors;
+    }
 }

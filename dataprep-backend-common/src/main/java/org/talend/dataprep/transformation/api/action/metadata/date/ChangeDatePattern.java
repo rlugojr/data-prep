@@ -15,9 +15,13 @@ package org.talend.dataprep.transformation.api.action.metadata.date;
 
 import java.time.DateTimeException;
 import java.time.LocalDateTime;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.talend.dataprep.api.dataset.ColumnMetadata;
 import org.talend.dataprep.api.dataset.DataSetRow;
@@ -37,6 +41,7 @@ public class ChangeDatePattern extends AbstractDate implements ColumnAction, Dat
 
     /** Action name. */
     public static final String ACTION_NAME = "change_date_pattern"; //$NON-NLS-1$
+    public static final Logger LOGGER = LoggerFactory.getLogger(ChangeDatePattern.class);
 
     /**
      * @see ActionMetadata#getName()
@@ -64,7 +69,7 @@ public class ChangeDatePattern extends AbstractDate implements ColumnAction, Dat
 
             //register the new pattern in column stats as most used pattern, to be able to process date action more efficiently later
             final DatePattern newPattern = actionContext.get(COMPILED_DATE_PATTERN);
-            final RowMetadata rowMetadata = actionContext.getInputRowMetadata();
+            final RowMetadata rowMetadata = actionContext.getRowMetadata();
             final ColumnMetadata column = rowMetadata.getById(actionContext.getColumnId());
             final Statistics statistics = column.getStatistics();
 
@@ -97,10 +102,11 @@ public class ChangeDatePattern extends AbstractDate implements ColumnAction, Dat
             return;
         }
         try {
-            final LocalDateTime date = dateParser.parse(value, row.getRowMetadata().getById(columnId));
+            final LocalDateTime date = dateParser.parse(value, context.getRowMetadata().getById(columnId));
             row.set(columnId, newPattern.getFormatter().format(date));
         } catch (DateTimeException e) {
             // cannot parse the date, let's leave it as is
+            LOGGER.debug("Unable to parse date {}.", value, e);
         }
     }
 
@@ -117,6 +123,11 @@ public class ChangeDatePattern extends AbstractDate implements ColumnAction, Dat
         }
         patternFrequencies.sort((p1, p2) -> Long.compare(p2.getOccurrences(), p1.getOccurrences()));
         return patternFrequencies.get(0).getOccurrences();
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.VALUES_COLUMN);
     }
 
 }

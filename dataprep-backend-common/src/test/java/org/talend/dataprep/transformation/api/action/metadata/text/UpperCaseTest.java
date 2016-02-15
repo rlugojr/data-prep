@@ -79,8 +79,8 @@ public class UpperCaseTest extends BaseDateTests {
         expectedValues.put("city", "VANCOUVER"); // Vancouver --> VANCOUVER
         expectedValues.put("country", "Canada");
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -101,8 +101,8 @@ public class UpperCaseTest extends BaseDateTests {
         expectedValues.put("country", "Canada");
         expectedValues.put("capital", "Ottawa");
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());

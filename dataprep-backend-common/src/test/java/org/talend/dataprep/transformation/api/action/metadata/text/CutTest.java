@@ -34,9 +34,6 @@ import org.talend.dataprep.transformation.api.action.metadata.AbstractMetadataBa
 import org.talend.dataprep.transformation.api.action.metadata.ActionMetadataTestUtils;
 import org.talend.dataprep.transformation.api.action.metadata.category.ActionCategory;
 import org.talend.dataprep.transformation.api.action.metadata.common.ImplicitParameters;
-import org.talend.dataprep.transformation.api.action.metadata.common.ReplaceOnValueHelper;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  * Unit test for the Cut action.
@@ -83,7 +80,7 @@ public class CutTest extends AbstractMetadataBaseTest {
         DataSetRow expected = getRow("Wait for it...", "value that gets cut !", "Done !");
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expected, row);
@@ -100,7 +97,7 @@ public class CutTest extends AbstractMetadataBaseTest {
         regexpParameters.put("pattern", generateJson("The", "starts_with"));
 
         // when
-        ActionTestWorkbench.test(row, action.create(regexpParameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(regexpParameters));
 
         // then
         assertEquals(expected, row);
@@ -118,7 +115,7 @@ public class CutTest extends AbstractMetadataBaseTest {
         regexpParameters.put("pattern", generateJson("cut !", "ends_with"));
 
         // when
-        ActionTestWorkbench.test(row, action.create(regexpParameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(regexpParameters));
 
         // then
         assertEquals(expected, row);
@@ -138,7 +135,7 @@ public class CutTest extends AbstractMetadataBaseTest {
         regexpParameters.put("pattern", generateJson("(", "contains"));
 
         // when
-        ActionTestWorkbench.test(row, action.create(regexpParameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(regexpParameters));
 
         // then
         assertEquals(expected, row);
@@ -155,7 +152,7 @@ public class CutTest extends AbstractMetadataBaseTest {
         regexpParameters.put("pattern", generateJson(".*gets", "regex"));
 
         // when
-        ActionTestWorkbench.test(row, action.create(regexpParameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(regexpParameters));
 
         // then
         assertEquals(expected, row);
@@ -172,7 +169,7 @@ public class CutTest extends AbstractMetadataBaseTest {
         regexpParameters.put("pattern", generateJson("*", "regex"));
 
         // when
-        ActionTestWorkbench.test(row, action.create(regexpParameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(regexpParameters));
 
         // then
         assertEquals(expected, row);
@@ -190,7 +187,7 @@ public class CutTest extends AbstractMetadataBaseTest {
         regexpParameters.put("pattern", generateJson("", "regex"));
 
         // when
-        ActionTestWorkbench.test(row, action.create(regexpParameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(regexpParameters));
 
         // then
         assertEquals(expected, row);
@@ -204,7 +201,7 @@ public class CutTest extends AbstractMetadataBaseTest {
 
         // when (apply on a column that does not exists)
         parameters.put(ImplicitParameters.COLUMN_ID.getKey().toLowerCase(), "0010");
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then (row should not be changed)
         assertEquals(expected, row);

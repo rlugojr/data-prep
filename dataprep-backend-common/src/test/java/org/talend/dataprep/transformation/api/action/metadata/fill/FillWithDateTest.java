@@ -84,7 +84,7 @@ public class FillWithDateTest extends AbstractMetadataBaseTest {
                 this.getClass().getResourceAsStream("fillEmptyDateAction.json"));
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         Assert.assertEquals("1/1/1970 10:00:00", row.get("0002"));
@@ -111,7 +111,7 @@ public class FillWithDateTest extends AbstractMetadataBaseTest {
                 this.getClass().getResourceAsStream("fillEmptyDateAction.json"));
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         Assert.assertEquals("1/1/1970 10:00:00", row.get("0002"));
@@ -139,7 +139,7 @@ public class FillWithDateTest extends AbstractMetadataBaseTest {
                 .parseParameters(this.getClass().getResourceAsStream("fillEmptyDateAction.json"));
 
         // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         Assert.assertEquals("1970-01-01", row.get("0002"));
@@ -167,7 +167,7 @@ public class FillWithDateTest extends AbstractMetadataBaseTest {
         // when
         parameters.put(FillIfEmpty.MODE_PARAMETER, FillIfEmpty.OTHER_COLUMN_MODE);
         parameters.put(FillIfEmpty.SELECTED_COLUMN_PARAMETER, "0003");
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         Assert.assertEquals("15/10/1999", row.get("0003"));
@@ -196,7 +196,7 @@ public class FillWithDateTest extends AbstractMetadataBaseTest {
         // when
         parameters.put(FillIfEmpty.MODE_PARAMETER, FillIfEmpty.OTHER_COLUMN_MODE);
         parameters.put(FillIfEmpty.SELECTED_COLUMN_PARAMETER, "0003");
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         Assert.assertEquals("tagada", row.get("0003"));

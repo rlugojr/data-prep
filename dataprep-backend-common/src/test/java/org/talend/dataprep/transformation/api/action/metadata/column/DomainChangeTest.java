@@ -69,7 +69,7 @@ public class DomainChangeTest extends BaseDateTests {
         final DataSetRow row = new DataSetRow(rowMetadata, values);
 
         // when
-        ActionTestWorkbench.test(row, domainChange.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, domainChange.create(parameters));
 
         // then
         final ColumnMetadata column = row.getRowMetadata().getColumns().get(0);
@@ -90,7 +90,7 @@ public class DomainChangeTest extends BaseDateTests {
         final DataSetRow row = new DataSetRow(rowMetadata, values);
 
         // when
-        ActionTestWorkbench.test(row, domainChange.create(parameters).getRowAction());
+        ActionTestWorkbench.test(row, domainChange.create(parameters));
 
         // then
         assertThat(row.getRowMetadata().getById("0002").isDomainForced()).isTrue();

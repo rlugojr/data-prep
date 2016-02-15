@@ -81,8 +81,8 @@ public class RemoveNonAlphaNumCharsTest extends BaseDateTests {
         expectedValues.put("entity", "10k");
         expectedValues.put("joined", "May 20th 2015");
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());

@@ -125,7 +125,7 @@ public class PreparationDetailsJsonSerializer extends JsonSerializer<Preparation
 
         List<ActionMetadata> metadataList = new ArrayList<>(actions.size());
         for (Action action : actions) {
-            String actionName = action.getAction();
+            String actionName = action.getName();
             for (ActionMetadata metadata : actionMetadata) {
                 if (metadata.getName().equals(actionName)) {
                     metadataList.add(metadata);

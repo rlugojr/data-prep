@@ -17,7 +17,9 @@ import static org.talend.dataprep.api.dataset.ColumnMetadata.Builder.column;
 import static org.talend.dataprep.transformation.api.action.metadata.category.ActionScope.COLUMN_METADATA;
 
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Component;
@@ -69,7 +71,6 @@ public class CopyColumnMetadata extends ActionMetadata implements ColumnAction {
         return true;
     }
 
-
     /**
      * @see ActionMetadata#getActionScope()
      */
@@ -78,27 +79,38 @@ public class CopyColumnMetadata extends ActionMetadata implements ColumnAction {
         return Collections.singletonList(COLUMN_METADATA.getDisplayName());
     }
 
+    @Override
+    public void compile(ActionContext actionContext) {
+        super.compile(actionContext);
+        if (actionContext.getActionStatus() == ActionContext.ActionStatus.OK) {
+            final RowMetadata rowMetadata = actionContext.getRowMetadata();
+            final String columnId = actionContext.getColumnId();
+            final ColumnMetadata column = rowMetadata.getById(columnId);
+            actionContext.column(COPY_APPENDIX, r -> {
+                final ColumnMetadata newColumn = column() //
+                        .copy(column) //
+                        .computedId(StringUtils.EMPTY) //
+                        .name(column.getName() + COPY_APPENDIX) //
+                        .build();
+                rowMetadata.insertAfter(columnId, newColumn);
+                return newColumn;
+            });
+        }
+    }
+
     /**
      * @see ColumnAction#applyOnColumn(DataSetRow, ActionContext)
      */
     @Override
     public void applyOnColumn(DataSetRow row, ActionContext context) {
-        final RowMetadata rowMetadata = row.getRowMetadata();
+        final String copyColumn = context.column(COPY_APPENDIX);
         final String columnId = context.getColumnId();
-        final ColumnMetadata column = rowMetadata.getById(columnId);
-        final String copyColumn = context.column(
-                column.getName() + COPY_APPENDIX,
-                (r) -> {
-                    final ColumnMetadata newColumn = column() //
-                            .copy(column) //
-                            .computedId(StringUtils.EMPTY) //
-                            .name(column.getName() + COPY_APPENDIX) //
-                            .build();
-                    rowMetadata.insertAfter(columnId, newColumn);
-                    return newColumn;
-                }
-        );
         row.set(copyColumn, row.get(columnId));
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.METADATA_COPY_COLUMNS);
     }
 
 }

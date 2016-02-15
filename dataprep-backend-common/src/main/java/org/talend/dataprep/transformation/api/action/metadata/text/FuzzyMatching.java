@@ -18,8 +18,10 @@ import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.talend.dataprep.api.type.Type.BOOLEAN;
 import static org.talend.dataprep.transformation.api.action.parameters.ParameterType.INTEGER;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -91,6 +93,32 @@ public class FuzzyMatching extends ActionMetadata implements ColumnAction {
     }
 
     @Override
+    public void compile(ActionContext context) {
+        super.compile(context);
+        if (context.getActionStatus() == ActionContext.ActionStatus.OK) {
+            final String columnId = context.getColumnId();
+            // create new column and append it after current column
+            RowMetadata rowMetadata = context.getRowMetadata();
+            ColumnMetadata column = rowMetadata.getById(columnId);
+
+            context.column(column.getName() + APPENDIX, (r) -> {
+                final ColumnMetadata c = ColumnMetadata.Builder //
+                        .column() //
+                        .name(column.getName() + APPENDIX) //
+                        .type(BOOLEAN) //
+                        .typeForce(true) //
+                        .empty(column.getQuality().getEmpty()) //
+                        .invalid(column.getQuality().getInvalid()) //
+                        .valid(column.getQuality().getValid()) //
+                        .headerSize(column.getHeaderSize()) //
+                        .build();
+                rowMetadata.insertAfter(columnId, c);
+                return c;
+            });
+        }
+    }
+
+    @Override
     public void applyOnColumn(DataSetRow row, ActionContext context) {
         final String columnId = context.getColumnId();
         Map<String, String> parameters = context.getParameters();
@@ -98,26 +126,13 @@ public class FuzzyMatching extends ActionMetadata implements ColumnAction {
         int sensitivity = NumberUtils.toInt(parameters.get(SENSITIVITY));
 
         // create new column and append it after current column
-        RowMetadata rowMetadata = row.getRowMetadata();
+        RowMetadata rowMetadata = context.getRowMetadata();
         ColumnMetadata column = rowMetadata.getById(columnId);
 
-        final String fuzzyMatches = context.column(column.getName() + APPENDIX, (r) -> {
-            final ColumnMetadata c = ColumnMetadata.Builder //
-                    .column() //
-                    .name(column.getName() + APPENDIX) //
-                    .type(BOOLEAN) //
-                    .typeForce(true) //
-                    .empty(column.getQuality().getEmpty()) //
-                    .invalid(column.getQuality().getInvalid()) //
-                    .valid(column.getQuality().getValid()) //
-                    .headerSize(column.getHeaderSize()) //
-                    .build();
-            rowMetadata.insertAfter(columnId, c);
-            return c;
-        });
+        final String fuzzyMatches = context.column(column.getName() + APPENDIX);
 
         String value = row.get(context.getColumnId());
-        String referenceValue = "";
+        String referenceValue;
         if (parameters.get(OtherColumnParameters.MODE_PARAMETER).equals(OtherColumnParameters.CONSTANT_MODE)) {
             referenceValue = parameters.get(VALUE_PARAMETER);
         } else {
@@ -133,6 +148,11 @@ public class FuzzyMatching extends ActionMetadata implements ColumnAction {
     private boolean fuzzyMatches(String value, String reference, int sensitivity) {
         int levenshteinDistance = StringUtils.getLevenshteinDistance(value, reference);
         return levenshteinDistance <= sensitivity;
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.METADATA_CREATE_COLUMNS);
     }
     
 }

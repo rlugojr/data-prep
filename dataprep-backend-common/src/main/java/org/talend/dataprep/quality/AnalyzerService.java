@@ -242,6 +242,13 @@ public class AnalyzerService implements DisposableBean {
         return dateTimePatternFrequencyAnalyzer;
     }
 
+    public Analyzer<Analyzers.Result> transformationInlineAnalysis(List<ColumnMetadata> columns) {
+        // Configure value quality analysis
+        final Analyzer<Analyzers.Result> analyzer = Analyzers.with(getDataTypeAnalyzer(columns));
+        analyzer.init();
+        return analyzer;
+    }
+
     public Analyzer<Analyzers.Result> qualityAnalysis(List<ColumnMetadata> columns) {
         DataTypeEnum[] types = TypeUtils.convert(columns);
         // Run analysis

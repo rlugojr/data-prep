@@ -13,6 +13,8 @@
 package org.talend.dataprep.transformation.api.action.metadata.math;
 
 import java.math.BigDecimal;
+import java.util.EnumSet;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -130,6 +132,11 @@ public class Absolute extends ActionMetadata implements ColumnAction {
             return this;
         }
         return applicationContext.getBean( getClass(), type );
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.VALUES_COLUMN);
     }
 
 }

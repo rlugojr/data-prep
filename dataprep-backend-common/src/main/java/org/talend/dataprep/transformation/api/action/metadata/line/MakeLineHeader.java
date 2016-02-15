@@ -15,6 +15,9 @@ package org.talend.dataprep.transformation.api.action.metadata.line;
 
 import static org.talend.dataprep.transformation.api.action.metadata.category.ActionCategory.DATA_CLEANSING;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -62,24 +65,29 @@ public class MakeLineHeader extends ActionMetadata implements RowAction {
     public void applyOnLine(DataSetRow row, ActionContext context) {
         if (getFilter(context.getParameters()).test(row)) {
             LOGGER.debug("Make line header for rowId {} with parameters {} ", context.getRowId(), context.getParameters());
-            for (ColumnMetadata column : row.getRowMetadata().getColumns()) {
+            for (ColumnMetadata column : context.getRowMetadata().getColumns()) {
                 String newColumnName = context.get(column.getId(), p -> row.get(column.getId()));
                 column.setName(newColumnName);
             }
-            context.setOutputRowMetadata(row.getRowMetadata().clone());
+            context.setRowMetadata(context.getRowMetadata().clone());
             row.setDeleted(true);
         } else {
             boolean hasChanged = false;
-            for (ColumnMetadata column : row.getRowMetadata().getColumns()) {
+            for (ColumnMetadata column : context.getRowMetadata().getColumns()) {
                 if (context.has(column.getId())) {
                     column.setName(context.get(column.getId()));
                     hasChanged = true;
                 } // else don't change (new column names are not yet known.
             }
             if (hasChanged) {
-                context.setOutputRowMetadata(row.getRowMetadata().clone());
+                context.setRowMetadata(context.getRowMetadata().clone());
             }
         }
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.METADATA_CHANGE_NAME, Behavior.VALUES_ALL);
     }
 
 }

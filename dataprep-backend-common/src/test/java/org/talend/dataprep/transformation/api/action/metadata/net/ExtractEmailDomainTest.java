@@ -87,8 +87,8 @@ public class ExtractEmailDomainTest extends BaseDateTests {
         expectedValues.put("0004", "yopmail.com");
         expectedValues.put("0002", "01/01/2015");
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -110,8 +110,8 @@ public class ExtractEmailDomainTest extends BaseDateTests {
         expectedValues.put("0004", "");
         expectedValues.put("0002", "01/01/2015");
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expectedValues, row.values());
@@ -136,8 +136,8 @@ public class ExtractEmailDomainTest extends BaseDateTests {
         expected.add(createMetadata("0004", "email_domain"));
         expected.add(createMetadata("0002", "last update"));
 
-        // when
-        ActionTestWorkbench.test(row, action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(row, action.create(parameters));
 
         // then
         assertEquals(expected, row.getRowMetadata().getColumns());
@@ -164,8 +164,8 @@ public class ExtractEmailDomainTest extends BaseDateTests {
         expected.add(createMetadata("0004", "email_domain"));
         expected.add(createMetadata("0002", "last update"));
 
-        // when
-        ActionTestWorkbench.test(rowMetadata, action.create(parameters).getRowAction(), action.create(parameters).getRowAction());
+        //when
+        ActionTestWorkbench.test(rowMetadata, action.create(parameters), action.create(parameters));
 
         // then
         assertEquals(expected, rowMetadata.getColumns());

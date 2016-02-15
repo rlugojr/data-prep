@@ -16,8 +16,10 @@ package org.talend.dataprep.transformation.api.action.metadata.text;
 import static org.apache.commons.lang.StringUtils.EMPTY;
 import static org.talend.dataprep.transformation.api.action.metadata.category.ActionCategory.STRINGS;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.stereotype.Component;
 import org.talend.dataprep.api.dataset.ColumnMetadata;
@@ -121,28 +123,40 @@ public class Substring extends ActionMetadata implements ColumnAction {
         return Type.STRING.equals(Type.get(column.getType()));
     }
 
+    @Override
+    public void compile(ActionContext context) {
+        super.compile(context);
+        if (context.getActionStatus() == ActionContext.ActionStatus.OK) {
+            // Create result column
+            final RowMetadata rowMetadata = context.getRowMetadata();
+            final String columnId = context.getColumnId();
+            final ColumnMetadata column = rowMetadata.getById(columnId);
+            context.column(column.getName() + APPENDIX, (r) -> {
+                final ColumnMetadata c = ColumnMetadata.Builder //
+                        .column() //
+                        .name(column.getName() + APPENDIX) //
+                        .type(Type.get(column.getType())) //
+                        .empty(column.getQuality().getEmpty()) //
+                        .invalid(column.getQuality().getInvalid()) //
+                        .valid(column.getQuality().getValid()) //
+                        .headerSize(column.getHeaderSize()) //
+                        .build();
+                rowMetadata.insertAfter(columnId, c);
+                return c;
+            });
+        }
+    }
+
     /**
      * @see ColumnAction#applyOnColumn(DataSetRow, ActionContext)
      */
     @Override
     public void applyOnColumn(DataSetRow row, ActionContext context) {
         // create the new column
-        final RowMetadata rowMetadata = row.getRowMetadata();
+        final RowMetadata rowMetadata = context.getRowMetadata();
         final String columnId = context.getColumnId();
         final ColumnMetadata column = rowMetadata.getById(columnId);
-        final String substringColumn = context.column(column.getName() + APPENDIX, (r) -> {
-            final ColumnMetadata c = ColumnMetadata.Builder //
-                    .column() //
-                    .name(column.getName() + APPENDIX) //
-                    .type(Type.get(column.getType())) //
-                    .empty(column.getQuality().getEmpty()) //
-                    .invalid(column.getQuality().getInvalid()) //
-                    .valid(column.getQuality().getValid()) //
-                    .headerSize(column.getHeaderSize()) //
-                    .build();
-            rowMetadata.insertAfter(columnId, c);
-            return c;
-        });
+        final String substringColumn = context.column(column.getName() + APPENDIX);
 
         // Perform substring
         final String value = row.get(columnId);
@@ -200,6 +214,11 @@ public class Substring extends ActionMetadata implements ColumnAction {
         default:
             return 0;
         }
+    }
+
+    @Override
+    public Set<Behavior> getBehavior() {
+        return EnumSet.of(Behavior.METADATA_CREATE_COLUMNS);
     }
 
 }

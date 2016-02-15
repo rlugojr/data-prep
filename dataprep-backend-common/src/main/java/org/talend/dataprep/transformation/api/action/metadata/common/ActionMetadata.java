@@ -17,10 +17,7 @@ import static org.talend.dataprep.api.preparation.Action.Builder.builder;
 import static org.talend.dataprep.transformation.api.action.metadata.common.ImplicitParameters.ROW_ID;
 import static org.talend.dataprep.transformation.api.action.metadata.common.ImplicitParameters.SCOPE;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Predicate;
 
 import org.apache.commons.lang.ObjectUtils;
@@ -42,6 +39,8 @@ import org.talend.dataprep.transformation.api.action.metadata.category.ScopeCate
 import org.talend.dataprep.transformation.api.action.parameters.Parameter;
 import org.talend.dataprep.transformation.api.action.validation.ActionMetadataValidation;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * Model an action to perform on a dataset.
  * <p>
@@ -62,6 +61,17 @@ public abstract class ActionMetadata {
     @Autowired
     private FilterService filterService;
 
+    public enum Behavior {
+        VALUES_ALL,
+        METADATA_CHANGE_TYPE,
+        METADATA_CHANGE_NAME,
+        METADATA_CREATE_COLUMNS,
+        METADATA_COPY_COLUMNS,
+        METADATA_DELETE_COLUMNS,
+        VALUES_COLUMN,
+        NEED_STATISTICS
+    }
+
     /**
      * <p>
      * Adapts the current action metadata to the column. This method may return <code>this</code> if no action specific
@@ -76,11 +86,10 @@ public abstract class ActionMetadata {
      * @param column A {@link ColumnMetadata column} information.
      * @return <code>this</code> if any of the following is true:
      * <ul>
-     *     <li>no change is required.</li>
-     *     <li>column type is not {@link #acceptColumn(ColumnMetadata) accepted} for current action.</li>
+     * <li>no change is required.</li>
+     * <li>column type is not {@link #acceptColumn(ColumnMetadata) accepted} for current action.</li>
      * </ul>
-     * OR a new action metadata with information extracted from
-     * <code>column</code>.
+     * OR a new action metadata with information extracted from <code>column</code>.
      */
     public ActionMetadata adapt(ColumnMetadata column) {
         return this;
@@ -93,8 +102,7 @@ public abstract class ActionMetadata {
      * </p>
      *
      * @param scope A {@link ScopeCategory scope}.
-     * @return <code>this</code> if no change is required.
-     * OR a new action metadata with information extracted from
+     * @return <code>this</code> if no change is required. OR a new action metadata with information extracted from
      * <code>scope</code>.
      */
     public ActionMetadata adapt(final ScopeCategory scope) {
@@ -152,7 +160,7 @@ public abstract class ActionMetadata {
      * @return list of scopes of this action
      * @see ActionScope
      */
-    public List<String> getActionScope(){
+    public List<String> getActionScope() {
         return new ArrayList<>();
     }
 
@@ -211,16 +219,16 @@ public abstract class ActionMetadata {
      */
     public final boolean acceptScope(final ScopeCategory scope) {
         switch (scope) {
-            case CELL:
-                return this instanceof CellAction;
-            case LINE:
-                return this instanceof RowAction;
-            case COLUMN:
-                return this instanceof ColumnAction;
-            case DATASET:
-                return this instanceof DataSetAction;
-            default:
-                return false;
+        case CELL:
+            return this instanceof CellAction;
+        case LINE:
+            return this instanceof RowAction;
+        case COLUMN:
+            return this instanceof ColumnAction;
+        case DATASET:
+            return this instanceof DataSetAction;
+        default:
+            return false;
         }
     }
 
@@ -235,7 +243,7 @@ public abstract class ActionMetadata {
      * @see ActionContext#setActionStatus(ActionContext.ActionStatus)
      */
     public void compile(ActionContext actionContext) {
-        final RowMetadata input = actionContext.getInputRowMetadata();
+        final RowMetadata input = actionContext.getRowMetadata();
         final ScopeCategory scope = actionContext.getScope();
         if (scope != null) {
             switch (scope) {
@@ -272,7 +280,7 @@ public abstract class ActionMetadata {
         final ScopeCategory scope = getScope(parametersCopy);
         final Predicate<DataSetRow> filter = getFilter(parametersCopy);
 
-        return builder().withCompile((actionContext) -> {
+        return builder().withName(getName()).withParameters(parametersCopy).withCompile(actionContext -> {
             try {
                 actionContext.setParameters(parametersCopy);
                 compile(actionContext);
@@ -280,8 +288,7 @@ public abstract class ActionMetadata {
                 LOGGER.error("Unable to use action '{}' due to unexpected error.", this.getName(), e);
                 actionContext.setActionStatus(ActionContext.ActionStatus.CANCELED);
             }
-        })
-        .withRow((row, context) -> {
+        }).withRow((row, context) -> {
             try {
                 if (implicitFilter() && !filter.test(row)) {
                     // Return non-modifiable row since it didn't pass the filter (but metadata might be modified).
@@ -308,7 +315,8 @@ public abstract class ActionMetadata {
                 // For following actions, returns the row as modifiable to allow further modifications.
                 return row.modifiable();
             } catch (Exception e) {
-                LOGGER.error("Unable to use action '{}' (parameters: {}) due to unexpected error.", this.getName(), parameters, e);
+                LOGGER.error("Unable to use action '{}' (parameters: {}) due to unexpected error.", this.getName(), parameters,
+                        e);
                 context.setActionStatus(ActionContext.ActionStatus.CANCELED);
                 return row.modifiable();
             }
@@ -329,5 +337,12 @@ public abstract class ActionMetadata {
      **/
     public List<Parameter> getParameters() {
         return ImplicitParameters.getParameters();
+    }
+
+    @JsonIgnore
+    public Set<Behavior> getBehavior() {
+        // Safe strategy: use all behaviors to disable all optimizations. Each implementation of action must explicitly
+        // declare its behavior(s).
+        return EnumSet.allOf(Behavior.class);
     }
 }

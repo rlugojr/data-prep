@@ -33,6 +33,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.dataprep.api.dataset.ColumnMetadata;
 import org.talend.dataprep.api.dataset.DataSetRow;
 import org.talend.dataprep.api.dataset.RowMetadata;
+import org.talend.dataprep.api.preparation.Action;
 import org.talend.dataprep.api.type.Type;
 import org.talend.dataprep.exception.TDPException;
 
@@ -75,11 +76,10 @@ public class ActionParserTest {
 
         RowMetadata expectedMetadata = getRowMetadata();
 
-        ParsedActions actualActions = actionParser.parse("");
+        List<Action> actualActions = actionParser.parse("");
 
         // when
-        List<DataSetRowAction> rowTransformers = actualActions.getRowTransformers();
-        final DataSetRowAction[] actions = rowTransformers.toArray(new DataSetRowAction[rowTransformers.size()]);
+        final Action[] actions = actualActions.toArray(new Action[actualActions.size()]);
         ActionTestWorkbench.test(actualRow, actions);
 
         // then
@@ -93,11 +93,10 @@ public class ActionParserTest {
         DataSetRow actualRow = getDataSetRow();
 
         String json = IOUtils.toString(ActionParserTest.class.getResourceAsStream("actions.json"));
-        ParsedActions actualActions = actionParser.parse(json);
+        List<Action> actualActions = actionParser.parse(json);
 
         // when
-        List<DataSetRowAction> rowTransformers = actualActions.getRowTransformers();
-        final DataSetRowAction[] actions = rowTransformers.toArray(new DataSetRowAction[rowTransformers.size()]);
+        final Action[] actions = actualActions.toArray(new Action[actualActions.size()]);
         ActionTestWorkbench.test(actualRow, actions);
 
         // then
