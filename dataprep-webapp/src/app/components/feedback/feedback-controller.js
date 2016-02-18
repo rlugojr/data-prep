@@ -51,9 +51,11 @@ export default function FeedbackCtrl(state, $translate, FeedbackRestService, Mes
     vm.sendFeedback = function () {
         vm.feedbackForm.$commitViewValue();
         vm.isSendingFeedback = true;
+
+        StorageService.saveFeedbackUserMail(vm.feedback.mail);
+
         FeedbackRestService.sendFeedback(vm.feedback)
             .then (function () {
-                StorageService.saveFeedbackUserMail(vm.feedback.mail);
                 resetForm();
                 StateService.hideFeedback();
                 MessageService.success('FEEDBACK_SENT_TITLE', 'FEEDBACK_SENT_CONTENT');

@@ -153,7 +153,6 @@ describe('Feedback controller', function () {
 
             //given
             ctrl.sendFeedback();
-            scope.$digest();
 
             //then
             expect(StorageService.saveFeedbackUserMail).toHaveBeenCalledWith('test mail');
