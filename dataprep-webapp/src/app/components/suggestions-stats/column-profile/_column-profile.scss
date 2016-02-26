@@ -12,37 +12,39 @@
   ============================================================================*/
 
 .column-profile {
+
   .column-profile-options {
-    margin: 15px 10px;
+    @include flex-column();
+    padding: 10px 10px;
 
-    .button-dropdown .button-dropdown-main {
-      background-color: $white;
-      border-color: $dark-gray;
-      color: $dark-gray;
-      max-width: 240px;
-      min-width: 90px;
-    }
+    .column-profile-chart-control {
+      @include flex-row();
+      @include align-items(center);
 
-    .button-dropdown .button-dropdown-side {
-      background-color: $white;
-      border-color: $dark-gray;
-      color: $dark-gray;
+      .button-dropdown {
+        border-color: $dark-gray;
+        min-width: 90px;
+        max-width: 240px;
+      }
+
+      .button-dropdown,
+      .button-dropdown .button-dropdown-main,
+      .button-dropdown .button-dropdown-side {
+        background-color: $white;
+        color: $dark-gray;
+      }
     }
 
     .moreText {
       @include ellipsis(95%);
     }
 
-    .column-profile-aggregation-list {
-      @include menu-list;
+    .highlight {
+      font-weight: bold;
     }
 
-    .column-profile-aggregation-description {
-      padding: 10px 5px;
-
-      .highlight {
-        font-weight: bold;
-      }
+    .column-profile-aggregation-list {
+      @include menu-list;
     }
   }
 }
