@@ -39,8 +39,12 @@
       @include ellipsis(95%);
     }
 
-    .highlight {
-      font-weight: bold;
+    .column-profile-aggregation-description {
+      padding: 10px 5px;
+
+      .highlight {
+        font-weight: bold;
+      }
     }
 
     .column-profile-aggregation-list {
