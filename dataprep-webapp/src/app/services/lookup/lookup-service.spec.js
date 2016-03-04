@@ -416,11 +416,26 @@ describe('lookup service', function () {
             expect(StateService.setLookupUpdateMode).toHaveBeenCalledWith(firstLookupAction, dsLookupContent, lookupStep);
         }));
 
-        it('should NOT change state when the lookup is not visible', inject(function ($rootScope, LookupService, DatasetRestService, StateService) {
+        it('should NOT update target column when the lookup is not visible', inject(function ($rootScope, LookupService, DatasetRestService, StateService) {
             //given
             stateMock.playground.lookup.addedActions = lookupActions;
             stateMock.playground.lookup.dataset = firstLookupAction;
             stateMock.playground.lookup.visibility = false;
+
+            //when
+            LookupService.updateTargetColumn();
+            $rootScope.$digest();
+
+            //then
+            expect(StateService.setLookupAddMode).not.toHaveBeenCalled();
+            expect(StateService.setLookupUpdateMode).not.toHaveBeenCalled();
+        }));
+
+        it('should NOT update target column when there is no lookup dataset', inject(function ($rootScope, LookupService, DatasetRestService, StateService) {
+            //given
+            stateMock.playground.lookup.addedActions = lookupActions;
+            stateMock.playground.lookup.dataset = null;
+            stateMock.playground.lookup.visibility = true;
 
             //when
             LookupService.updateTargetColumn();

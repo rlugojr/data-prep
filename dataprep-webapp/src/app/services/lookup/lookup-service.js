@@ -174,11 +174,11 @@ export default function LookupService($q, state, StateService, TransformationRes
      * Otherwise, we load the lookup action as new lookup
      */
     function updateTargetColumn() {
-        if (!state.playground.lookup.visibility) {
+        var lookupAction = state.playground.lookup.dataset;
+        if (!state.playground.lookup.visibility || !lookupAction) {
             return;
         }
 
-        var lookupAction = state.playground.lookup.dataset;
         return loadFromAction(lookupAction);
     }
 
