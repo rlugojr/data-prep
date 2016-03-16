@@ -61,7 +61,7 @@ public class ActionTestWorkbench {
         dataSet.setMetadata(dataSetMetadata);
         dataSet.setRecords(input.stream());
         final TestOutputNode outputNode = new TestOutputNode();
-        Pipeline pipeline = Pipeline.Builder.builder() //
+        Pipeline pipeline = Pipeline.PipelineBuilder.pipeline() //
                 .withInitialMetadata(rowMetadata) //
                 .withActions(allActions) //
                 .withContext(context) //

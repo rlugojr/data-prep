@@ -56,7 +56,7 @@ public class PipelineTest extends TransformationBaseTest {
         dataSetMetadata.setRowMetadata(row1.getRowMetadata());
         dataSet.setMetadata(dataSetMetadata);
         dataSet.setRecords(Arrays.asList(row1, row2, row3).stream());
-        Pipeline pipeline = Pipeline.Builder.builder()
+        Pipeline pipeline = Pipeline.PipelineBuilder.pipeline()
                 .withActionRegistry(actionRegistry)
                 .withInitialMetadata(row1.getRowMetadata())
                 .withActions(actionParser.parse(json))

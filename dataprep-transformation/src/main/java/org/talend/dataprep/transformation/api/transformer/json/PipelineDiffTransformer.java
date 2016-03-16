@@ -33,10 +33,10 @@ import org.talend.dataprep.transformation.api.transformer.TransformerWriter;
 import org.talend.dataprep.transformation.api.transformer.configuration.Configuration;
 import org.talend.dataprep.transformation.api.transformer.configuration.PreviewConfiguration;
 import org.talend.dataprep.transformation.format.WriterRegistrationService;
-import org.talend.dataprep.transformation.pipeline.ActionRegistry;
-import org.talend.dataprep.transformation.pipeline.Pipeline;
-import org.talend.dataprep.transformation.pipeline.PipelineConsoleDump;
-import org.talend.dataprep.transformation.pipeline.model.*;
+import org.talend.dataprep.transformation.pipeline.*;
+import org.talend.dataprep.transformation.pipeline.link.CloneLink;
+import org.talend.dataprep.transformation.pipeline.model.DiffWriterNode;
+import org.talend.dataprep.transformation.pipeline.node.BasicNode;
 
 /**
  * Transformer that preview the transformation (puts additional json content so that the front can display the
@@ -110,7 +110,7 @@ class PipelineDiffTransformer implements Transformer {
                                    String actions,
                                    TransformationContext transformationContext,
                                    Node output) {
-        return Pipeline.Builder.builder() //
+        return Pipeline.PipelineBuilder.pipeline() //
                 .withActionRegistry(actionRegistry) //
                 .withActions(actionParser.parse(actions)) //
                 .withInitialMetadata(rowMetadata) //

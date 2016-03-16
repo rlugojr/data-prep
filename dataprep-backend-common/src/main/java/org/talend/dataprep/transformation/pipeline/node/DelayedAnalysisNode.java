@@ -1,4 +1,4 @@
-package org.talend.dataprep.transformation.pipeline.model;
+package org.talend.dataprep.transformation.pipeline.node;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,6 +23,11 @@ import org.talend.dataprep.api.dataset.RowMetadata;
 import org.talend.dataprep.api.dataset.statistics.StatisticsAdapter;
 import org.talend.dataprep.exception.TDPException;
 import org.talend.dataprep.exception.error.CommonErrorCodes;
+import org.talend.dataprep.transformation.pipeline.Link;
+import org.talend.dataprep.transformation.pipeline.Monitored;
+import org.talend.dataprep.transformation.pipeline.Signal;
+import org.talend.dataprep.transformation.pipeline.Visitor;
+import org.talend.dataprep.transformation.pipeline.link.NullLink;
 import org.talend.dataprep.util.FilesHelper;
 import org.talend.datascience.common.inference.Analyzer;
 import org.talend.datascience.common.inference.Analyzers;
@@ -112,7 +117,7 @@ public class DelayedAnalysisNode extends AnalysisNode implements Monitored {
     public void signal(Signal signal) {
         final long start = System.currentTimeMillis();
         try {
-            if (signal == Signal.END_OF_STREAM) {
+            if (signal == Signal.END_OF_STREAM || signal == Signal.CANCEL) {
                 // End temporary output
                 generator.writeEndArray();
                 generator.writeEndObject();

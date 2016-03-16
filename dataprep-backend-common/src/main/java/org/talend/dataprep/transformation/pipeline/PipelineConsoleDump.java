@@ -1,6 +1,9 @@
 package org.talend.dataprep.transformation.pipeline;
 
-import org.talend.dataprep.transformation.pipeline.model.*;
+import org.talend.dataprep.transformation.pipeline.link.BasicLink;
+import org.talend.dataprep.transformation.pipeline.link.CloneLink;
+import org.talend.dataprep.transformation.pipeline.link.MonitorLink;
+import org.talend.dataprep.transformation.pipeline.node.*;
 
 public class PipelineConsoleDump implements Visitor {
 

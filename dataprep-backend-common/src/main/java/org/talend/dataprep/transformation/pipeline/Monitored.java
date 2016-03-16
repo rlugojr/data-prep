@@ -1,4 +1,4 @@
-package org.talend.dataprep.transformation.pipeline.model;
+package org.talend.dataprep.transformation.pipeline;
 
 /**
  * To be implemented to indicate pipeline element can monitor performance.

@@ -1,9 +1,11 @@
-package org.talend.dataprep.transformation.pipeline.model;
+package org.talend.dataprep.transformation.pipeline.node;
 
 import org.talend.dataprep.api.dataset.DataSetRow;
 import org.talend.dataprep.api.dataset.RowMetadata;
 import org.talend.dataprep.api.preparation.Action;
 import org.talend.dataprep.transformation.api.action.context.ActionContext;
+import org.talend.dataprep.transformation.pipeline.*;
+import org.talend.dataprep.transformation.pipeline.link.NullLink;
 
 public class ActionNode implements Node, Monitored {
 

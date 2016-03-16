@@ -1,9 +1,14 @@
-package org.talend.dataprep.transformation.pipeline.model;
+package org.talend.dataprep.transformation.pipeline.node;
 
 import org.talend.dataprep.api.dataset.DataSetRow;
 import org.talend.dataprep.api.dataset.RowMetadata;
 import org.talend.dataprep.api.preparation.Action;
 import org.talend.dataprep.transformation.api.action.context.ActionContext;
+import org.talend.dataprep.transformation.pipeline.Link;
+import org.talend.dataprep.transformation.pipeline.Node;
+import org.talend.dataprep.transformation.pipeline.Signal;
+import org.talend.dataprep.transformation.pipeline.Visitor;
+import org.talend.dataprep.transformation.pipeline.link.NullLink;
 
 public class CompileNode implements Node {
 

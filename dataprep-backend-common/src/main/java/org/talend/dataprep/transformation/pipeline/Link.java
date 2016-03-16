@@ -1,4 +1,4 @@
-package org.talend.dataprep.transformation.pipeline.model;
+package org.talend.dataprep.transformation.pipeline;
 
 import org.talend.dataprep.api.dataset.DataSetRow;
 import org.talend.dataprep.api.dataset.RowMetadata;

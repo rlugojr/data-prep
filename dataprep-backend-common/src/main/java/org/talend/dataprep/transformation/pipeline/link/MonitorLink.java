@@ -1,7 +1,10 @@
-package org.talend.dataprep.transformation.pipeline.model;
+package org.talend.dataprep.transformation.pipeline.link;
 
 import org.talend.dataprep.api.dataset.DataSetRow;
 import org.talend.dataprep.api.dataset.RowMetadata;
+import org.talend.dataprep.transformation.pipeline.Link;
+import org.talend.dataprep.transformation.pipeline.Signal;
+import org.talend.dataprep.transformation.pipeline.Visitor;
 
 public class MonitorLink implements Link {
 

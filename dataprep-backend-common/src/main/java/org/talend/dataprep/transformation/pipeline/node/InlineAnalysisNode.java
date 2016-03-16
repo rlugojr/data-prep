@@ -1,4 +1,4 @@
-package org.talend.dataprep.transformation.pipeline.model;
+package org.talend.dataprep.transformation.pipeline.node;
 
 import java.util.Collections;
 import java.util.List;
@@ -15,6 +15,11 @@ import org.talend.dataprep.api.dataset.DataSetRow;
 import org.talend.dataprep.api.dataset.RowMetadata;
 import org.talend.dataprep.api.dataset.statistics.StatisticsAdapter;
 import org.talend.dataprep.transformation.api.transformer.json.NullAnalyzer;
+import org.talend.dataprep.transformation.pipeline.Link;
+import org.talend.dataprep.transformation.pipeline.Monitored;
+import org.talend.dataprep.transformation.pipeline.Signal;
+import org.talend.dataprep.transformation.pipeline.Visitor;
+import org.talend.dataprep.transformation.pipeline.link.NullLink;
 import org.talend.datascience.common.inference.Analyzer;
 import org.talend.datascience.common.inference.Analyzers;
 
@@ -122,7 +127,7 @@ public class InlineAnalysisNode extends AnalysisNode implements Monitored {
 
     @Override
     public void signal(Signal signal) {
-        if (signal == Signal.END_OF_STREAM) {
+        if (signal == Signal.END_OF_STREAM || signal == Signal.CANCEL) {
             adapter.adapt(previousColumns, inlineAnalyzer.getResult(), filter);
         }
         try {

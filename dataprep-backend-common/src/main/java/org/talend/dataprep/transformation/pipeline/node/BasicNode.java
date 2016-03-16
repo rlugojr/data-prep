@@ -1,21 +1,19 @@
-package org.talend.dataprep.transformation.pipeline.model;
+package org.talend.dataprep.transformation.pipeline.node;
 
 import org.talend.dataprep.api.dataset.DataSetRow;
 import org.talend.dataprep.api.dataset.RowMetadata;
+import org.talend.dataprep.transformation.pipeline.Link;
+import org.talend.dataprep.transformation.pipeline.Node;
+import org.talend.dataprep.transformation.pipeline.Signal;
+import org.talend.dataprep.transformation.pipeline.Visitor;
 
-public class SourceNode implements Node {
+public class BasicNode implements Node {
 
-    private Link link = NullLink.INSTANCE;
+    private Link link;
 
     @Override
     public void receive(DataSetRow row, RowMetadata metadata) {
         link.emit(row, metadata);
-    }
-
-    @Override
-    public void accept(Visitor visitor) {
-        visitor.visitSource(this);
-        link.accept(visitor);
     }
 
     @Override
@@ -33,4 +31,8 @@ public class SourceNode implements Node {
         link.signal(signal);
     }
 
+    @Override
+    public void accept(Visitor visitor) {
+        visitor.visitNode(this);
+    }
 }
