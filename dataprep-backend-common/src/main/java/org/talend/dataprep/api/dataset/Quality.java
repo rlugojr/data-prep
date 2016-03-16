@@ -117,6 +117,43 @@ public class Quality implements Serializable {
         this.invalidValues = invalidValues;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Quality)) {
+            return false;
+        }
+
+        Quality quality = (Quality) o;
+
+        if (empty != quality.empty) {
+            return false;
+        }
+        if (invalid != quality.invalid) {
+            return false;
+        }
+        if (valid != quality.valid) {
+            return false;
+        }
+        if (mostFrequentSubType != null ? !mostFrequentSubType.equals(quality.mostFrequentSubType) : quality.mostFrequentSubType != null) {
+            return false;
+        }
+        return invalidValues != null ? invalidValues.equals(quality.invalidValues) : quality.invalidValues == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = empty;
+        result = 31 * result + (mostFrequentSubType != null ? mostFrequentSubType.hashCode() : 0);
+        result = 31 * result + invalid;
+        result = 31 * result + valid;
+        result = 31 * result + (invalidValues != null ? invalidValues.hashCode() : 0);
+        return result;
+    }
+
     /**
      * @see Object#toString()
      */

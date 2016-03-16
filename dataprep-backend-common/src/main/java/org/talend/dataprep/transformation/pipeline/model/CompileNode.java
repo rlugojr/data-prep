@@ -13,6 +13,8 @@ public class CompileNode implements Node {
 
     private Link link = NullLink.INSTANCE;
 
+    private int hashCode = 0;
+
     public CompileNode(Action action, ActionContext actionContext) {
         this.action = action;
         this.actionContext = actionContext;
@@ -20,10 +22,13 @@ public class CompileNode implements Node {
 
     @Override
     public void receive(DataSetRow row, RowMetadata metadata) {
-        if (actionContext.getRowMetadata() == null) {
-            actionContext.setRowMetadata(metadata);
+        boolean needCompile = actionContext.getActionStatus() == ActionContext.ActionStatus.NOT_EXECUTED;
+        if (actionContext.getRowMetadata() == null || hashCode != metadata.hashCode()) {
+            actionContext.setRowMetadata(metadata.clone());
+            hashCode = metadata.hashCode();
+            needCompile = true; // Metadata changed, force re-compile
         }
-        if (actionContext.getActionStatus() == ActionContext.ActionStatus.NOT_EXECUTED) {
+        if (needCompile) {
             action.getRowAction().compile(actionContext);
         }
         link.emit(row, actionContext.getRowMetadata());

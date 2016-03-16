@@ -38,8 +38,8 @@ public class Pipeline implements Node {
     }
 
     public void execute(DataSet dataSet) {
+        final RowMetadata rowMetadata = dataSet.getMetadata().getRowMetadata().clone();
         try (Stream<DataSetRow> records = dataSet.getRecords()) {
-            final RowMetadata rowMetadata = dataSet.getMetadata().getRowMetadata();
             records.forEach(r -> node.receive(r, rowMetadata));
             node.signal(Signal.END_OF_STREAM);
         }
@@ -109,45 +109,13 @@ public class Pipeline implements Node {
             return new Builder();
         }
 
-        private Node buildApplyActions(Node node, Function<Action, Node> nodeFunction) {
-            final Iterator<Action> compileIterator = actions.iterator();
-            Node lastNode = node;
-            while (compileIterator.hasNext()) {
-                final Action action = compileIterator.next();
-                // Check if action needs for up-to-date statistics
-                // TODO To enable needs further testing (see TDP-1543).
-                /*
-                if (hasBehavior(action, ActionMetadata.Behavior.NEED_STATISTICS)) {
-                    Node newNode = new InlineAnalysisNode(inlineAnalyzer, filter, adapter);
-                    Link link = new BasicLink(newNode);
-                    lastNode.setLink(link);
-                    lastNode = newNode;
-                }
-                */
-                // Adds new action
-                Node newNode = nodeFunction.apply(action);
-                Link link = new BasicLink(newNode);
-                lastNode.setLink(link);
-                lastNode = newNode;
-            }
-            return lastNode;
-        }
+        private Node buildAction(Node previousNode, Action action, Function<Action, Node> compile, Function<Action, Node> execute) {
+            Node compileAction = compile.apply(action);
+            Node executeAction = execute.apply(action);
 
-        private boolean hasBehavior(Action action, ActionMetadata.Behavior behavior) {
-            return actionToMetadata.get(action) != null && actionToMetadata.get(action).getBehavior().contains(behavior);
-        }
-
-        private Node buildCompileActions(Node node, Function<Action, Node> nodeFunction) {
-            final Iterator<Action> compileIterator = actions.iterator();
-            Node lastNode = node;
-            while (compileIterator.hasNext()) {
-                final Action action = compileIterator.next();
-                Node newNode = nodeFunction.apply(action);
-                Link link = new BasicLink(newNode);
-                lastNode.setLink(link);
-                lastNode = newNode;
-            }
-            return lastNode;
+            previousNode.setLink(new BasicLink(compileAction));
+            compileAction.setLink(new BasicLink(executeAction));
+            return executeAction;
         }
 
         public Builder withStatisticsAdapter(StatisticsAdapter adapter) {
@@ -192,12 +160,14 @@ public class Pipeline implements Node {
 
         public Pipeline build() {
             // Source
-            final SourceNode sourceNode = new SourceNode();
+            final Node sourceNode = new SourceNode();
+            Node current = sourceNode;
             // Compile actions
             final Set<String> readOnlyColumns = rowMetadata.getColumns().stream().map(ColumnMetadata::getId)
                     .collect(Collectors.toSet());
             final Set<String> modifiedColumns = new HashSet<>();
             int createColumnActions = 0;
+            final boolean needDelayedAnalysis;
             if (actionRegistry != null) {
                 for (Action action : actions) {
                     final ActionMetadata actionMetadata = actionRegistry.get(action.getName());
@@ -235,15 +205,24 @@ public class Pipeline implements Node {
                         }
                     }
                 }
+                filter = c -> modifiedColumns.contains(c.getId()) || !readOnlyColumns.contains(c.getId());
+                needDelayedAnalysis = !modifiedColumns.isEmpty() || createColumnActions > 0;
             } else {
                 LOGGER.warn("Unable to statically analyze actions (no action registry defined).");
+                filter = c -> true;
+                needDelayedAnalysis = true;
             }
-            filter = c -> modifiedColumns.contains(c.getId()) || !readOnlyColumns.contains(c.getId());
             // Compile actions
-            Node current = buildCompileActions(sourceNode, a -> new CompileNode(a, context.create(a.getRowAction())));
-            current = buildApplyActions(current, a -> new ActionNode(a, context.in(a.getRowAction())));
+            for (Action action : actions) {
+                current = buildAction(current, //
+                        action, //
+                        a -> new CompileNode(a, context.create(a.getRowAction())), //
+                        a -> new ActionNode(a, context.in(a.getRowAction()))
+                );
+            }
+
             // Analyze (delayed)
-            if (!modifiedColumns.isEmpty() || createColumnActions > 0) {
+            if (needDelayedAnalysis) {
                 // Inline analysis
                 Node inlineAnalysisNode = new InlineAnalysisNode(inlineAnalyzer, filter, adapter);
                 current.setLink(new BasicLink(inlineAnalysisNode));

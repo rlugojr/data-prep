@@ -17,16 +17,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
-import org.talend.dataprep.api.dataset.DataSet;
-import org.talend.dataprep.api.dataset.DataSetMetadata;
-import org.talend.dataprep.api.dataset.DataSetRow;
-import org.talend.dataprep.api.dataset.RowMetadata;
+import org.talend.dataprep.api.dataset.*;
 import org.talend.dataprep.api.dataset.statistics.StatisticsAdapter;
 import org.talend.dataprep.api.preparation.Action;
 import org.talend.dataprep.transformation.api.action.context.TransformationContext;
+import org.talend.dataprep.transformation.api.transformer.json.NullAnalyzer;
 import org.talend.dataprep.transformation.pipeline.Pipeline;
 import org.talend.dataprep.transformation.pipeline.model.*;
+import org.talend.datascience.common.inference.Analyzer;
+import org.talend.datascience.common.inference.Analyzers;
 
 public class ActionTestWorkbench {
 
@@ -42,6 +43,13 @@ public class ActionTestWorkbench {
     }
 
     public static void test(Collection<DataSetRow> input, Action... actions) {
+        test(input, c -> Analyzers.with(NullAnalyzer.INSTANCE), c -> Analyzers.with(NullAnalyzer.INSTANCE), actions);
+    }
+
+    public static void test(Collection<DataSetRow> input,
+                            Function<List<ColumnMetadata>, Analyzer<Analyzers.Result>> inlineAnalysis,
+                            Function<List<ColumnMetadata>, Analyzer<Analyzers.Result>> delayedAnalysis,
+                            Action... actions) {
         TransformationContext context = new TransformationContext();
         final List<Action> allActions = new ArrayList<>();
         Collections.addAll(allActions, actions);
@@ -52,21 +60,36 @@ public class ActionTestWorkbench {
         dataSetMetadata.setRowMetadata(rowMetadata);
         dataSet.setMetadata(dataSetMetadata);
         dataSet.setRecords(input.stream());
+        final TestOutputNode outputNode = new TestOutputNode();
         Pipeline pipeline = Pipeline.Builder.builder() //
                 .withInitialMetadata(rowMetadata) //
                 .withActions(allActions) //
                 .withContext(context) //
+                .withInlineAnalysis(inlineAnalysis)
+                .withDelayedAnalysis(delayedAnalysis)
                 .withStatisticsAdapter(new StatisticsAdapter()) //
-                .withOutput(TestOutputNode::new) //
+                .withOutput(() -> outputNode) //
                 .build();
         pipeline.execute(dataSet);
+
+        // Some tests rely on the metadata changes in the provided metadata so set back modified columns in row metadata
+        // (although this should be avoided in tests).
+        // TODO Make this method return the modified metadata iso. setting modified columns.
+        rowMetadata.setColumns(outputNode.getMetadata().getColumns());
     }
 
     private static class TestOutputNode implements Node {
 
+        private RowMetadata metadata;
+
+        public RowMetadata getMetadata() {
+            return metadata;
+        }
+
         @Override
         public void receive(DataSetRow row, RowMetadata metadata) {
-            row.setRowMetadata(metadata);
+            this.metadata = metadata;
+            row.setRowMetadata(this.metadata);
         }
 
         @Override

@@ -27,12 +27,12 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.talend.dataprep.api.dataset.ColumnMetadata;
 import org.talend.dataprep.api.dataset.DataSetRow;
-import org.talend.dataprep.api.dataset.Quality;
 import org.talend.dataprep.api.dataset.RowMetadata;
-import org.talend.dataprep.api.dataset.location.SemanticDomain;
+import org.talend.dataprep.api.dataset.statistics.PatternFrequency;
 import org.talend.dataprep.api.dataset.statistics.Statistics;
 import org.talend.dataprep.api.preparation.Action;
 import org.talend.dataprep.api.type.Type;
+import org.talend.dataprep.quality.AnalyzerService;
 import org.talend.dataprep.transformation.api.action.ActionTestWorkbench;
 import org.talend.dataprep.transformation.api.action.metadata.AbstractMetadataBaseTest;
 import org.talend.dataprep.transformation.api.action.metadata.ActionMetadataTestUtils;
@@ -45,6 +45,9 @@ import org.talend.dataprep.transformation.api.action.parameters.Parameter;
  * @see Split
  */
 public class SplitTest extends AbstractMetadataBaseTest {
+
+    @Autowired
+    AnalyzerService analyzerService;
 
     /**
      * The action to test.
@@ -288,27 +291,20 @@ public class SplitTest extends AbstractMetadataBaseTest {
         values.put("0002", "01/01/2015");
         final DataSetRow row = new DataSetRow(values);
 
-        Statistics originalStats = row.getRowMetadata().getById("0001").getStatistics();
-        Quality originalQuality = row.getRowMetadata().getById("0001").getQuality();
-        List<SemanticDomain> originalDomains = row.getRowMetadata().getById("0001").getSemanticDomains();
+
 
         // when
-        ActionTestWorkbench.test(row, factory.create(action, parameters));
+        ActionTestWorkbench.test(Collections.singletonList(row), //
+                c -> analyzerService.schemaAnalysis(c), // Test requires some analysis in asserts
+                c -> analyzerService.full(c), // Test requires some analysis in asserts
+                factory.create(action, parameters));
 
         // then
-        assertTrue(originalStats == row.getRowMetadata().getById("0001").getStatistics());
-        assertTrue(originalQuality == row.getRowMetadata().getById("0001").getQuality());
-        assertTrue(originalDomains == row.getRowMetadata().getById("0001").getSemanticDomains());
+        Statistics originalStats = row.getRowMetadata().getById("0001").getStatistics();
+        final List<PatternFrequency> originalPatterns = originalStats.getPatternFrequencies();
 
-        assertTrue(originalStats != row.getRowMetadata().getById("0003").getStatistics());
-        assertTrue(originalQuality != row.getRowMetadata().getById("0003").getQuality());
-        assertTrue(originalDomains == Collections.<SemanticDomain> emptyList()
-                || originalDomains != row.getRowMetadata().getById("0003").getSemanticDomains());
-
-        assertTrue(originalStats != row.getRowMetadata().getById("0004").getStatistics());
-        assertTrue(originalQuality != row.getRowMetadata().getById("0004").getQuality());
-        assertTrue(originalDomains == Collections.<SemanticDomain> emptyList()
-                || originalDomains != row.getRowMetadata().getById("0004").getSemanticDomains());
+        assertFalse(originalPatterns.equals(row.getRowMetadata().getById("0003").getStatistics().getPatternFrequencies()));
+        assertFalse(originalPatterns.equals(row.getRowMetadata().getById("0004").getStatistics().getPatternFrequencies()));
     }
 
     @Test

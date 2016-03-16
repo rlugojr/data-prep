@@ -69,6 +69,11 @@ public class Concat extends ActionMetadata implements ColumnAction, OtherColumnP
     public static final String COLUMN_NAMES_SEPARATOR = "_"; //$NON-NLS-1$
 
     /**
+     * The parameter used to lookup for the newly created column.
+     */
+    public static final String CONCAT_NEW_COLUMN = "new_column";
+
+    /**
      * @see ActionMetadata#getName()
      */
     @Override
@@ -128,7 +133,7 @@ public class Concat extends ActionMetadata implements ColumnAction, OtherColumnP
             final Map<String, String> parameters = context.getParameters();
             final ColumnMetadata sourceColumn = rowMetadata.getById(columnId);
             final String newColumnName = evalNewColumnName(sourceColumn.getName(), rowMetadata, parameters);
-            context.column(newColumnName, (r) -> {
+            context.column(CONCAT_NEW_COLUMN, (r) -> {
                 final ColumnMetadata c = ColumnMetadata.Builder //
                         .column() //
                         .name(newColumnName) //
@@ -149,10 +154,8 @@ public class Concat extends ActionMetadata implements ColumnAction, OtherColumnP
         final RowMetadata rowMetadata = context.getRowMetadata();
         final String columnId = context.getColumnId();
         final Map<String, String> parameters = context.getParameters();
-        final ColumnMetadata sourceColumn = rowMetadata.getById(columnId);
 
-        final String newColumnName = evalNewColumnName(sourceColumn.getName(), rowMetadata, parameters);
-        String concatColumn = context.column(newColumnName);
+        String concatColumn = context.column(CONCAT_NEW_COLUMN);
 
         // Set new column value
         String sourceValue = row.get(columnId);

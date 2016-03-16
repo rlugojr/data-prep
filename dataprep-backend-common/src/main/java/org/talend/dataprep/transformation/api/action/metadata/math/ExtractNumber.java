@@ -42,32 +42,26 @@ import org.talend.dataprep.transformation.api.action.parameters.SelectParameter;
  *
  * We use metric prefix from <a href="https://en.wikipedia.org/wiki/Metric_prefix">Wikipedia</a>
  *
- *  <ul>
- *     <li>tera, T, 1000000000000</li>
- *     <li>giga, G, 1000000000</li>
- *     <li>mega, M, 1000000</li>
- *     <li>kilo, k, 1000</li>
- *     <li>hecto, h, 100</li>
- *     <li>deca, da, 10</li>
- *     <li>(none), (none), 1</li>
- *     <li>deci, d, 0.1</li>
- *     <li>centi, c, 0.01</li>
- *     <li>milli, m, 0.001</li>
- *     <li>micro, μ, 0.000001</li>
- *     <li>nano, n, 0.000000001</li>
- *     <li>pico p 0.000000000001</li>
+ * <ul>
+ * <li>tera, T, 1000000000000</li>
+ * <li>giga, G, 1000000000</li>
+ * <li>mega, M, 1000000</li>
+ * <li>kilo, k, 1000</li>
+ * <li>hecto, h, 100</li>
+ * <li>deca, da, 10</li>
+ * <li>(none), (none), 1</li>
+ * <li>deci, d, 0.1</li>
+ * <li>centi, c, 0.01</li>
+ * <li>milli, m, 0.001</li>
+ * <li>micro, μ, 0.000001</li>
+ * <li>nano, n, 0.000000001</li>
+ * <li>pico p 0.000000000001</li>
  * </ul>
  */
 @Component(ActionMetadata.ACTION_BEAN_PREFIX + ExtractNumber.EXTRACT_NUMBER_ACTION_NAME)
 public class ExtractNumber extends ActionMetadata implements ColumnAction {
 
     public static final String EXTRACT_NUMBER_ACTION_NAME = "extract_number"; //$NON-NLS-1$
-
-    public static String DECIMAL_SEPARATOR = "decimal_separator"; //$NON-NLS-1$
-
-    public static String DOT = ".";
-
-    public static String COMMA = ",";
 
     public static final String DEFAULT_RESULT = "0";
 
@@ -76,52 +70,33 @@ public class ExtractNumber extends ActionMetadata implements ColumnAction {
      */
     public static final int MAX_FRACTION_DIGITS_DISPLAY = 30;
 
+    public static String DECIMAL_SEPARATOR = "decimal_separator"; //$NON-NLS-1$
+
+    public static String DOT = ".";
+
+    public static String COMMA = ",";
+
     /**
      * K: the prefix, V: the value
      */
     private Map<String, MetricPrefix> metricPrefixes = new HashMap<>(13);
 
-    public static class MetricPrefix {
-
-        private final String name, sign;
-
-        private final BigDecimal multiply;
-
-        public MetricPrefix(BigDecimal multiply, String name, String sign) {
-            this.multiply = multiply;
-            this.name = name;
-            this.sign = sign;
-        }
-
-        public BigDecimal getMultiply() {
-            return multiply;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getSign() {
-            return sign;
-        }
-    }
-
     /**
      * Initialize the metrics
      * <ul>
-     *     <li>tera, T, 1000000000000</li>
-     *     <li>giga, G, 1000000000</li>
-     *     <li>mega, M, 1000000</li>
-     *     <li>kilo, k, 1000</li>
-     *     <li>hecto, h, 100</li>
-     *     <li>deca, da, 10</li>
-     *     <li>(none), (none), 1</li>
-     *     <li>deci, d, 0.1</li>
-     *     <li>centi, c, 0.01</li>
-     *     <li>milli, m, 0.001</li>
-     *     <li>micro, μ, 0.000001</li>
-     *     <li>nano, n, 0.000000001</li>
-     *     <li>pico p 0.000000000001</li>
+     * <li>tera, T, 1000000000000</li>
+     * <li>giga, G, 1000000000</li>
+     * <li>mega, M, 1000000</li>
+     * <li>kilo, k, 1000</li>
+     * <li>hecto, h, 100</li>
+     * <li>deca, da, 10</li>
+     * <li>(none), (none), 1</li>
+     * <li>deci, d, 0.1</li>
+     * <li>centi, c, 0.01</li>
+     * <li>milli, m, 0.001</li>
+     * <li>micro, μ, 0.000001</li>
+     * <li>nano, n, 0.000000001</li>
+     * <li>pico p 0.000000000001</li>
      * </ul>
      */
     @PostConstruct
@@ -176,38 +151,41 @@ public class ExtractNumber extends ActionMetadata implements ColumnAction {
     }
 
     @Override
+    public void compile(ActionContext actionContext) {
+        super.compile(actionContext);
+        if (actionContext.getActionStatus() == ActionContext.ActionStatus.OK) {
+            final String columnId = actionContext.getColumnId();
+            final RowMetadata rowMetadata = actionContext.getRowMetadata();
+            final ColumnMetadata column = rowMetadata.getById(columnId);
+            actionContext.column("result", r -> {
+                final ColumnMetadata c = ColumnMetadata.Builder //
+                        .column() //
+                        .name(column.getName() + "_number") //
+                        .type(Type.NUMERIC) //
+                        .build();
+                rowMetadata.insertAfter(columnId, c);
+                return c;
+            });
+        }
+    }
+
+    @Override
     public void applyOnColumn(DataSetRow row, ActionContext context) {
-
         final String columnId = context.getColumnId();
-        final RowMetadata rowMetadata = row.getRowMetadata();
-
         final Map<String, String> parameters = context.getParameters();
-
         String decimalSeparator = parameters.get(DECIMAL_SEPARATOR);
-
         if (StringUtils.isEmpty(decimalSeparator)) {
             decimalSeparator = DOT;
         }
 
         // create new column and append it after current column
-        final ColumnMetadata column = rowMetadata.getById(columnId);
-        final String newColumnId = context.column("result", (r) -> {
-            final ColumnMetadata c = ColumnMetadata.Builder //
-                    .column() //
-                    .name(column.getName() + "_number") //
-                    .type(Type.NUMERIC) //
-                    .build();
-            rowMetadata.insertAfter(columnId, c);
-            return c;
-        });
-
+        final String newColumnId = context.column("result");
         row.set(newColumnId, extractNumber(row.get(columnId), decimalSeparator));
-
     }
 
     protected String extractNumber(String value, String decimalSeparator) {
 
-        if (StringUtils.isEmpty( value )) {
+        if (StringUtils.isEmpty(value)) {
             return DEFAULT_RESULT;
         }
 
@@ -238,11 +216,11 @@ public class ExtractNumber extends ActionMetadata implements ColumnAction {
             }
         }
 
-        if (firstPart.length()<1 && secondPart.length()<1){
+        if (firstPart.length() < 1 && secondPart.length() < 1) {
             return DEFAULT_RESULT;
         }
-        if (firstPart.length()<1){
-            firstPart.append( '0' );
+        if (firstPart.length() < 1) {
+            firstPart.append('0');
         }
 
         BigDecimal bigDecimal = new BigDecimal(firstPart.append(DOT).append(secondPart).toString());
@@ -251,10 +229,35 @@ public class ExtractNumber extends ActionMetadata implements ColumnAction {
             bigDecimal = bigDecimal.multiply(metricPrefix.getMultiply());
         }
 
-        DecimalFormat decimalFormat = new DecimalFormat( "0.#" );
-        decimalFormat.setMaximumFractionDigits( MAX_FRACTION_DIGITS_DISPLAY );
-        return decimalFormat.format( bigDecimal.stripTrailingZeros() );
+        DecimalFormat decimalFormat = new DecimalFormat("0.#");
+        decimalFormat.setMaximumFractionDigits(MAX_FRACTION_DIGITS_DISPLAY);
+        return decimalFormat.format(bigDecimal.stripTrailingZeros());
 
+    }
+
+    public static class MetricPrefix {
+
+        private final String name, sign;
+
+        private final BigDecimal multiply;
+
+        public MetricPrefix(BigDecimal multiply, String name, String sign) {
+            this.multiply = multiply;
+            this.name = name;
+            this.sign = sign;
+        }
+
+        public BigDecimal getMultiply() {
+            return multiply;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getSign() {
+            return sign;
+        }
     }
 
 }
