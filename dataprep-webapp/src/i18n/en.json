@@ -73,6 +73,11 @@
   "PREPARATION_RENAME_SUCCESS": "The preparation has been renamed.",
   "PREPARATION_COPYING_SUCCESS_TITLE": "Preparation copying",
   "PREPARATION_COPYING_SUCCESS": "The preparation has been copied.",
+  "APPLY_PREPARATION_ON_ANOTHER_DATASET": "Apply this preparation on another dataset",
+  "LOCATED_IN_FOLDER": "is located in: ",
+  "REPLACE_EXISTING_DATASET": "Choose a dataset to replace the existing one:",
+  "NO_COMPATIBLE_DATASETS": "There are no compatible datasets to preparation: {{name}}",
+  "REPLACE_EXISTING_DATASET": "Replace the existing dataset with a compatible one",
 
   "_comment": "Datagrid transformations",
   "RECIPE_ITEM_ON_COL": "on column <b>{{columnName}}</b>",

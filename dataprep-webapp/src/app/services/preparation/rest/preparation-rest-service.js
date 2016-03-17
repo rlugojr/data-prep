@@ -1,22 +1,24 @@
 /*  ============================================================================
 
-  Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+ Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 
-  This source code is available under agreement available at
-  https://github.com/Talend/data-prep/blob/master/LICENSE
+ This source code is available under agreement available at
+ https://github.com/Talend/data-prep/blob/master/LICENSE
 
-  You should have received a copy of the agreement
-  along with this program; if not, write to Talend SA
-  9 rue Pages 92150 Suresnes, France
+ You should have received a copy of the agreement
+ along with this program; if not, write to Talend SA
+ 9 rue Pages 92150 Suresnes, France
 
-  ============================================================================*/
+ ============================================================================*/
 
 /**
  * @ngdoc service
  * @name data-prep.services.preparation.service:PreparationRestService
- * @description Preparation service. This service provides the entry point to preparation REST api. It holds the loaded preparation.<br/>
+ * @description Preparation service. This service provides the entry point to preparation REST api. It holds the loaded
+ *     preparation.<br/>
  * <b style="color: red;">WARNING : do NOT use this service directly.
- * {@link data-prep.services.preparation.service:PreparationService PreparationService} must be the only entry point for preparations</b>
+ * {@link data-prep.services.preparation.service:PreparationService PreparationService} must be the only entry point
+ *     for preparations</b>
  */
 export default function PreparationRestService($http, RestURLs) {
     'ngInject';
@@ -38,6 +40,7 @@ export default function PreparationRestService($http, RestURLs) {
         getPreparations: getPreparations,
         getContent: getContent,
         getDetails: getDetails,
+        getCandidateDatasets: getCandidateDatasets,
 
         //preview
         getPreviewDiff: getPreviewDiff,
@@ -86,6 +89,19 @@ export default function PreparationRestService($http, RestURLs) {
      */
     function getDetails(preparationId) {
         return $http.get(RestURLs.preparationUrl + '/' + preparationId + '/details');
+    }
+
+    /**
+     * @ngdoc method
+     * @name getCandidateDatasets
+     * @methodOf data-prep.services.preparation.service:PreparationRestService
+     * @param {string} preparationId The preparation id
+     * @description Get candidate datasets
+     * @returns {promise} The GET promise
+     */
+    function getCandidateDatasets(preparationId) {
+        return $http.get(RestURLs.preparationUrl + '/' + preparationId + '/basedatasets')
+            .then((resp) => resp.data);
     }
 
     //---------------------------------------------------------------------------------

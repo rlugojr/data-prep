@@ -33,7 +33,8 @@ export default function PreparationListService(PreparationRestService, StateServ
         create: create,
         clone: clone,
         update: update,
-        delete: deletePreparation
+        delete: deletePreparation,
+        getCandidateDatasets: getCandidateDatasets
     };
 
     /**
@@ -140,5 +141,17 @@ export default function PreparationListService(PreparationRestService, StateServ
     function deletePreparation(preparation) {
         return PreparationRestService.delete(preparation.id)
             .then(() => StateService.removePreparation(preparation));
+    }
+
+    /**
+     * @ngdoc method
+     * @name getCandidateDatasets
+     * @methodOf data-prep.services.preparation.service:PreparationListService
+     * @param {String} preparationId
+     * @description fetches the candidate datasets to replace the current one
+     * @returns {promise} The GET promise
+     */
+    function getCandidateDatasets(preparationId) {
+        return PreparationRestService.getCandidateDatasets(preparationId);
     }
 }

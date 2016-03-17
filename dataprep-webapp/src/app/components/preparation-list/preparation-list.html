@@ -30,7 +30,12 @@
             </p>
 
             <p class="details">
-                <span class="important name one-line" title="{{preparation.dataset.name}}">{{preparation.dataset.name}}</span>&nbsp;- {{ preparation.dataset.records}} <span translate-once="ROWS"></span>
+                <a data-icon="E" translate-once-title="REPLACE_EXISTING_DATASET" ng-click="preparationListCtrl.showDatasetPicker(preparation)"></a>
+                <span class="important name one-line" title="{{preparation.dataset.name}}">
+                    {{preparation.dataset.name}}
+                </span>
+                &nbsp;- {{ preparation.dataset.records}}
+                <span translate-once="ROWS"></span>
             </p>
             <p class="details">
                 <span class="important">{{preparation.steps.length - 1}}</span> <span class="important" translate-once="STEPS"></span> <span translate-once="RECIPE"></span>
@@ -44,3 +49,17 @@
         </div>
     </div>
 </div>
+
+<talend-modal
+        class="dataset-picker-modal"
+        fullscreen="false"
+        state="preparationListCtrl.displayDatasetPicker"
+        close-button="true"
+        ng-if="preparationListCtrl.displayDatasetPicker">
+    <div class="modal-title" translate-once="REPLACE_EXISTING_DATASET"></div>
+
+    <dataset-picker
+            preparation="preparationListCtrl.preparationToUpdate"
+            display-picker="preparationListCtrl.displayDatasetPicker">
+    </dataset-picker>
+</talend-modal>

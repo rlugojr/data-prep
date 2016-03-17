@@ -33,7 +33,9 @@ import PreparationList from './preparation-list-directive';
             'talend.widget',
             'data-prep.services.preparation',
             'data-prep.services.playground',
-            'data-prep.services.state'
+            'data-prep.services.state',
+            'data-prep.inventory-item',
+            'data-prep.dataset-picker'
         ])
         .controller('PreparationListCtrl', PreparationListCtrl)
         .directive('preparationList', PreparationList);

@@ -1,15 +1,15 @@
 /*  ============================================================================
 
-  Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+ Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 
-  This source code is available under agreement available at
-  https://github.com/Talend/data-prep/blob/master/LICENSE
+ This source code is available under agreement available at
+ https://github.com/Talend/data-prep/blob/master/LICENSE
 
-  You should have received a copy of the agreement
-  along with this program; if not, write to Talend SA
-  9 rue Pages 92150 Suresnes, France
+ You should have received a copy of the agreement
+ along with this program; if not, write to Talend SA
+ 9 rue Pages 92150 Suresnes, France
 
-  ============================================================================*/
+ ============================================================================*/
 
 /**
  * @ngdoc controller
@@ -22,13 +22,15 @@
  * @requires data-prep.services.utils.service:MessageService
  * @requires talend.widget.service:TalendConfirmService
  */
-export default function PreparationListCtrl($rootScope, $state, state, StateService,
+export default function PreparationListCtrl($timeout, $rootScope, $state, state, StateService,
                                             PreparationService, MessageService, TalendConfirmService) {
     'ngInject';
 
     var vm = this;
     vm.preparationService = PreparationService;
     vm.state = state;
+    vm.displayDatasetPicker = false;
+    vm.preparationToUpdate = null;
 
     /**
      * @ngdoc method
@@ -104,4 +106,27 @@ export default function PreparationListCtrl($rootScope, $state, state, StateServ
                 $rootScope.$emit('talend.loading.stop');
             });
     };
+
+    /**
+     * @ngdoc method
+     * @name getCandidateDatasets
+     * @methodOf data-prep.preparation-list.controller:PreparationListCtrl
+     * @param {Object} preparation - the preparation to update
+     * @description populates the list of the candidates datasets
+     */
+    vm.showDatasetPicker = function showDatasetPicker(preparation) {
+        vm.displayDatasetPicker = true;
+        vm.preparationToUpdate = preparation;
+    };
+
+    //vm.replaceBaseDataset = function replaceBaseDataset(datasetId, preparationId){
+    //    $rootScope.$emit('talend.loading.start');
+    //    PreparationService.update(preparationId, {dataSetId: datasetId})
+    //        .then(() => {
+    //            return PreparationService.refreshPreparations();
+    //        })
+    //        .then(() => {
+    //            $rootScope.$emit('talend.loading.stop');
+    //        });
+    //}
 }

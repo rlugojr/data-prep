@@ -1,0 +1,37 @@
+<!--
+  ~ ============================================================================
+  ~
+  ~  Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+  ~
+  ~  This source code is available under agreement available at
+  ~  https://github.com/Talend/data-prep/blob/master/LICENSE
+  ~
+  ~  You should have received a copy of the agreement
+  ~  along with this program; if not, write to Talend SA
+  ~  9 rue Pages 92150 Suresnes, France
+  ~
+  ~ ============================================================================
+  -->
+<div class="datasets-picker-modal-content">
+
+    <span ng-if="$ctrl.isFetchingDatasets" class="fetching-spinner">
+        <i data-icon="c" class="talend-button-loader-icon continuous-rotate icon"></i>
+    </span>
+
+    <span ng-if="!$ctrl.candidateDatasets.length"
+          translate-once="NO_COMPATIBLE_DATASETS"
+          translate-values="{name: $ctrl.preparation.name}"
+    ></span>
+
+    <div class="inventory inventory-list">
+        <div class="candidate-dataset-row" ng-repeat="candidateDataset in $ctrl.candidateDatasets track by candidateDataset.id">
+            <inventory-item
+                    ng-click="$ctrl.replaceBaseDataset(candidateDataset.id, $ctrl.preparation.id)"
+                    type="dataset"
+                    item="candidateDataset"
+                    details="DATASET_DETAILS"
+                    toggle-favorite="angular.noop">
+            </inventory-item>
+        </div>
+    </div>
+</div>
