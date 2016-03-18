@@ -20,19 +20,19 @@ describe('Editable Text Widget', function() {
     beforeEach(angular.mock.module('talend.widget'));
     beforeEach(angular.mock.module('htmlTemplates'));
 
-    beforeEach(inject(function ($rootScope, $controller) {
+    beforeEach(inject(function ($rootScope, $componentController) {
         scope = $rootScope.$new();
         onValidateFn = jasmine.createSpy('onValidateFn');
         onCancelFn = jasmine.createSpy('onCancelFn');
 
         createController = function () {
-            var ctrlFn = $controller('TalendEditableTextCtrl', {
-                $scope: scope
-            }, true);
-
-            ctrlFn.instance.onValidate = onValidateFn;
-            ctrlFn.instance.onCancel = onCancelFn;
-            return ctrlFn();
+            return $componentController('talendEditableText',
+                {$scope: scope},
+                {
+                    onValidate: onValidateFn,
+                    onCancel: onCancelFn
+                }
+            );
         };
     }));
 
@@ -79,30 +79,70 @@ describe('Editable Text Widget', function() {
     });
 
     describe('validation', function() {
-        it('should execute validation callback when text has changed', function() {
-            //given
-            var ctrl = createController();
-            ctrl.text = 'Jimmy';
-            ctrl.editionText = 'new Jimmy';
+        describe('validate everytime', () => {
+            it('should execute validation callback when text has changed', function() {
+                //given
+                var ctrl = createController();
+                ctrl.text = 'Jimmy';
+                ctrl.editionText = 'new Jimmy';
 
-            //when
-            ctrl.validate();
+                expect(onValidateFn).not.toHaveBeenCalled();
 
-            //then
-            expect(onValidateFn).toHaveBeenCalled();
+                //when
+                ctrl.validate();
+
+                //then
+                expect(onValidateFn).toHaveBeenCalled();
+            });
+
+            it('should execute validation callback when text has NOT changed', function() {
+                //given
+                var ctrl = createController();
+                ctrl.text = 'Jimmy';
+                ctrl.editionText = 'Jimmy';
+
+                expect(onValidateFn).not.toHaveBeenCalled();
+
+                //when
+                ctrl.validate();
+
+                //then
+                expect(onValidateFn).toHaveBeenCalled();
+            });
         });
 
-        it('should NOT execute validation callback when text has NOT changed', function() {
-            //given
-            var ctrl = createController();
-            ctrl.text = 'Jimmy';
-            ctrl.editionText = 'Jimmy';
+        describe('validate only on change', () => {
+            it('should execute validation callback when text has changed', function() {
+                //given
+                var ctrl = createController();
+                ctrl.text = 'Jimmy';
+                ctrl.editionText = 'new Jimmy';
+                ctrl.validateOnlyOnChange = ''; //defined
 
-            //when
-            ctrl.validate();
+                expect(onValidateFn).not.toHaveBeenCalled();
 
-            //then
-            expect(onValidateFn).not.toHaveBeenCalled();
+                //when
+                ctrl.validate();
+
+                //then
+                expect(onValidateFn).toHaveBeenCalled();
+            });
+
+            it('should NOT execute validation callback when text has NOT changed', function() {
+                //given
+                var ctrl = createController();
+                ctrl.text = 'Jimmy';
+                ctrl.editionText = 'Jimmy';
+                ctrl.validateOnlyOnChange = ''; //defined
+
+                expect(onValidateFn).not.toHaveBeenCalled();
+
+                //when
+                ctrl.validate();
+
+                //then
+                expect(onValidateFn).not.toHaveBeenCalled();
+            });
         });
 
         it('should switch to non edition mode', function() {

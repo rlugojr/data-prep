@@ -11,6 +11,8 @@
 
   ============================================================================*/
 
+import TalendEditableTextCtrl from './widget-editable-text-controller';
+
 /**
  * @ngdoc directive
  * @name talend.widget.directive:TalendEditableText
@@ -24,7 +26,7 @@
  *                              on-text-click="onTextClick()"
  *                              on-validate="onValidate()"
  *                              on-cancel="onCancel()"
- *                              ></talend-editable-text>
+ *                              validate-only-on-change></talend-editable-text>
  * @param {string} placeholder The placeholder to insert in the edition input
  * @param {string} text The text to display
  * @param {string} textTitle The text tooltip
@@ -33,51 +35,38 @@
  * @param {function} onTextClick The action triggered by a text click
  * @param {function} onValidate The action triggered by an edition validation
  * @param {function} onCancel The action triggered by an edition cancelation
+ * @param {any} validateOnlyOnChange If this attribute is present, the onValidate callback is triggered only when value has changed
  */
-export default function TalendEditableText($timeout) {
-    'ngInject';
+export default function TalendEditableText() {
 
     return {
         restrict: 'E',
         templateUrl: 'app/components/widgets/editable-text/editable-text.html',
         scope: {
             placeholder: '@',
-            text: '=',
+            text: '<',
             textTitle: '@',
             textClass: '@',
             editionMode: '=?',
             onTextClick: '&',
             onValidate: '&',
-            onCancel: '&'
+            onCancel: '&',
+            validateOnlyOnChange: '@'
         },
         bindToController: true,
-        controller: 'TalendEditableTextCtrl',
+        controller: TalendEditableTextCtrl,
         controllerAs: 'editableTextCtrl',
         link: function (scope, iElement, iAttrs, ctrl) {
-            $timeout(function () {
-                var inputElement = iElement.find('.edition-text-input').eq(0);
-
-                inputElement.keydown(function (e) {
-                    if (e.keyCode === 27) {
-                        ctrl.cancel();
-                        scope.$digest();
-                    }
-                });
-
-                iElement.find('.edit-btn').eq(0).click(function () {
-                    inputElement.focus();
-                    inputElement.select();
-                });
-            }, 0, false);
-
-            scope.$watch(
-                function () {
-                    return ctrl.text;
-                },
-                function () {
-                    ctrl.reset();
+            const inputElement = iElement.find('.edition-text-input').eq(0);
+            inputElement.keydown((e) => {
+                if (e.keyCode === 27) {
+                    ctrl.cancel();
+                    scope.$digest();
                 }
-            );
+            });
+
+            const editBtn = iElement.find('.edit-btn').eq(0);
+            editBtn.click(() => inputElement.select());
         }
     };
 }

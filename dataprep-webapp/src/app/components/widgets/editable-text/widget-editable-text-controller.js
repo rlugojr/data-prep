@@ -16,12 +16,16 @@
  * @name talend.widgets.controller:TalendEditableTextCtrl
  * @description Editable Text controller
  */
-export default function TalendEditableTextCtrl() {
-    var vm = this;
-    vm.edit = edit;
-    vm.reset = reset;
-    vm.validate = validate;
-    vm.cancel = cancel;
+export default class TalendEditableTextCtrl {
+
+    constructor($scope) {
+        'ngInject';
+        this.$scope = $scope;
+    }
+
+    $onInit() {
+        this.$scope.$watch(() => this.text, this.reset.bind(this));
+    }
 
     /**
      * @ngdoc method
@@ -29,8 +33,8 @@ export default function TalendEditableTextCtrl() {
      * @methodOf data-prep.actions-suggestions-stats.controller:ActionsSuggestionsCtrl
      * @description Set the edition text with the original value
      */
-    function reset() {
-        vm.editionText = vm.text;
+    reset() {
+        this.editionText = this.text;
     }
 
     /**
@@ -39,9 +43,9 @@ export default function TalendEditableTextCtrl() {
      * @methodOf data-prep.actions-suggestions-stats.controller:ActionsSuggestionsCtrl
      * @description Reset the edition text and set edition mode flag
      */
-    function edit() {
-        reset();
-        vm.editionMode = true;
+    edit() {
+        this.reset();
+        this.editionMode = true;
     }
 
     /**
@@ -50,11 +54,11 @@ export default function TalendEditableTextCtrl() {
      * @methodOf data-prep.actions-suggestions-stats.controller:ActionsSuggestionsCtrl
      * @description Execute the validation callback if the value has changed, and set the edition mode to false
      */
-    function validate() {
-        if (vm.editionText !== vm.text) {
-            vm.onValidate({text: vm.editionText});
+    validate() {
+        if (angular.isUndefined(this.validateOnlyOnChange) || this.editionText !== this.text) {
+            this.onValidate({text: this.editionText});
         }
-        vm.editionMode = false;
+        this.editionMode = false;
     }
 
     /**
@@ -63,8 +67,8 @@ export default function TalendEditableTextCtrl() {
      * @methodOf data-prep.actions-suggestions-stats.controller:ActionsSuggestionsCtrl
      * @description Execute the cancel callback and set the edition mode to false
      */
-    function cancel() {
-        vm.onCancel({text: vm.editionText});
-        vm.editionMode = false;
+    cancel() {
+        this.onCancel({text: this.editionText});
+        this.editionMode = false;
     }
 }

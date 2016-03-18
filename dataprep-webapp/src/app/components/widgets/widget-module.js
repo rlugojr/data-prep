@@ -29,7 +29,6 @@ import TalendDropdown from './dropdown/widget-dropdown-directive';
 import TalendEditableRegexCtrl from './editable-regex/widget-editable-regex-controller';
 import TalendEditableRegex from './editable-regex/widget-editable-regex-directive';
 import EditableSelect from './editable-select/widget-editable-select-directive';
-import TalendEditableTextCtrl from './editable-text/widget-editable-text-controller';
 import TalendEditableText from './editable-text/widget-editable-text-directive';
 import TalendFileSelector from './file-selector/widget-file-selector-directive';
 import TalendLoading from './loading/widget-loading-directive';
@@ -81,7 +80,6 @@ import TalendTooltip from './tooltip/widget-tooltip-directive';
 
         .directive('editableSelect', EditableSelect)
 
-        .controller('TalendEditableTextCtrl', TalendEditableTextCtrl)
         .directive('talendEditableText', TalendEditableText)
 
         .directive('talendFileSelector', TalendFileSelector)

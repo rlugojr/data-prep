@@ -32,7 +32,8 @@
                               text-class="inventory-title"
                               text-title="{{'OPEN_ACTION' | translate: inventoryItemCtrl.getTooltipContent()}}"
                               on-text-click="inventoryItemCtrl.openInventoryItem()"
-                              on-validate="inventoryItemCtrl.rename(inventoryItemCtrl.item, text)">
+                              on-validate="inventoryItemCtrl.rename(inventoryItemCtrl.item, text)"
+                              validate-only-on-change>
         </talend-editable-text>
         <span ng-if="!inventoryItemCtrl.open || !inventoryItemCtrl.rename"
               class="inventory-title"
