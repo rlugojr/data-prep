@@ -1,31 +1,31 @@
 /*  ============================================================================
 
-  Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+ Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 
-  This source code is available under agreement available at
-  https://github.com/Talend/data-prep/blob/master/LICENSE
+ This source code is available under agreement available at
+ https://github.com/Talend/data-prep/blob/master/LICENSE
 
-  You should have received a copy of the agreement
-  along with this program; if not, write to Talend SA
-  9 rue Pages 92150 Suresnes, France
+ You should have received a copy of the agreement
+ along with this program; if not, write to Talend SA
+ 9 rue Pages 92150 Suresnes, France
 
-  ============================================================================*/
+ ============================================================================*/
 
-describe('Editable Text Widget', function() {
+describe('Editable Text Widget', () => {
     'use strict';
 
-    var createController, scope;
-    var onValidateFn, onCancelFn;
+    let createController, scope;
+    let onValidateFn, onCancelFn;
 
     beforeEach(angular.mock.module('talend.widget'));
     beforeEach(angular.mock.module('htmlTemplates'));
 
-    beforeEach(inject(function ($rootScope, $componentController) {
+    beforeEach(inject(($rootScope, $componentController) => {
         scope = $rootScope.$new();
         onValidateFn = jasmine.createSpy('onValidateFn');
         onCancelFn = jasmine.createSpy('onCancelFn');
 
-        createController = function () {
+        createController = () => {
             return $componentController('talendEditableText',
                 {$scope: scope},
                 {
@@ -36,9 +36,9 @@ describe('Editable Text Widget', function() {
         };
     }));
 
-    it('should set edition text to the original text', function() {
+    it('should set edition text to the original text', () => {
         //given
-        var ctrl = createController();
+        const ctrl = createController();
         ctrl.text = 'Jimmy';
 
         expect(ctrl.editionText).toBeFalsy();
@@ -50,10 +50,10 @@ describe('Editable Text Widget', function() {
         expect(ctrl.editionText).toBe('Jimmy');
     });
 
-    describe('edit mode', function() {
-        it('should set edition text to the original text', function() {
+    describe('edit mode', () => {
+        it('should set edition text to the original text', () => {
             //given
-            var ctrl = createController();
+            const ctrl = createController();
             ctrl.text = 'Jimmy';
 
             expect(ctrl.editionText).toBeFalsy();
@@ -65,9 +65,9 @@ describe('Editable Text Widget', function() {
             expect(ctrl.editionText).toBe('Jimmy');
         });
 
-        it('should sswitch to edition mode', function() {
+        it('should sswitch to edition mode', () => {
             //given
-            var ctrl = createController();
+            const ctrl = createController();
             ctrl.editionMode = false;
 
             //when
@@ -78,11 +78,11 @@ describe('Editable Text Widget', function() {
         });
     });
 
-    describe('validation', function() {
+    describe('validation', () => {
         describe('validate everytime', () => {
-            it('should execute validation callback when text has changed', function() {
+            it('should execute validation callback when text has changed', () => {
                 //given
-                var ctrl = createController();
+                const ctrl = createController();
                 ctrl.text = 'Jimmy';
                 ctrl.editionText = 'new Jimmy';
 
@@ -95,9 +95,9 @@ describe('Editable Text Widget', function() {
                 expect(onValidateFn).toHaveBeenCalled();
             });
 
-            it('should execute validation callback when text has NOT changed', function() {
+            it('should execute validation callback when text has NOT changed', () => {
                 //given
-                var ctrl = createController();
+                const ctrl = createController();
                 ctrl.text = 'Jimmy';
                 ctrl.editionText = 'Jimmy';
 
@@ -112,9 +112,9 @@ describe('Editable Text Widget', function() {
         });
 
         describe('validate only on change', () => {
-            it('should execute validation callback when text has changed', function() {
+            it('should execute validation callback when text has changed', () => {
                 //given
-                var ctrl = createController();
+                const ctrl = createController();
                 ctrl.text = 'Jimmy';
                 ctrl.editionText = 'new Jimmy';
                 ctrl.validateOnlyOnChange = ''; //defined
@@ -128,9 +128,9 @@ describe('Editable Text Widget', function() {
                 expect(onValidateFn).toHaveBeenCalled();
             });
 
-            it('should NOT execute validation callback when text has NOT changed', function() {
+            it('should NOT execute validation callback when text has NOT changed', () => {
                 //given
-                var ctrl = createController();
+                const ctrl = createController();
                 ctrl.text = 'Jimmy';
                 ctrl.editionText = 'Jimmy';
                 ctrl.validateOnlyOnChange = ''; //defined
@@ -145,9 +145,9 @@ describe('Editable Text Widget', function() {
             });
         });
 
-        it('should switch to non edition mode', function() {
+        it('should switch to non edition mode', () => {
             //given
-            var ctrl = createController();
+            const ctrl = createController();
             ctrl.editionMode = true;
 
             //when
@@ -158,10 +158,10 @@ describe('Editable Text Widget', function() {
         });
     });
 
-    describe('cancel', function() {
-        it('should execute cancel callback', function() {
+    describe('cancel', () => {
+        it('should execute cancel callback', () => {
             //given
-            var ctrl = createController();
+            const ctrl = createController();
 
             //when
             ctrl.cancel();
@@ -170,9 +170,9 @@ describe('Editable Text Widget', function() {
             expect(onCancelFn).toHaveBeenCalled();
         });
 
-        it('should switch to non edition mode', function() {
+        it('should switch to non edition mode', () => {
             //given
-            var ctrl = createController();
+            const ctrl = createController();
             ctrl.editionMode = true;
 
             //when

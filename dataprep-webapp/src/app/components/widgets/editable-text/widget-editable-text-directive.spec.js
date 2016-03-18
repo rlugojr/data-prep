@@ -14,7 +14,7 @@
 describe('Editable Text widget directive', () => {
     'use strict';
 
-    var scope, element, createElement;
+    let scope, element, createElement;
 
     beforeEach(angular.mock.module('talend.widget'));
     beforeEach(angular.mock.module('htmlTemplates'));
@@ -153,7 +153,7 @@ describe('Editable Text widget directive', () => {
             scope.text = 'Jimmy';
             createElement();
 
-            var ctrl = element.controller('talendEditableText');
+            const ctrl = element.controller('talendEditableText');
             ctrl.editionText = 'no Jimmy';
             ctrl.onValidate = jasmine.createSpy('onValidate');
 
@@ -181,7 +181,7 @@ describe('Editable Text widget directive', () => {
             scope.editionMode = true;
             createElement();
 
-            var ctrl = element.controller('talendEditableText');
+            const ctrl = element.controller('talendEditableText');
             ctrl.onCancel = jasmine.createSpy('onCancel');
 
             //when
@@ -209,10 +209,10 @@ describe('Editable Text widget directive', () => {
             scope.editionMode = true;
             createElement();
 
-            var ctrl = element.controller('talendEditableText');
+            const ctrl = element.controller('talendEditableText');
             ctrl.cancel = jasmine.createSpy('onCancel');
 
-            var event = angular.element.Event('keydown');
+            const event = angular.element.Event('keydown');
             event.keyCode = 27;
 
             //when
@@ -228,10 +228,10 @@ describe('Editable Text widget directive', () => {
             scope.editionMode = true;
             createElement();
 
-            var ctrl = element.controller('talendEditableText');
+            const ctrl = element.controller('talendEditableText');
             ctrl.cancel = jasmine.createSpy('onCancel');
 
-            var event = angular.element.Event('keydown');
+            const event = angular.element.Event('keydown');
             event.keyCode = 8;
 
             //when
