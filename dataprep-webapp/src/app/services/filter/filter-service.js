@@ -257,6 +257,27 @@ export default function FilterService($timeout, state, StateService, FilterAdapt
     //--------------------------------------------------------------------------------------------------------------
     //---------------------------------------------------FILTER LIFE------------------------------------------------
     //--------------------------------------------------------------------------------------------------------------
+
+    /**
+     * @ngdoc method
+     * @name getValueToDisplay
+     * @param {string} value The value to convert
+     * @description convert the value for display
+     */
+    function getValueToDisplay(value) {
+        return value.replace(new RegExp('\n', 'g'), '\\n'); //eslint-disable-line no-control-regex
+    }
+
+    /**
+     * @ngdoc method
+     * @name getValueToMatch
+     * @param {string} value The value to convert
+     * @description convert the value for matching
+     */
+    function getValueToMatch(value) {
+        return value.replace(new RegExp('\\\\n', 'g'), '\n'); //eslint-disable-line no-control-regex
+    }
+
     /**
      * @ngdoc method
      * @name addFilter
@@ -268,16 +289,22 @@ export default function FilterService($timeout, state, StateService, FilterAdapt
      * @param {function} removeFilterFn An optional remove callback
      * @description Add a filter and update datagrid filters
      */
+
     function addFilter(type, colId, colName, args, removeFilterFn) {
         var filterFn;
         var sameColAndTypeFilter = _.find(state.playground.filter.gridFilters, {colId: colId, type: type});
-        var createFilter, getFilterValue, filterExists;
+        var createFilter, getFilterValue, filterExists, argsToDisplay;
 
         switch (type) {
             case 'contains':
+                argsToDisplay = {
+                    caseSensitive: args.caseSensitive,
+                    phrase: getValueToDisplay(args.phrase)
+                };
+
                 createFilter = function createFilter() {
                     filterFn = createContainFilterFn(colId, args.phrase);
-                    return FilterAdapterService.createFilter(type, colId, colName, true, args, filterFn, removeFilterFn);
+                    return FilterAdapterService.createFilter(type, colId, colName, true, argsToDisplay, filterFn, removeFilterFn);
                 };
 
                 getFilterValue = function getFilterValue() {
@@ -285,21 +312,26 @@ export default function FilterService($timeout, state, StateService, FilterAdapt
                 };
 
                 filterExists = function filterExists() {
-                    return sameColAndTypeFilter.args.phrase === args.phrase;
+                    return sameColAndTypeFilter.args.phrase === argsToDisplay.phrase;
                 };
                 break;
             case 'exact':
+                argsToDisplay = {
+                    caseSensitive: args.caseSensitive,
+                    phrase: getValueToDisplay(args.phrase)
+                };
+
                 createFilter = function createFilter() {
                     filterFn = createExactFilterFn(colId, args.phrase, args.caseSensitive);
-                    return FilterAdapterService.createFilter(type, colId, colName, true, args, filterFn, removeFilterFn);
+                    return FilterAdapterService.createFilter(type, colId, colName, true, argsToDisplay, filterFn, removeFilterFn);
                 };
 
                 getFilterValue = function getFilterValue() {
-                    return args.phrase;
+                    return argsToDisplay.phrase;
                 };
 
                 filterExists = function filterExists() {
-                    return sameColAndTypeFilter.args.phrase === args.phrase;
+                    return sameColAndTypeFilter.args.phrase === argsToDisplay.phrase;
                 };
                 break;
             case 'invalid_records':
@@ -408,12 +440,12 @@ export default function FilterService($timeout, state, StateService, FilterAdapt
         switch (oldFilter.type) {
             case 'contains':
                 newArgs = {phrase: newValue};
-                newFilterFn = createContainFilterFn(oldFilter.colId, newValue);
+                newFilterFn = createContainFilterFn(oldFilter.colId, getValueToMatch(newValue));
                 editableFilter = true;
                 break;
             case 'exact':
                 newArgs = {phrase: newValue};
-                newFilterFn = createExactFilterFn(oldFilter.colId, newValue, oldFilter.args.caseSensitive);
+                newFilterFn = createExactFilterFn(oldFilter.colId, getValueToMatch(newValue), oldFilter.args.caseSensitive);
                 editableFilter = true;
                 break;
             case 'inside_range':

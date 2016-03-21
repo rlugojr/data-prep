@@ -44,7 +44,8 @@ describe('Filter service', function () {
                 expect(StateService.addGridFilter).not.toHaveBeenCalled();
 
                 //when
-                FilterService.addFilter('contains', 'col1', 'column name', {phrase: 'toto'}, removeFnCallback);
+
+                FilterService.addFilter('contains', 'col1', 'column name', {caseSensitive: true, phrase: 'toto\n'}, removeFnCallback);
 
                 //then
                 expect(StateService.addGridFilter).toHaveBeenCalled();
@@ -54,8 +55,9 @@ describe('Filter service', function () {
                 expect(filterInfo.colId).toBe('col1');
                 expect(filterInfo.colName).toBe('column name');
                 expect(filterInfo.editable).toBe(true);
-                expect(filterInfo.args).toEqual({phrase: 'toto'});
-                expect(filterInfo.filterFn()({col1: ' toto est ici'})).toBeTruthy();
+                expect(filterInfo.args).toEqual({caseSensitive: true, phrase: 'toto\\n'});
+                expect(filterInfo.filterFn()({col1: ' toto\nest ici'})).toBeTruthy();
+                expect(filterInfo.filterFn()({col1: ' toto est ici'})).toBeFalsy();
                 expect(filterInfo.filterFn()({col1: ' tata est ici'})).toBeFalsy();
                 expect(filterInfo.removeFilterFn).toBe(removeFnCallback);
             }));
@@ -114,13 +116,16 @@ describe('Filter service', function () {
                 expect(StateService.addGridFilter).not.toHaveBeenCalled();
 
                 //when
-                FilterService.addFilter('exact', 'col1', 'column name', {phrase: 'toici', caseSensitive: true});
+                FilterService.addFilter('exact', 'col1', 'column name', {phrase: 'toici\n', caseSensitive: true});
 
                 //then
                 expect(StateService.addGridFilter).toHaveBeenCalled();
 
                 var filterInfo = StateService.addGridFilter.calls.argsFor(0)[0];
-                expect(filterInfo.filterFn()({col1: 'toici'})).toBeTruthy();
+                expect(filterInfo.args).toEqual({phrase: 'toici\\n', caseSensitive: true});
+
+                expect(filterInfo.filterFn()({col1: 'toici\n'})).toBeTruthy();
+                expect(filterInfo.filterFn()({col1: 'toici'})).toBeFalsy();
                 expect(filterInfo.filterFn()({col1: 'Toici'})).toBeFalsy();
                 expect(filterInfo.filterFn()({col1: ' toici'})).toBeFalsy();
                 expect(filterInfo.filterFn()({col1: 'toici '})).toBeFalsy();
@@ -543,7 +548,7 @@ describe('Filter service', function () {
             expect(StateService.addGridFilter).not.toHaveBeenCalled();
 
             //when
-            FilterService.addFilterAndDigest('contains', 'col1', 'column name', {phrase: 'toto'}, removeFnCallback);
+            FilterService.addFilterAndDigest('contains', 'col1', 'column name', {caseSensitive: true, phrase: 'toto\n'}, removeFnCallback);
             expect(StateService.addGridFilter).not.toHaveBeenCalled();
             $timeout.flush();
 
@@ -555,8 +560,9 @@ describe('Filter service', function () {
             expect(filterInfo.colId).toBe('col1');
             expect(filterInfo.colName).toBe('column name');
             expect(filterInfo.editable).toBe(true);
-            expect(filterInfo.args).toEqual({phrase: 'toto'});
-            expect(filterInfo.filterFn()({col1: ' toto est ici'})).toBeTruthy();
+            expect(filterInfo.args).toEqual({caseSensitive: true, phrase: 'toto\\n'});
+            expect(filterInfo.filterFn()({col1: ' toto\nest ici'})).toBeTruthy();
+            expect(filterInfo.filterFn()({col1: ' toto est ici'})).toBeFalsy();
             expect(filterInfo.filterFn()({col1: ' tata est ici'})).toBeFalsy();
             expect(filterInfo.removeFilterFn).toBe(removeFnCallback);
         }));
@@ -661,7 +667,7 @@ describe('Filter service', function () {
             expect(StateService.updateGridFilter).not.toHaveBeenCalled();
 
             //when
-            FilterService.updateFilter(oldFilter, 'Tata');
+            FilterService.updateFilter(oldFilter, 'Tata\\n');
 
             //then
             var argsOldFilter = StateService.updateGridFilter.calls.argsFor(0)[0];
@@ -672,7 +678,11 @@ describe('Filter service', function () {
             expect(newFilter.type).toBe('contains');
             expect(newFilter.colId).toBe('col2');
             expect(newFilter.colName).toBe('column 2');
-            expect(newFilter.args.phrase).toBe('Tata');
+            expect(newFilter.args.phrase).toBe('Tata\\n');
+
+            expect(newFilter.filterFn()({col2: ' Tata\n est ici'})).toBeTruthy();
+            expect(newFilter.filterFn()({col2: ' Tata\\n est ici'})).toBeFalsy();
+
         }));
 
         it('should update "exact" filter', inject(function (FilterService, StateService) {
@@ -691,7 +701,7 @@ describe('Filter service', function () {
             expect(StateService.updateGridFilter).not.toHaveBeenCalled();
 
             //when
-            FilterService.updateFilter(oldFilter, 'Tata');
+            FilterService.updateFilter(oldFilter, 'Tata\\n');
 
             //then
             var argsOldFilter = StateService.updateGridFilter.calls.argsFor(0)[0];
@@ -702,8 +712,11 @@ describe('Filter service', function () {
             expect(newFilter.type).toBe('exact');
             expect(newFilter.colId).toBe('col2');
             expect(newFilter.colName).toBe('column 2');
-            expect(newFilter.args.phrase).toBe('Tata');
-            expect(newFilter.value).toBe('Tata');
+            expect(newFilter.args.phrase).toBe('Tata\\n');
+            expect(newFilter.value).toBe('Tata\\n');
+
+            expect(newFilter.filterFn()({col2: 'Tata\n'})).toBeTruthy();
+            expect(newFilter.filterFn()({col2: 'Tata\\n'})).toBeFalsy();
         }));
 
         it('should update "inside_range" filter after a brush', inject(function (FilterService, StateService) {
