@@ -71,6 +71,21 @@ describe('Datagrid external service', () => {
         }));
     });
 
+    describe('update grid range index', () => {
+        it('should add scroll listener', inject((PreviewService, DatagridExternalService) => {
+            //given
+            const range = [5, 15];
+            gridMock.initRenderedRangeMock(range);
+            DatagridExternalService.init(gridMock);
+
+            //when
+            DatagridExternalService.updateGridRangeIndex();
+
+            //then
+            expect(PreviewService.gridRangeIndex).toBe(range);
+        }));
+    });
+
     describe('update right panel', () => {
 
         describe('tab selection', () => {

@@ -170,6 +170,7 @@ export default function Datagrid($timeout, state, DatagridGridService, DatagridC
                 if (grid) {
                     DatagridStyleService.resetCellStyles();
                     grid.scrollRowToTop(0);
+                    DatagridExternalService.updateGridRangeIndex();
                 }
             };
 

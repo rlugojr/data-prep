@@ -72,6 +72,7 @@ describe('Datagrid directive', () => {
         spyOn(DatagridStyleService, 'resetStyles').and.returnValue();
         spyOn(DatagridStyleService, 'updateColumnClass').and.returnValue();
         spyOn(DatagridExternalService, 'updateSuggestionPanel').and.returnValue();
+        spyOn(DatagridExternalService, 'updateGridRangeIndex').and.returnValue();
         spyOn(StateService, 'setGridSelection').and.returnValue();
     }));
 
@@ -237,6 +238,11 @@ describe('Datagrid directive', () => {
             //then
             expect(grid.scrollRowToTop).toHaveBeenCalledWith(0);
         });
+
+        it('should update grid range index for future preview', inject((DatagridExternalService) => {
+            //then
+            expect(DatagridExternalService.updateGridRangeIndex).toHaveBeenCalled();
+        }));
     });
 
     describe('on grid selection change', () => {

@@ -84,6 +84,10 @@ export default class DatagridExternalService {
         }
     }
 
+    updateGridRangeIndex() {
+        this.PreviewService.gridRangeIndex = this.grid.getRenderedRange();
+    }
+
     /**
      * @ngdoc method
      * @name attachGridScroll
@@ -94,7 +98,7 @@ export default class DatagridExternalService {
         this.grid.onScroll.subscribe(() => {
             this.$timeout.cancel(this.scrollTimeout);
             this.scrollTimeout = this.$timeout(
-                () => this.PreviewService.gridRangeIndex = this.grid.getRenderedRange(),
+                () => this.updateGridRangeIndex(),
                 500,
                 false
             );
