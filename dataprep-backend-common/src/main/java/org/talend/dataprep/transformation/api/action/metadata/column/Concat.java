@@ -112,20 +112,17 @@ public class Concat extends ActionMetadata implements ColumnAction, OtherColumnP
                 .name(MODE_PARAMETER)
                 .item(OTHER_COLUMN_MODE,
                         new Parameter(SELECTED_COLUMN_PARAMETER, ParameterType.COLUMN, StringUtils.EMPTY, //
-                                      false, false, getMessagesBundle()),
-                        new Parameter(SEPARATOR_PARAMETER, ParameterType.STRING, StringUtils.EMPTY)) //
+                                false, false, getMessagesBundle()),
+                        new Parameter(SEPARATOR_PARAMETER, ParameterType.STRING, StringUtils.EMPTY), //
+                        SelectParameter.Builder.builder() //
+                                .name(SEPARATOR_CONDITION) //
+                                .item(BOTH_NOT_EMPTY) //
+                                .item(ALWAYS) //
+                                .defaultValue(BOTH_NOT_EMPTY) //
+                                .build())//
                 .item(CONSTANT_MODE) //
                 .defaultValue(OTHER_COLUMN_MODE) //
                 .build());
-
-        parameters.add(
-                SelectParameter.Builder.builder() //
-                        .name(SEPARATOR_CONDITION) //
-                        .item(BOTH_NOT_EMPTY) //
-                        .item(ALWAYS) //
-                        .defaultValue(BOTH_NOT_EMPTY) //
-                        .build()
-                );
 
         parameters.add(new Parameter(SUFFIX_PARAMETER, ParameterType.STRING, StringUtils.EMPTY));
         return parameters;
