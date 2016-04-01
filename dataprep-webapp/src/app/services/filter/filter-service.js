@@ -195,7 +195,7 @@ export default function FilterService($timeout, state, StateService, FilterAdapt
      * @description Create a 'range' filter function
      * @returns {function} The predicate function
      */
-    function createRangeFilterFn(colId, values) {
+    function createRangeFilterFn(colId, values, isMaxReached) {
         return function () {
             return function (item) {
                 if (!ConverterService.isNumber(item[colId])) {
@@ -205,7 +205,9 @@ export default function FilterService($timeout, state, StateService, FilterAdapt
                 var numberValue = ConverterService.adaptValue('numeric', item[colId]);
                 var min = values[0];
                 var max = values[1];
-                return (numberValue === min) || (numberValue > min && numberValue < max);
+                return isMaxReached ?
+                (numberValue === min) || (numberValue > min && numberValue <= max):
+                (numberValue === min) || (numberValue > min && numberValue < max);
             };
         };
     }
@@ -368,7 +370,7 @@ export default function FilterService($timeout, state, StateService, FilterAdapt
                 createFilter = function createFilter() {
                     filterFn = args.type === 'date' ?
                         createDateRangeFilterFn(colId, args.interval) :
-                        createRangeFilterFn(colId, args.interval);
+                        createRangeFilterFn(colId, args.interval, args.isMaxReached);
                     return FilterAdapterService.createFilter(type, colId, colName, false, args, filterFn, removeFilterFn);
                 };
 
@@ -453,7 +455,7 @@ export default function FilterService($timeout, state, StateService, FilterAdapt
                 editableFilter = false;
                 newFilterFn = newValue.type === 'date' ?
                     createDateRangeFilterFn(oldFilter.colId, newValue.interval) :
-                    createRangeFilterFn(oldFilter.colId, newValue.interval);
+                    createRangeFilterFn(oldFilter.colId, newValue.interval, newValue.isMaxReached);
                 break;
             case 'matches':
                 newArgs = {pattern: newValue};

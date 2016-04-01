@@ -67,7 +67,12 @@ export default function ColumnProfileCtrl($timeout, state, StatisticsService, St
         if (!interval.label) {
             var min = d3.format(',')(interval.min);
             var max = d3.format(',')(interval.max);
-            interval.label = min === max ? '[' + min + ']' : '[' + min + ' .. ' + max + '[';
+            if(min === max){
+                interval.label = '[' + min + ']';
+            }
+            else {
+                interval.label = interval.isMaxReached ? '[' + min + ' .. ' + max + ']' : '[' + min + ' .. ' + max + '[';
+            }
         }
         var removeFilterFn = StatisticsService.getRangeFilterRemoveFn();
         FilterService.addFilterAndDigest('inside_range',
@@ -76,7 +81,8 @@ export default function ColumnProfileCtrl($timeout, state, StatisticsService, St
             {
                 interval: [interval.min, interval.max],
                 label: interval.label,
-                type: selectedColumn.type
+                type: selectedColumn.type,
+                isMaxReached: interval.isMaxReached
             },
             removeFilterFn);
     };

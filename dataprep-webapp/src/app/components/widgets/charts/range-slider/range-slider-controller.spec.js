@@ -29,6 +29,23 @@ describe('RangeSlider controller', function () {
         };
     }));
 
+
+    it('should check if the maximum value of the filter to apply has reached to column maximum', inject(function () {
+        //given
+        var ctrl = createController();
+
+        ctrl.rangeLimits = {
+            min: -92,
+            max: 98
+        };
+
+        //when
+        var result = ctrl.isMaxReached({min: 2, max: 98});
+
+        //then
+        expect(result).toEqual({min: 2, max: 98, isMaxReached: true});
+    }));
+
     it('should check if both of the entered min and max are numbers when entered value is invalid', inject(function () {
         //given
         var ctrl = createController();

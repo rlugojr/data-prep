@@ -313,8 +313,8 @@ describe('Filter service', function () {
                 expect(StateService.addGridFilter).not.toHaveBeenCalled();
 
                 //when
-                FilterService.addFilter('inside_range', 'col1', 'column name', {interval: [0, 22], label: '[0 .. 22[', type: 'integer'});
-                FilterService.addFilter('inside_range', 'col2', 'column name2', {interval: [0, 1000000], label: '[0 .. 1,000,000[', type: 'integer'});
+                FilterService.addFilter('inside_range', 'col1', 'column name', {interval: [0, 22], label: '[0 .. 22[', type: 'integer', isMaxReached: true});
+                FilterService.addFilter('inside_range', 'col2', 'column name2', {interval: [0, 1000000], label: '[0 .. 1,000,000[', type: 'integer', isMaxReached: false});
 
                 //then
                 expect(StateService.addGridFilter).toHaveBeenCalled();
@@ -326,7 +326,7 @@ describe('Filter service', function () {
                 expect(filterInfo.colName).toBe('column name');
                 expect(filterInfo.value).toBe('[0 .. 22[');
                 expect(filterInfo.editable).toBe(false);
-                expect(filterInfo.args).toEqual({interval: [0, 22], label: '[0 .. 22[', type: 'integer'});
+                expect(filterInfo.args).toEqual({interval: [0, 22], label: '[0 .. 22[', type: 'integer', isMaxReached: true});
                 expect(filterInfo.filterFn()({col1:'5'})).toBeTruthy();
                 expect(filterInfo.filterFn()({col1:'-5'})).toBeFalsy();
                 expect(filterInfo.filterFn()({col1: ''})).toBeFalsy();
@@ -337,7 +337,7 @@ describe('Filter service', function () {
                 expect(filterInfo2.colName).toBe('column name2');
                 expect(filterInfo2.value).toBe('[0 .. 1,000,000[');
                 expect(filterInfo2.editable).toBe(false);
-                expect(filterInfo2.args).toEqual({interval: [0, 1000000], label: '[0 .. 1,000,000[', type: 'integer'});
+                expect(filterInfo2.args).toEqual({interval: [0, 1000000], label: '[0 .. 1,000,000[', type: 'integer', isMaxReached: false});
                 expect(filterInfo2.filterFn()({col2: '1000'})).toBeTruthy();
                 expect(filterInfo2.filterFn()({col2: '-5'})).toBeFalsy();
                 expect(filterInfo2.filterFn()({col2: ''})).toBeFalsy();
@@ -809,7 +809,7 @@ describe('Filter service', function () {
             stateMock.playground.filter.gridFilters = [filterInfo];
 
             //when
-            FilterService.addFilter('inside_range', 'col1', 'column name', {interval: [5, 10], label: '[5 .. 10[', type: 'integer'});
+            FilterService.addFilter('inside_range', 'col1', 'column name', {interval: [5, 10], label: '[5 .. 10[', type: 'integer', isMaxReached: true});
 
             //then
             expect(StateService.updateGridFilter).toHaveBeenCalled();
@@ -824,7 +824,7 @@ describe('Filter service', function () {
             expect(newFilterInfos.colName).toBe('column name');
             expect(newFilterInfos.value).toBe('[5 .. 10[');
             expect(newFilterInfos.editable).toBe(false);
-            expect(newFilterInfos.args).toEqual({interval: [5, 10], label: '[5 .. 10[', type: 'integer'});
+            expect(newFilterInfos.args).toEqual({interval: [5, 10], label: '[5 .. 10[', type: 'integer', isMaxReached: true});
             expect(newFilterInfos.filterFn()({col1: '8'})).toBeTruthy();
             //the 4 is no more inside the brush range
             expect(newFilterInfos.filterFn()({col1: '4'})).toBeFalsy();

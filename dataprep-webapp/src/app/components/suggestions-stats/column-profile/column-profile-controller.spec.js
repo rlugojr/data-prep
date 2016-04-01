@@ -64,12 +64,13 @@ describe('ColumnProfile controller', () => {
             });
         }));
 
-        it('should add a number "range" filter', inject((StatisticsService, FilterService) => {
+        it('should add a number "range" filter with closed intervals', inject((StatisticsService, FilterService) => {
             //given
             const ctrl = createController();
             const interval = {
                 min: 5,
-                max: 15
+                max: 15,
+                isMaxReached: true
             };
 
             stateMock.playground.grid.selectedColumn = {
@@ -87,7 +88,78 @@ describe('ColumnProfile controller', () => {
                 'inside_range',
                 '0001',
                 'firstname',
-                {interval: [5, 15], label: '[5 .. 15[', type: 'integer'},
+                {
+                    interval: [5, 15],
+                    label: '[5 .. 15]',
+                    type: 'integer',
+                    isMaxReached: true
+                },
+                removeFilterFn);
+        }));
+
+        it('should add a number "range" filter with mixed intervals', inject((StatisticsService, FilterService) => {
+            //given
+            const ctrl = createController();
+            const interval = {
+                min: 5,
+                max: 15,
+                isMaxReached: false
+            };
+
+            stateMock.playground.grid.selectedColumn = {
+                id: '0001',
+                name: 'firstname',
+                type: 'integer'
+            };
+
+            //when
+            ctrl.addRangeFilter(interval);
+
+            //then
+            expect(StatisticsService.getRangeFilterRemoveFn).toHaveBeenCalled();
+            expect(FilterService.addFilterAndDigest).toHaveBeenCalledWith(
+                'inside_range',
+                '0001',
+                'firstname',
+                {
+                    interval: [5, 15],
+                    label: '[5 .. 15[',
+                    type: 'integer',
+                    isMaxReached: false
+                },
+                removeFilterFn);
+        }));
+
+        it('should add a number "range" filter with only one value', inject((StatisticsService, FilterService) => {
+            //given
+            const ctrl = createController();
+            const interval = {
+                min: 15,
+                max: 15,
+                isMaxReached: true
+            };
+
+            stateMock.playground.grid.selectedColumn = {
+                id: '0001',
+                name: 'firstname',
+                type: 'integer'
+            };
+
+            //when
+            ctrl.addRangeFilter(interval);
+
+            //then
+            expect(StatisticsService.getRangeFilterRemoveFn).toHaveBeenCalled();
+            expect(FilterService.addFilterAndDigest).toHaveBeenCalledWith(
+                'inside_range',
+                '0001',
+                'firstname',
+                {
+                    interval: [15, 15],
+                    label: '[15]',
+                    type: 'integer',
+                    isMaxReached: true
+                },
                 removeFilterFn);
         }));
 
@@ -97,7 +169,8 @@ describe('ColumnProfile controller', () => {
             const interval = {
                 min: '01-06-2015',
                 max: '30-06-2015',
-                label: 'Jun 2015'
+                label: 'Jun 2015',
+                isMaxReached: undefined
             };
 
             stateMock.playground.grid.selectedColumn = {
@@ -115,7 +188,12 @@ describe('ColumnProfile controller', () => {
                 'inside_range',
                 '0001',
                 'firstname',
-                {interval: ['01-06-2015', '30-06-2015'], label: 'Jun 2015', type: 'date'},
+                {
+                    interval: ['01-06-2015', '30-06-2015'],
+                    label: 'Jun 2015',
+                    type: 'date',
+                    isMaxReached: undefined
+                },
                 removeFilterFn);
         }));
 
