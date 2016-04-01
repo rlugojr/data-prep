@@ -89,6 +89,14 @@ export default class DatagridGridService {
         this.grid.onHeaderClick.subscribe((e, args) => {
             this.$timeout(() => this.StateService.setGridSelection(args.column.tdpColMetadata, null));
         });
+
+        this.grid.onColumnsReordered.subscribe((e, args) => {
+            let cols = args.grid.getColumns();
+            _.forEach(cols, (col) => {
+                let id = col.id;
+                id++;
+            });
+        });
     }
 
     /**
