@@ -9,7 +9,7 @@ import org.talend.dataprep.transformation.pipeline.Visitor;
 
 public class BasicNode implements Node {
 
-    private Link link;
+    protected Link link;
 
     @Override
     public void receive(DataSetRow row, RowMetadata metadata) {

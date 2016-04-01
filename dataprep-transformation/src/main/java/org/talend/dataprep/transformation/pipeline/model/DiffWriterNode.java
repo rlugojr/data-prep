@@ -13,8 +13,9 @@ import org.talend.dataprep.api.dataset.RowMetadata;
 import org.talend.dataprep.transformation.api.transformer.TransformerWriter;
 import org.talend.dataprep.transformation.pipeline.*;
 import org.talend.dataprep.transformation.pipeline.link.NullLink;
+import org.talend.dataprep.transformation.pipeline.node.TerminalNode;
 
-public class DiffWriterNode implements Node, Monitored {
+public class DiffWriterNode extends TerminalNode implements Monitored {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DiffWriterNode.class);
 
@@ -87,16 +88,6 @@ public class DiffWriterNode implements Node, Monitored {
                 writer.write(initialRow);
             }
         }
-    }
-
-    @Override
-    public Link getLink() {
-        return NullLink.INSTANCE;
-    }
-
-    @Override
-    public void setLink(Link link) {
-        throw new UnsupportedOperationException();
     }
 
     @Override

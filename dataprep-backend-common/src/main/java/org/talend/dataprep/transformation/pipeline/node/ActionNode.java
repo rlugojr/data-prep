@@ -7,13 +7,11 @@ import org.talend.dataprep.transformation.api.action.context.ActionContext;
 import org.talend.dataprep.transformation.pipeline.*;
 import org.talend.dataprep.transformation.pipeline.link.NullLink;
 
-public class ActionNode implements Node, Monitored {
+public class ActionNode extends BasicNode implements Monitored {
 
     private final Action action;
 
     private final ActionContext actionContext;
-
-    private Link link = NullLink.INSTANCE;
 
     private long totalTime;
 
@@ -50,24 +48,6 @@ public class ActionNode implements Node, Monitored {
     @Override
     public void accept(Visitor visitor) {
         visitor.visitAction(this);
-        if (link != null) {
-            link.accept(visitor);
-        }
-    }
-
-    @Override
-    public void setLink(Link link) {
-        this.link = link;
-    }
-
-    @Override
-    public Link getLink() {
-        return link;
-    }
-
-    @Override
-    public void signal(Signal signal) {
-        link.signal(signal);
     }
 
     @Override

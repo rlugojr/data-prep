@@ -2,29 +2,54 @@ package org.talend.dataprep.transformation.pipeline;
 
 import org.talend.dataprep.transformation.pipeline.link.BasicLink;
 import org.talend.dataprep.transformation.pipeline.link.CloneLink;
-import org.talend.dataprep.transformation.pipeline.link.MonitorLink;
 import org.talend.dataprep.transformation.pipeline.node.*;
 
-public interface Visitor {
+public abstract class Visitor {
 
-    void visitAction(ActionNode actionNode);
+    private void doNodeVisit(Node node) {
+        if (node != null && node.getLink() != null) {
+            node.getLink().accept(this);
+        }
+    }
 
-    void visitCompile(CompileNode compileNode);
+    public void visitAction(ActionNode actionNode) {
+        doNodeVisit(actionNode);
+    }
 
-    void visitInlineAnalysis(InlineAnalysisNode inlineAnalysisNode);
+    public void visitCompile(CompileNode compileNode) {
+        doNodeVisit(compileNode);
+    }
 
-    void visitSource(SourceNode sourceNode);
+    public void visitInlineAnalysis(InlineAnalysisNode inlineAnalysisNode) {
+        doNodeVisit(inlineAnalysisNode);
+    }
 
-    void visitBasicLink(BasicLink basicLink);
+    public void visitSource(SourceNode sourceNode) {
+        doNodeVisit(sourceNode);
+    }
 
-    void visitMonitorLink(MonitorLink monitorLink);
+    public void visitBasicLink(BasicLink basicLink) {
+        basicLink.getTarget().accept(this);
+    }
 
-    void visitDelayedAnalysis(DelayedAnalysisNode delayedAnalysisNode);
+    public void visitDelayedAnalysis(DelayedAnalysisNode delayedAnalysisNode) {
+        doNodeVisit(delayedAnalysisNode);
+    }
 
-    void visitPipeline(Pipeline pipeline);
+    public void visitPipeline(Pipeline pipeline) {
+        pipeline.getNode().accept(this);
+    }
 
-    void visitNode(Node node);
+    public void visitNode(Node node)  {
+        doNodeVisit(node);
+    }
 
-    void visitCloneLink(CloneLink cloneLink);
+    public void visitCloneLink(CloneLink cloneLink) {
+        final Node[] nodes = cloneLink.getNodes();
+        for (Node node : nodes) {
+            node.accept(this);
+        }
+    }
+
 
 }

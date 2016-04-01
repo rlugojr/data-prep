@@ -26,6 +26,7 @@ import org.talend.dataprep.transformation.api.action.context.TransformationConte
 import org.talend.dataprep.transformation.api.transformer.json.NullAnalyzer;
 import org.talend.dataprep.transformation.pipeline.*;
 import org.talend.dataprep.transformation.pipeline.link.NullLink;
+import org.talend.dataprep.transformation.pipeline.node.TerminalNode;
 import org.talend.datascience.common.inference.Analyzer;
 import org.talend.datascience.common.inference.Analyzers;
 
@@ -78,7 +79,7 @@ public class ActionTestWorkbench {
         rowMetadata.setColumns(outputNode.getMetadata().getColumns());
     }
 
-    private static class TestOutputNode implements Node {
+    private static class TestOutputNode extends TerminalNode {
 
         private RowMetadata metadata;
 
@@ -92,24 +93,5 @@ public class ActionTestWorkbench {
             row.setRowMetadata(this.metadata);
         }
 
-        @Override
-        public Link getLink() {
-            return NullLink.INSTANCE;
-        }
-
-        @Override
-        public void setLink(Link link) {
-            // Nothing to do
-        }
-
-        @Override
-        public void signal(Signal signal) {
-            // Nothing to do
-        }
-
-        @Override
-        public void accept(Visitor visitor) {
-            // Nothing to do
-        }
     }
 }

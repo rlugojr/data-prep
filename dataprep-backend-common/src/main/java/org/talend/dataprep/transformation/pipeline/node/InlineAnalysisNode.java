@@ -27,8 +27,6 @@ public class InlineAnalysisNode extends AnalysisNode implements Monitored {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AnalysisNode.class);
 
-    private Link link = NullLink.INSTANCE;
-
     private List<ColumnMetadata> previousColumns = Collections.emptyList();
 
     private Analyzer<Analyzers.Result> inlineAnalyzer = Analyzers.with(NullAnalyzer.INSTANCE);
@@ -112,17 +110,6 @@ public class InlineAnalysisNode extends AnalysisNode implements Monitored {
     @Override
     public void accept(Visitor visitor) {
         visitor.visitInlineAnalysis(this);
-        link.accept(visitor);
-    }
-
-    @Override
-    public void setLink(Link link) {
-        this.link = link;
-    }
-
-    @Override
-    public Link getLink() {
-        return link;
     }
 
     @Override
@@ -135,7 +122,7 @@ public class InlineAnalysisNode extends AnalysisNode implements Monitored {
         } catch (Exception e) {
             LOGGER.debug("Unable to close inline analyzer.", e);
         }
-        link.signal(signal);
+        super.signal(signal);
     }
 
     @Override

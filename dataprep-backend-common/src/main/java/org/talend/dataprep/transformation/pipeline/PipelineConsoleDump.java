@@ -2,10 +2,9 @@ package org.talend.dataprep.transformation.pipeline;
 
 import org.talend.dataprep.transformation.pipeline.link.BasicLink;
 import org.talend.dataprep.transformation.pipeline.link.CloneLink;
-import org.talend.dataprep.transformation.pipeline.link.MonitorLink;
 import org.talend.dataprep.transformation.pipeline.node.*;
 
-public class PipelineConsoleDump implements Visitor {
+public class PipelineConsoleDump extends Visitor {
 
     private final StringBuilder builder;
 
@@ -53,16 +52,6 @@ public class PipelineConsoleDump implements Visitor {
     public void visitBasicLink(BasicLink basicLink) {
         builder.append("-> ");
         basicLink.getTarget().accept(this);
-    }
-
-    @Override
-    public void visitMonitorLink(MonitorLink monitorLink) {
-        final long totalTime = monitorLink.getTotalTime();
-        final long count = monitorLink.getCount();
-        double speed = totalTime > 0 ? Math.round(((double) count * 1000) / totalTime) : -1;
-        builder.append("-(").append(totalTime).append(" ms - ").append(count).append(" rows").append(" - ").append(speed)
-                .append(" rows/s").append(")");
-        monitorLink.getDelegate().accept(this);
     }
 
     @Override

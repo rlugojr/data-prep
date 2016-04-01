@@ -10,13 +10,11 @@ import org.talend.dataprep.transformation.pipeline.Signal;
 import org.talend.dataprep.transformation.pipeline.Visitor;
 import org.talend.dataprep.transformation.pipeline.link.NullLink;
 
-public class CompileNode implements Node {
+public class CompileNode extends BasicNode {
 
     private final Action action;
 
     private final ActionContext actionContext;
-
-    private Link link = NullLink.INSTANCE;
 
     private int hashCode = 0;
 
@@ -42,22 +40,6 @@ public class CompileNode implements Node {
     @Override
     public void accept(Visitor visitor) {
         visitor.visitCompile(this);
-        link.accept(visitor);
-    }
-
-    @Override
-    public void setLink(Link link) {
-        this.link = link;
-    }
-
-    @Override
-    public Link getLink() {
-        return link;
-    }
-
-    @Override
-    public void signal(Signal signal) {
-        link.signal(signal);
     }
 
     public Action getAction() {

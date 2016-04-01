@@ -9,8 +9,9 @@ import org.talend.dataprep.api.dataset.RowMetadata;
 import org.talend.dataprep.transformation.api.transformer.TransformerWriter;
 import org.talend.dataprep.transformation.pipeline.*;
 import org.talend.dataprep.transformation.pipeline.link.NullLink;
+import org.talend.dataprep.transformation.pipeline.node.TerminalNode;
 
-public class WriterNode implements Node, Monitored {
+public class WriterNode extends TerminalNode implements Monitored {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WriterNode.class);
 
@@ -49,16 +50,6 @@ public class WriterNode implements Node, Monitored {
             totalTime += System.currentTimeMillis() - start;
             count++;
         }
-    }
-
-    @Override
-    public void setLink(Link link) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Link getLink() {
-        return NullLink.INSTANCE;
     }
 
     @Override

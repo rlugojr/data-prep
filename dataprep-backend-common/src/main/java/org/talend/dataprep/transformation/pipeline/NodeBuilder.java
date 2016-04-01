@@ -1,9 +1,12 @@
 package org.talend.dataprep.transformation.pipeline;
 
 import org.talend.dataprep.api.dataset.DataSetRow;
+import org.talend.dataprep.exception.TDPException;
+import org.talend.dataprep.exception.error.CommonErrorCodes;
 import org.talend.dataprep.transformation.pipeline.link.BasicLink;
 import org.talend.dataprep.transformation.pipeline.link.CloneLink;
-import org.talend.dataprep.transformation.pipeline.model.FilteredSourceNode;
+import org.talend.dataprep.transformation.pipeline.link.NullLink;
+import org.talend.dataprep.transformation.pipeline.node.FilteredSourceNode;
 import org.talend.dataprep.transformation.pipeline.node.SourceNode;
 
 import java.util.function.Function;
@@ -28,13 +31,26 @@ public class NodeBuilder {
         return new NodeBuilder(new FilteredSourceNode(filter));
     }
 
+    public NodeBuilder sink() {
+        state = state.next(n -> NullLink.INSTANCE);
+        return this;
+    }
+
     public NodeBuilder to() {
-        state = state.next(n -> new BasicLink(n[0]));
+        try {
+            state = state.next(n -> new BasicLink(n[0]));
+        } catch (IllegalStateException e) {
+            throw new TDPException(CommonErrorCodes.UNEXPECTED_EXCEPTION, new Exception("Each to() must be followed by node().", e));
+        }
         return this;
     }
 
     public NodeBuilder toMany() {
-        state = state.next(CloneLink::new);
+        try {
+            state = state.next(CloneLink::new);
+        } catch (Exception e) {
+            throw new TDPException(CommonErrorCodes.UNEXPECTED_EXCEPTION, new Exception("Each toMany() must be followed by nodes().", e));
+        }
         return this;
     }
 
@@ -80,7 +96,11 @@ public class NodeBuilder {
 
         @Override
         public State next(Node... node) {
-            previousNode.setLink(linkFunction.apply(node));
+            try {
+                previousNode.setLink(linkFunction.apply(node));
+            } catch (UnsupportedOperationException e) {
+                throw new TDPException(CommonErrorCodes.UNEXPECTED_EXCEPTION, new Exception("Unable to specify a new output after a terminal node.", e));
+            }
             return new NodeState(node);
         }
 

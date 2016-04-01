@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import org.talend.dataprep.transformation.api.action.metadata.common.ActionMetadata;
 
 @Component
-public class SpringActionRegistry implements ActionRegistry {
+public class SpringActionRegistry implements ActionRegistry { // NOSONAR
 
     @Autowired
     ApplicationContext applicationContext;

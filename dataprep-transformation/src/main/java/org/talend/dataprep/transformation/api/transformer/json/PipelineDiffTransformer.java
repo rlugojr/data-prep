@@ -15,7 +15,6 @@ package org.talend.dataprep.transformation.api.transformer.json;
 
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,11 +33,7 @@ import org.talend.dataprep.transformation.api.transformer.configuration.Configur
 import org.talend.dataprep.transformation.api.transformer.configuration.PreviewConfiguration;
 import org.talend.dataprep.transformation.format.WriterRegistrationService;
 import org.talend.dataprep.transformation.pipeline.*;
-import org.talend.dataprep.transformation.pipeline.link.CloneLink;
-import org.talend.dataprep.transformation.pipeline.link.NullLink;
 import org.talend.dataprep.transformation.pipeline.model.DiffWriterNode;
-import org.talend.dataprep.transformation.pipeline.model.FilteredSourceNode;
-import org.talend.dataprep.transformation.pipeline.node.BasicNode;
 
 /**
  * Transformer that preview the transformation (puts additional json content so that the front can display the

@@ -10,7 +10,7 @@ import org.talend.dataprep.transformation.pipeline.Node;
 import org.talend.datascience.common.inference.Analyzer;
 import org.talend.datascience.common.inference.Analyzers;
 
-public abstract class AnalysisNode implements Node {
+public abstract class AnalysisNode extends BasicNode {
 
     protected final Function<List<ColumnMetadata>, Analyzer<Analyzers.Result>> analyzer;
 

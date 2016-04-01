@@ -45,8 +45,6 @@ public class DelayedAnalysisNode extends AnalysisNode implements Monitored {
 
     private final File transformationDelayed;
 
-    private Link link = NullLink.INSTANCE;
-
     private RowMetadata rowMetadata;
 
     private long totalTime;
@@ -100,17 +98,6 @@ public class DelayedAnalysisNode extends AnalysisNode implements Monitored {
     @Override
     public void accept(Visitor visitor) {
         visitor.visitDelayedAnalysis(this);
-        link.accept(visitor);
-    }
-
-    @Override
-    public void setLink(Link link) {
-        this.link = link;
-    }
-
-    @Override
-    public Link getLink() {
-        return link;
     }
 
     @Override
@@ -172,7 +159,7 @@ public class DelayedAnalysisNode extends AnalysisNode implements Monitored {
             FilesHelper.deleteQuietly(transformationDelayed);
             totalTime += System.currentTimeMillis() - start;
         }
-        link.signal(signal);
+        super.signal(signal);
     }
 
     @Override

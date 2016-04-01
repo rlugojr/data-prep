@@ -11,7 +11,7 @@ import org.talend.dataprep.transformation.pipeline.link.NullLink;
 /**
  * Equivalent for a /dev/null for a Node: has a {@link NullLink} and do nothing on {@link #receive(DataSetRow, RowMetadata)}.
  */
-public class NullNode implements Node {
+public class NullNode extends TerminalNode {
 
     public static final Node INSTANCE = new NullNode();
 
@@ -23,23 +23,4 @@ public class NullNode implements Node {
         // Nothing to do
     }
 
-    @Override
-    public void setLink(Link link) {
-        // Nothing to do
-    }
-
-    @Override
-    public Link getLink() {
-        return NullLink.INSTANCE;
-    }
-
-    @Override
-    public void signal(Signal signal) {
-        // Nothing to do
-    }
-
-    @Override
-    public void accept(Visitor visitor) {
-        visitor.visitNode(this);
-    }
 }

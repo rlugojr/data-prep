@@ -33,7 +33,7 @@ public class Pipeline implements Node {
      * @param node The source node (the node in the pipeline that submit content to the pipeline).
      * @see Builder to create a new instance of this class.
      */
-    private Pipeline(Node node) {
+    Pipeline(Node node) {
         this.node = node;
     }
 
