@@ -24,8 +24,8 @@ import org.talend.dataprep.api.dataset.statistics.StatisticsAdapter;
 import org.talend.dataprep.api.preparation.Action;
 import org.talend.dataprep.transformation.api.action.context.TransformationContext;
 import org.talend.dataprep.transformation.api.transformer.json.NullAnalyzer;
-import org.talend.dataprep.transformation.pipeline.Pipeline;
-import org.talend.dataprep.transformation.pipeline.model.*;
+import org.talend.dataprep.transformation.pipeline.*;
+import org.talend.dataprep.transformation.pipeline.link.NullLink;
 import org.talend.datascience.common.inference.Analyzer;
 import org.talend.datascience.common.inference.Analyzers;
 
@@ -61,7 +61,7 @@ public class ActionTestWorkbench {
         dataSet.setMetadata(dataSetMetadata);
         dataSet.setRecords(input.stream());
         final TestOutputNode outputNode = new TestOutputNode();
-        Pipeline pipeline = Pipeline.PipelineBuilder.pipeline() //
+        Pipeline pipeline = Pipeline.Builder.builder() //
                 .withInitialMetadata(rowMetadata) //
                 .withActions(allActions) //
                 .withContext(context) //

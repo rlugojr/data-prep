@@ -35,7 +35,9 @@ import org.talend.dataprep.transformation.api.transformer.configuration.PreviewC
 import org.talend.dataprep.transformation.format.WriterRegistrationService;
 import org.talend.dataprep.transformation.pipeline.*;
 import org.talend.dataprep.transformation.pipeline.link.CloneLink;
+import org.talend.dataprep.transformation.pipeline.link.NullLink;
 import org.talend.dataprep.transformation.pipeline.model.DiffWriterNode;
+import org.talend.dataprep.transformation.pipeline.model.FilteredSourceNode;
 import org.talend.dataprep.transformation.pipeline.node.BasicNode;
 
 /**
@@ -84,33 +86,36 @@ class PipelineDiffTransformer implements Transformer {
         final String previewActions = previewConfiguration.getPreviewActions();
         final Pipeline referencePipeline = buildPipeline(rowMetadata, referenceActions, previewConfiguration.getReferenceContext(), diffWriterNode);
         final Pipeline previewPipeline = buildPipeline(rowMetadata, previewActions, previewConfiguration.getPreviewContext(), diffWriterNode);
-        Node mergePipelineNode = new BasicNode();
-        mergePipelineNode.setLink(new CloneLink(referencePipeline, previewPipeline));
-        // Print pipeline before execution (for debug purposes).
-        final StringBuilder beforeExecution = new StringBuilder();
-        mergePipelineNode.accept(new PipelineConsoleDump(beforeExecution));
-        LOGGER.debug("Before execution: {}", beforeExecution.toString());
-        // extract TDP ids information and filter source
+
+        // Filter source records (extract TDP ids information)
         final List<Long> indexes = previewConfiguration.getIndexes();
         final boolean isIndexLimited = indexes != null && !indexes.isEmpty();
         final Long minIndex = isIndexLimited ? indexes.stream().mapToLong(Long::longValue).min().getAsLong() : 0L;
         final Long maxIndex = isIndexLimited ? indexes.stream().mapToLong(Long::longValue).max().getAsLong() : Long.MAX_VALUE;
-        Predicate<DataSetRow> filter = isWithinWantedIndexes(minIndex, maxIndex);
-        final Stream<DataSetRow> source = input.getRecords().filter(filter);
+        final Predicate<DataSetRow> filter = isWithinWantedIndexes(minIndex, maxIndex);
+
+        // Build diff pipeline
+        Node diffPipeline = NodeBuilder.filteredSource(filter) //
+                .toMany() //
+                .nodes(referencePipeline, previewPipeline) //
+                .build();
         // Run diff
-        source.forEach(r -> mergePipelineNode.receive(r, rowMetadata));
-        mergePipelineNode.signal(Signal.END_OF_STREAM);
-        // Print pipeline after execution (for debug purposes).
-        final StringBuilder afterExecution = new StringBuilder();
-        mergePipelineNode.accept(new PipelineConsoleDump(afterExecution));
-        LOGGER.debug("After execution: {}", afterExecution.toString());
+        try {
+            // Print pipeline before execution (for debug purposes).
+            LOGGER.debug("Before execution: {}", diffPipeline.toString());
+            input.getRecords().forEach(r -> diffPipeline.receive(r, rowMetadata));
+            diffPipeline.signal(Signal.END_OF_STREAM);
+        } finally {
+            // Print pipeline after execution (for debug purposes).
+            LOGGER.debug("After execution: {}", diffPipeline.toString());
+        }
     }
 
     private Pipeline buildPipeline(RowMetadata rowMetadata,
                                    String actions,
                                    TransformationContext transformationContext,
                                    Node output) {
-        return Pipeline.PipelineBuilder.pipeline() //
+        return Pipeline.Builder.builder() //
                 .withActionRegistry(actionRegistry) //
                 .withActions(actionParser.parse(actions)) //
                 .withInitialMetadata(rowMetadata) //
