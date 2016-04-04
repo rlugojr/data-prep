@@ -735,7 +735,6 @@ export default function StatisticsService($log, $filter, state, StateService,
         var specStats = state.playground.statistics.details.specific;
 
         StateService.setStatisticsBoxPlot(
-            specStats.LOWER_QUANTILE && //quantile computation is async, it is possible that we get falsy value
             {
                 min: specStats.MIN,
                 max: specStats.MAX,
