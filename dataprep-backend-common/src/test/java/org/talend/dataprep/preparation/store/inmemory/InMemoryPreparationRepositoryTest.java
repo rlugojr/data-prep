@@ -90,7 +90,7 @@ public class InMemoryPreparationRepositoryTest extends PreparationRepositoryTest
         Collection<Preparation> actual = repository.getByDataSet(dataSetId);
 
         // check the result
-        Assert.assertEquals(actual.size(), 3);
+        Assert.assertEquals(3, actual.size());
         for (Preparation preparation : expected) {
             Assert.assertTrue(actual.contains(preparation));
         }
@@ -111,7 +111,9 @@ public class InMemoryPreparationRepositoryTest extends PreparationRepositoryTest
      */
     @Override
     protected Preparation getPreparation(String rootName) {
-        return getPreparation(rootName + "_setId", rootName);
+        final Preparation preparation = getPreparation(rootName + "_setId", rootName);
+        preparation.setAuthor(rootName + "_setId");
+        return preparation;
     }
 
     /**
@@ -124,6 +126,7 @@ public class InMemoryPreparationRepositoryTest extends PreparationRepositoryTest
     private Preparation getPreparation(String datasetId, String rootName) {
         Preparation preparation = new Preparation(datasetId, getStep(rootName).id(), "1.0");
         preparation.setName(rootName + "_name");
+        preparation.setAuthor(rootName + "_name");
         return preparation;
     }
 

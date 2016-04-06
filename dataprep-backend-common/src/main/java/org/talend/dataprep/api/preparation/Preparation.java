@@ -162,10 +162,7 @@ public class Preparation extends Identifiable implements Serializable {
 
     @Override
     public String getId() {
-        if (StringUtils.isEmpty(name)) {
-            return DigestUtils.sha1Hex(dataSetId + author + creationDate);
-        }
-        return DigestUtils.sha1Hex(dataSetId + author + name + creationDate);
+        return DigestUtils.sha1Hex(dataSetId + author + creationDate);
     }
 
     /**

@@ -353,8 +353,8 @@ public class PreparationServiceTest {
                 .body("{\"name\": \"test_name_updated\", \"dataSetId\": \"1234\"}")
                 .when().put("/preparations/{id}", preparationId).asString();
 
-        // Preparation id should change
-        assertThat(updatedId, is(not(preparationId)));
+        // Preparation id should not change (name is not part of preparation id).
+        assertThat(updatedId, is(preparationId));
         Collection<Preparation> preparations = repository.listAll(Preparation.class);
         assertThat(preparations.size(), is(1));
         preparation = preparations.iterator().next();
@@ -376,8 +376,8 @@ public class PreparationServiceTest {
                 .body("{\"name\": \"éàçè\", \"dataSetId\": \"1234\"}".getBytes("UTF-8")).when()
                 .put("/preparations/{id}", preparationId).asString();
 
-        // Preparation id should change (new name)
-        assertThat(updatedId, is(not(preparationId)));
+        // Preparation id should not change (new name)
+        assertThat(updatedId, is(preparationId));
         Collection<Preparation> preparations = repository.listAll(Preparation.class);
         assertThat(preparations.size(), is(1));
         preparation = preparations.iterator().next();

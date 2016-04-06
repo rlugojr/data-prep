@@ -97,12 +97,12 @@ public class PreparationTest {
         preparation.setName("My Preparation");
         preparation.setCreationDate(0L);
         final String id0 = preparation.getId();
-        assertThat(id0, is("b100bd5fd2dc6a00781342569dec27cd3550b3c8"));
-        // Same preparation (but with empty name)
+        assertThat(id0, is("8b6281c5e99c41313a83777c3ab43b06adda9e5c"));
+        // Same preparation (but with empty name): id must remain same
         preparation.setName("");
         final String id1 = preparation.getId();
         assertThat(id1, is("8b6281c5e99c41313a83777c3ab43b06adda9e5c"));
-        // Same preparation (but with null name, null and empty names should be treated all the same)
+        // Same preparation (but with null name, null and empty names should be treated all the same): id must remain same
         preparation.setName(null);
         final String id2 = preparation.getId();
         assertThat(id2, is("8b6281c5e99c41313a83777c3ab43b06adda9e5c"));

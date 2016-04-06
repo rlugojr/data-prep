@@ -1,15 +1,15 @@
-//  ============================================================================
+// ============================================================================
 //
-//  Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
-//  This source code is available under agreement available at
-//  https://github.com/Talend/data-prep/blob/master/LICENSE
+// This source code is available under agreement available at
+// https://github.com/Talend/data-prep/blob/master/LICENSE
 //
-//  You should have received a copy of the agreement
-//  along with this program; if not, write to Talend SA
-//  9 rue Pages 92150 Suresnes, France
+// You should have received a copy of the agreement
+// along with this program; if not, write to Talend SA
+// 9 rue Pages 92150 Suresnes, France
 //
-//  ============================================================================
+// ============================================================================
 
 package org.talend.dataprep.api.service;
 
@@ -30,7 +30,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -50,6 +49,7 @@ import org.talend.dataprep.api.dataset.DataSetMoveRequest;
 import org.talend.dataprep.api.folder.FolderContent;
 import org.talend.dataprep.api.preparation.Preparation;
 import org.talend.dataprep.exception.error.DataSetErrorCodes;
+import org.talend.dataprep.inventory.Inventory;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -59,8 +59,6 @@ import com.jayway.restassured.RestAssured;
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.path.json.JsonPath;
 import com.jayway.restassured.response.Response;
-import org.talend.dataprep.inventory.Inventory;
-
 
 /**
  * Unit test for Export API.
@@ -72,7 +70,7 @@ public class DataSetAPITest extends ApiServiceTestBase {
 
     @Before
     public void cleanupFolder() throws Exception {
-        FileUtils.deleteDirectory( Paths.get( "target/test/store/folders").toFile());
+        FileUtils.deleteDirectory(Paths.get("target/test/store/folders").toFile());
     }
 
     @Test
@@ -93,75 +91,74 @@ public class DataSetAPITest extends ApiServiceTestBase {
     @Test
     public void testDataSetList() throws Exception {
         // given
-        final String dataSetId = createDataset( "dataset/dataset.csv", "testDataset", "text/csv" );
+        final String dataSetId = createDataset("dataset/dataset.csv", "testDataset", "text/csv");
 
         // when
         final String list = when().get("/api/datasets").asString();
 
         // then
-        assertTrue( list.contains( dataSetId ) );
+        assertTrue(list.contains(dataSetId));
     }
 
     @Test
     public void testListCompatibleDataSets() throws Exception {
         // given
-        final String dataSetId = createDataset( "dataset/dataset.csv", "compatible1", "text/csv" );
-        final String dataSetId2 = createDataset( "dataset/dataset.csv", "compatible2", "text/csv" );
+        final String dataSetId = createDataset("dataset/dataset.csv", "compatible1", "text/csv");
+        final String dataSetId2 = createDataset("dataset/dataset.csv", "compatible2", "text/csv");
         final String dataSetId3 = createDataset("t-shirt_100.csv", "incompatible", "text/csv");
 
         // when
         final String compatibleDatasetList = when().get("/api/datasets/{id}/compatibledatasets", dataSetId).asString();
 
         // then
-        assertTrue( compatibleDatasetList.contains( dataSetId2 ) );
-        assertFalse( compatibleDatasetList.contains( dataSetId3 ) );
+        assertTrue(compatibleDatasetList.contains(dataSetId2));
+        assertFalse(compatibleDatasetList.contains(dataSetId3));
     }
 
     @Test
     public void testListCompatiblePreparationsWhenNothingIsCompatible() throws Exception {
         //
-        final String dataSetId = createDataset( "dataset/dataset.csv", "compatible1", "text/csv" );
-        final String dataSetId2 = createDataset( "dataset/dataset.csv", "compatible2", "text/csv" );
+        final String dataSetId = createDataset("dataset/dataset.csv", "compatible1", "text/csv");
+        final String dataSetId2 = createDataset("dataset/dataset.csv", "compatible2", "text/csv");
         final String dataSetId3 = createDataset("t-shirt_100.csv", "incompatible", "text/csv");
 
-
         final String getResult = when().get("/api/datasets/{id}/compatiblepreparations", dataSetId).asString();
-        final List compatiblePreparations =  builder.build().readerFor(List.class).readValue(getResult);
+        final List compatiblePreparations = builder.build().readerFor(List.class).readValue(getResult);
 
         // then
-        assertTrue( compatiblePreparations.isEmpty() );
+        assertTrue(compatiblePreparations.isEmpty());
     }
 
     @Test
     public void testListCompatiblePreparationsWhenTwoPreparationsAreCompatible() throws Exception {
         //
-        final String dataSetId = createDataset( "dataset/dataset.csv", "compatible1", "text/csv" );
-        final String dataSetId2 = createDataset( "dataset/dataset.csv", "compatible2", "text/csv" );
+        final String dataSetId = createDataset("dataset/dataset.csv", "compatible1", "text/csv");
+        final String dataSetId2 = createDataset("dataset/dataset.csv", "compatible2", "text/csv");
         final String dataSetId3 = createDataset("t-shirt_100.csv", "incompatible", "text/csv");
 
         final String prep1 = createPreparationFromDataset(dataSetId, "prep1");
         final String prep2 = createPreparationFromDataset(dataSetId2, "prep2");
 
         final String getResult = when().get("/api/datasets/{id}/compatiblepreparations", dataSetId).asString();
-        final List<Preparation> compatiblePreparations =  builder.build().readerFor(new TypeReference<Collection<Preparation>>() {})
-                .readValue(getResult);
+        final List<Preparation> compatiblePreparations = builder.build().readerFor(new TypeReference<Collection<Preparation>>() {
+        }).readValue(getResult);
 
         // then
-        assertTrue( compatiblePreparations.size() == 2 );
-        assertTrue( prep2.equals(compatiblePreparations.get(0).getId()));
-        assertTrue( prep1.equals(compatiblePreparations.get(1).getId()));
+        assertTrue(compatiblePreparations.size() == 2);
+        assertTrue(prep2.equals(compatiblePreparations.get(0).getId()));
+        assertTrue(prep1.equals(compatiblePreparations.get(1).getId()));
     }
 
     @Test
     public void testListCompatibleDataSetsWhenUniqueDatasetInRepository() throws Exception {
         // given
-        final String dataSetId = createDataset( "dataset/dataset.csv", "unique", "text/csv" );
+        final String dataSetId = createDataset("dataset/dataset.csv", "unique", "text/csv");
 
         // when
         final String compatibleDatasetList = when().get("/api/datasets/{id}/compatibledatasets", dataSetId).asString();
 
         // then
-        assertFalse( compatibleDatasetList.contains( dataSetId ) );
+        assertFalse(compatibleDatasetList.contains(dataSetId));
     }
 
     @Test
@@ -177,7 +174,7 @@ public class DataSetAPITest extends ApiServiceTestBase {
 
         // then
         Iterator<JsonNode> elements = mapper.readTree(list).elements();
-        String[] expectedNames = new String[] {dataSetId2, dataSetId1};
+        String[] expectedNames = new String[] { dataSetId2, dataSetId1 };
         int i = 0;
         while (elements.hasNext()) {
             assertThat(elements.next().get("id").asText(), is(expectedNames[i++]));
@@ -188,7 +185,7 @@ public class DataSetAPITest extends ApiServiceTestBase {
 
         // then
         elements = mapper.readTree(list).elements();
-        expectedNames = new String[] {dataSetId1, dataSetId2};
+        expectedNames = new String[] { dataSetId1, dataSetId2 };
         i = 0;
         while (elements.hasNext()) {
             assertThat(elements.next().get("id").asText(), is(expectedNames[i++]));
@@ -208,7 +205,7 @@ public class DataSetAPITest extends ApiServiceTestBase {
 
         // then
         Iterator<JsonNode> elements = mapper.readTree(list).elements();
-        String[] expectedNames = new String[] {dataSetId2, dataSetId1};
+        String[] expectedNames = new String[] { dataSetId2, dataSetId1 };
         int i = 0;
         while (elements.hasNext()) {
             assertThat(elements.next().get("id").asText(), is(expectedNames[i++]));
@@ -219,13 +216,12 @@ public class DataSetAPITest extends ApiServiceTestBase {
 
         // then
         elements = mapper.readTree(list).elements();
-        expectedNames = new String[] {dataSetId1, dataSetId2};
+        expectedNames = new String[] { dataSetId1, dataSetId2 };
         i = 0;
         while (elements.hasNext()) {
             assertThat(elements.next().get("id").asText(), is(expectedNames[i++]));
         }
     }
-
 
     /**
      * Simple dataset deletion case.
@@ -256,11 +252,11 @@ public class DataSetAPITest extends ApiServiceTestBase {
         createPreparationFromDataset(dataSetId, "testPreparation");
 
         // when/then
-        final Response response = when().delete( "/api/datasets/" + dataSetId );
+        final Response response = when().delete("/api/datasets/" + dataSetId);
 
-        //then
+        // then
         final int statusCode = response.statusCode();
-        assertThat( statusCode, is( 409 ) );
+        assertThat(statusCode, is(409));
 
         final String responseAsString = response.asString();
         final JsonPath json = from(responseAsString);
@@ -270,15 +266,14 @@ public class DataSetAPITest extends ApiServiceTestBase {
     @Test
     public void testDataSetCreate() throws Exception {
         // given
-        final String dataSetId = createDataset( "dataset/dataset.csv", "tagada", "text/csv" );
-        final InputStream expected = PreparationAPITest.class.getResourceAsStream(
-            "dataset/expected_dataset_with_metadata.json" );
+        final String dataSetId = createDataset("dataset/dataset.csv", "tagada", "text/csv");
+        final InputStream expected = PreparationAPITest.class.getResourceAsStream("dataset/expected_dataset_with_metadata.json");
 
         // when
         final String contentAsString = when().get("/api/datasets/{id}?metadata=true&columns=false", dataSetId).asString();
 
         // then
-        assertThat(contentAsString, sameJSONAsFile( expected ));
+        assertThat(contentAsString, sameJSONAsFile(expected));
     }
 
     @Test
@@ -292,17 +287,17 @@ public class DataSetAPITest extends ApiServiceTestBase {
         String contentAsString = when().get("/api/datasets/{id}?metadata=true&columns=false", dataSetId).asString();
 
         // then
-        assertThat( contentAsString, sameJSONAsFile( expected ) );
+        assertThat(contentAsString, sameJSONAsFile(expected));
 
         String cloneName = "foo bar";
 
         final String clonedDataSetId = given() //
-            .queryParam( "cloneName", cloneName) //
-            .when() //
-            .put("/api/datasets/clone/{id}", dataSetId) //
-            .asString();
+                .queryParam("cloneName", cloneName) //
+                .when() //
+                .put("/api/datasets/clone/{id}", dataSetId) //
+                .asString();
 
-        Assertions.assertThat( clonedDataSetId ).isNotEmpty().isNotEqualTo( dataSetId );
+        Assertions.assertThat(clonedDataSetId).isNotEmpty().isNotEqualTo(dataSetId);
 
         Response response = when().get("/api/datasets/{id}?metadata=true&columns=false", clonedDataSetId);
 
@@ -310,18 +305,18 @@ public class DataSetAPITest extends ApiServiceTestBase {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        DataSet dataSet = objectMapper.readValue( contentAsString, DataSet.class );
+        DataSet dataSet = objectMapper.readValue(contentAsString, DataSet.class);
 
         DataSetMetadata dataSetMetadata = dataSet.getMetadata();
 
-        Assertions.assertThat( dataSetMetadata.getName() ).isEqualTo( cloneName );
+        Assertions.assertThat(dataSetMetadata.getName()).isEqualTo(cloneName);
 
-        Assert.assertEquals( HttpStatus.OK.value(), response.getStatusCode() );
+        Assert.assertEquals(HttpStatus.OK.value(), response.getStatusCode());
 
-        expected = PreparationAPITest.class.getResourceAsStream( "dataset/expected_dataset_with_metadata_clone.json" );
+        expected = PreparationAPITest.class.getResourceAsStream("dataset/expected_dataset_with_metadata_clone.json");
 
         // then
-        assertThat( contentAsString, sameJSONAsFile( expected ) );
+        assertThat(contentAsString, sameJSONAsFile(expected));
 
     }
 
@@ -330,10 +325,10 @@ public class DataSetAPITest extends ApiServiceTestBase {
 
         // create beer folder
         Response response = RestAssured.given() //
-            .queryParam("path", "beer").when() //
-            .put("/api/folders");
+                .queryParam("path", "beer").when() //
+                .put("/api/folders");
 
-        Assert.assertEquals( HttpStatus.OK.value(), response.getStatusCode() );
+        Assert.assertEquals(HttpStatus.OK.value(), response.getStatusCode());
 
         // given
         final String dataSetId = createDataset("dataset/dataset.csv", "tagada", "text/csv", "beer");
@@ -343,20 +338,20 @@ public class DataSetAPITest extends ApiServiceTestBase {
         String contentAsString = when().get("/api/datasets/{id}?metadata=true&columns=false", dataSetId).asString();
 
         // then
-        assertThat( contentAsString, sameJSONAsFile( expected ) );
+        assertThat(contentAsString, sameJSONAsFile(expected));
 
         String cloneName = "foo bar";
 
         String clonedDataSetId = given() //
-            .queryParam("folderPath", "foo") //
-            .queryParam( "cloneName", cloneName) //
-            .when() //
-            .put("/api/datasets/clone/{id}", dataSetId) //
-            .asString();
+                .queryParam("folderPath", "foo") //
+                .queryParam("cloneName", cloneName) //
+                .when() //
+                .put("/api/datasets/clone/{id}", dataSetId) //
+                .asString();
 
-        Assert.assertEquals( HttpStatus.OK.value(), response.getStatusCode() );
+        Assert.assertEquals(HttpStatus.OK.value(), response.getStatusCode());
 
-        Assertions.assertThat( clonedDataSetId ).isNotEmpty().isNotEqualTo( dataSetId );
+        Assertions.assertThat(clonedDataSetId).isNotEmpty().isNotEqualTo(dataSetId);
 
         response = when().get("/api/datasets/{id}?metadata=true&columns=false", clonedDataSetId);
 
@@ -364,27 +359,26 @@ public class DataSetAPITest extends ApiServiceTestBase {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        DataSet dataSet = objectMapper.readValue( contentAsString, DataSet.class );
+        DataSet dataSet = objectMapper.readValue(contentAsString, DataSet.class);
 
         DataSetMetadata dataSetMetadata = dataSet.getMetadata();
 
-        Assertions.assertThat( dataSetMetadata.getName() ).isEqualTo( cloneName );
+        Assertions.assertThat(dataSetMetadata.getName()).isEqualTo(cloneName);
 
-        expected = PreparationAPITest.class.getResourceAsStream( "dataset/expected_dataset_with_metadata_clone.json" );
+        expected = PreparationAPITest.class.getResourceAsStream("dataset/expected_dataset_with_metadata_clone.json");
 
         // then
-        assertThat( contentAsString, sameJSONAsFile( expected ) );
+        assertThat(contentAsString, sameJSONAsFile(expected));
 
         response = given() //
-            .queryParam("folderPath", "foo") //
-            .queryParam( "cloneName", cloneName) //
-            .when() //
-            .put("/api/datasets/clone/{id}", dataSetId);
+                .queryParam("folderPath", "foo") //
+                .queryParam("cloneName", cloneName) //
+                .when() //
+                .put("/api/datasets/clone/{id}", dataSetId);
 
-        Assert.assertEquals( HttpStatus.BAD_REQUEST.value(), response.getStatusCode() );
+        Assert.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode());
 
     }
-
 
     @Test
     public void testDataSetCreate_move() throws Exception {
@@ -395,66 +389,60 @@ public class DataSetAPITest extends ApiServiceTestBase {
         final String dataSetId = createDataset("dataset/dataset.csv", "tagada", "text/csv");
         InputStream expected = PreparationAPITest.class.getResourceAsStream("dataset/expected_dataset_with_metadata.json");
 
-
         // create wine folder
         Response response = RestAssured.given() //
-            .queryParam("path", "wine").when() //
-            .put("/api/folders");
+                .queryParam("path", "wine").when() //
+                .put("/api/folders");
 
         // when
         String contentAsString = when().get("/api/datasets/{id}?metadata=true&columns=false", dataSetId).asString();
 
         // then
-        assertThat( contentAsString, sameJSONAsFile( expected ) );
+        assertThat(contentAsString, sameJSONAsFile(expected));
 
         String list = when() //
-            .get("/api/folders/datasets?folder={folder}", "/") ///
-            .asString();
+                .get("/api/folders/datasets?folder={folder}", "/") ///
+                .asString();
 
         // then
 
-        //  home has one dataset
-        Inventory inventory = mapper.readValue( list, Inventory.class);
+        // home has one dataset
+        Inventory inventory = mapper.readValue(list, Inventory.class);
 
-        Assertions.assertThat( inventory.getDatasets() ).isNotEmpty().hasSize( 1 );
+        Assertions.assertThat(inventory.getDatasets()).isNotEmpty().hasSize(1);
 
-
-        //  wine has no dataset
+        // wine has no dataset
         list = when() //
-            .get("/api/folders/datasets?folder={folder}", "wine") //
-            .asString();
+                .get("/api/folders/datasets?folder={folder}", "wine") //
+                .asString();
 
-        inventory = mapper.readValue( list, Inventory.class);
+        inventory = mapper.readValue(list, Inventory.class);
 
-        Assertions.assertThat( inventory.getDatasets() ).isEmpty();
-
+        Assertions.assertThat(inventory.getDatasets()).isEmpty();
 
         given() //
-            .body( new DataSetMoveRequest( "", "wine", null ) ) //
-            .contentType(ContentType.JSON)
-            .when() //
-            .put("/api/datasets/move/{id}", dataSetId) //
-            .asString();
+                .body(new DataSetMoveRequest("", "wine", null)) //
+                .contentType(ContentType.JSON).when() //
+                .put("/api/datasets/move/{id}", dataSetId) //
+                .asString();
 
+        list = when() //
+                .get("/api/folders/datasets?folder={folder}", "wine") //
+                .asString();
 
-         list = when() //
-            .get("/api/folders/datasets?folder={folder}", "wine") //
-            .asString();
+        inventory = mapper.readValue(list, Inventory.class);
 
-
-         inventory = mapper.readValue( list, Inventory.class);
-
-        //  home has one dataset
-        Assertions.assertThat( inventory.getDatasets() ).isNotEmpty().hasSize( 1 );
+        // home has one dataset
+        Assertions.assertThat(inventory.getDatasets()).isNotEmpty().hasSize(1);
 
         list = when() //
                 .get("/api/folders/datasets?folder={folder}", "/") ///
                 .asString();
 
-        inventory = mapper.readValue( list, Inventory.class);
+        inventory = mapper.readValue(list, Inventory.class);
 
-        //  home has no dataset
-        Assertions.assertThat( inventory.getDatasets() ).isEmpty();
+        // home has no dataset
+        Assertions.assertThat(inventory.getDatasets()).isEmpty();
 
     }
 
@@ -463,14 +451,14 @@ public class DataSetAPITest extends ApiServiceTestBase {
 
         // create beer and foo folders
         RestAssured.given() //
-            .queryParam("path", "beer").when() //
-            .put("/api/folders");
+                .queryParam("path", "beer").when() //
+                .put("/api/folders");
 
         Response response = RestAssured.given() //
-            .queryParam("path", "foo").when() //
-            .put("/api/folders");
+                .queryParam("path", "foo").when() //
+                .put("/api/folders");
 
-        Assert.assertEquals( HttpStatus.OK.value(), response.getStatusCode() );
+        Assert.assertEquals(HttpStatus.OK.value(), response.getStatusCode());
 
         // given
         final String dataSetId = createDataset("dataset/dataset.csv", "tagada", "text/csv", "beer");
@@ -480,20 +468,20 @@ public class DataSetAPITest extends ApiServiceTestBase {
         String contentAsString = when().get("/api/datasets/{id}?metadata=true&columns=false", dataSetId).asString();
 
         // then
-        assertThat( contentAsString, sameJSONAsFile( expected ) );
+        assertThat(contentAsString, sameJSONAsFile(expected));
 
         String cloneName = "tagada";
 
         String clonedDataSetId = given() //
-            .queryParam("folderPath", "foo") //
-            .queryParam( "cloneName", cloneName) //
-            .when() //
-            .put("/api/datasets/clone/{id}", dataSetId) //
-            .asString();
+                .queryParam("folderPath", "foo") //
+                .queryParam("cloneName", cloneName) //
+                .when() //
+                .put("/api/datasets/clone/{id}", dataSetId) //
+                .asString();
 
-        Assert.assertEquals( HttpStatus.OK.value(), response.getStatusCode() );
+        Assert.assertEquals(HttpStatus.OK.value(), response.getStatusCode());
 
-        Assertions.assertThat( clonedDataSetId ).isNotEmpty().isNotEqualTo( dataSetId );
+        Assertions.assertThat(clonedDataSetId).isNotEmpty().isNotEqualTo(dataSetId);
 
         response = when().get("/api/datasets/{id}?metadata=true&columns=false", clonedDataSetId);
 
@@ -501,19 +489,19 @@ public class DataSetAPITest extends ApiServiceTestBase {
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        DataSet dataSet = objectMapper.readValue( contentAsString, DataSet.class );
+        DataSet dataSet = objectMapper.readValue(contentAsString, DataSet.class);
 
         DataSetMetadata dataSetMetadata = dataSet.getMetadata();
 
-        Assertions.assertThat( dataSetMetadata.getName() ).isEqualTo( cloneName );
+        Assertions.assertThat(dataSetMetadata.getName()).isEqualTo(cloneName);
 
         response = given() //
-            .body( new DataSetMoveRequest( "beer", "foo", null) ) //
-            .contentType(ContentType.JSON) //
-            .when() //
-            .put("/api/datasets/move/{id}", dataSetId);
+                .body(new DataSetMoveRequest("beer", "foo", null)) //
+                .contentType(ContentType.JSON) //
+                .when() //
+                .put("/api/datasets/move/{id}", dataSetId);
 
-        Assert.assertEquals( HttpStatus.BAD_REQUEST.value(), response.getStatusCode() );
+        Assert.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatusCode());
 
     }
 
@@ -522,14 +510,14 @@ public class DataSetAPITest extends ApiServiceTestBase {
 
         // create beer and foo folders
         Response response = RestAssured.given() //
-            .queryParam("path", "beer").when() //
-            .put("/api/folders");
+                .queryParam("path", "beer").when() //
+                .put("/api/folders");
 
         response = RestAssured.given() //
-            .queryParam("path", "foo").when() //
-            .put("/api/folders");
+                .queryParam("path", "foo").when() //
+                .put("/api/folders");
 
-        Assert.assertEquals( HttpStatus.OK.value(), response.getStatusCode() );
+        Assert.assertEquals(HttpStatus.OK.value(), response.getStatusCode());
 
         // given
         final String dataSetId = createDataset("dataset/dataset.csv", "tagada", "text/csv", "beer");
@@ -539,63 +527,62 @@ public class DataSetAPITest extends ApiServiceTestBase {
         String contentAsString = when().get("/api/datasets/{id}?metadata=true&columns=false", dataSetId).asString();
 
         // then
-        assertThat( contentAsString, sameJSONAsFile( expected ) );
+        assertThat(contentAsString, sameJSONAsFile(expected));
 
         String cloneName = "tagada";
 
         String clonedDataSetId = given() //
-            .queryParam("folderPath", "foo") //
-            .queryParam( "cloneName", cloneName) //
-            .when() //
-            .put("/api/datasets/clone/{id}", dataSetId) //
-            .asString();
+                .queryParam("folderPath", "foo") //
+                .queryParam("cloneName", cloneName) //
+                .when() //
+                .put("/api/datasets/clone/{id}", dataSetId) //
+                .asString();
 
-        Assert.assertEquals( HttpStatus.OK.value(), response.getStatusCode() );
+        Assert.assertEquals(HttpStatus.OK.value(), response.getStatusCode());
 
-        Assertions.assertThat( clonedDataSetId ).isNotEmpty().isNotEqualTo( dataSetId );
+        Assertions.assertThat(clonedDataSetId).isNotEmpty().isNotEqualTo(dataSetId);
 
         response = when().get("/api/datasets/{id}?metadata=true&columns=false", clonedDataSetId);
 
         contentAsString = response.asString();
 
-        ObjectMapper objectMapper = new ObjectMapper(  );
+        ObjectMapper objectMapper = new ObjectMapper();
 
-        builder.configure( objectMapper );
+        builder.configure(objectMapper);
 
-        DataSet dataSet = objectMapper.readValue( contentAsString, DataSet.class );
+        DataSet dataSet = objectMapper.readValue(contentAsString, DataSet.class);
 
         DataSetMetadata dataSetMetadata = dataSet.getMetadata();
 
-        Assertions.assertThat( dataSetMetadata.getName() ).isEqualTo( cloneName );
+        Assertions.assertThat(dataSetMetadata.getName()).isEqualTo(cloneName);
 
         response = given() //
-            .body( new DataSetMoveRequest("beer", "foo", "thegoodwine") ) //
-            .contentType( ContentType.JSON) //
-            .when() //
-            .put("/api/datasets/move/{id}", dataSetId);
+                .body(new DataSetMoveRequest("beer", "foo", "thegoodwine")) //
+                .contentType(ContentType.JSON) //
+                .when() //
+                .put("/api/datasets/move/{id}", dataSetId);
 
-        Assert.assertEquals( HttpStatus.OK.value(), response.getStatusCode() );
+        Assert.assertEquals(HttpStatus.OK.value(), response.getStatusCode());
 
         String list = when() //
-            .get("/api/folders/datasets?folder={folder}", "/foo") ///
-            .asString();
+                .get("/api/folders/datasets?folder={folder}", "/foo") ///
+                .asString();
 
-        //  /foo has one dataset
-        FolderContent folderContent = objectMapper.readValue( list, FolderContent.class);
+        // /foo has one dataset
+        FolderContent folderContent = objectMapper.readValue(list, FolderContent.class);
 
-        Assertions.assertThat( folderContent.getDatasets() ).isNotEmpty().hasSize( 2 );
+        Assertions.assertThat(folderContent.getDatasets()).isNotEmpty().hasSize(2);
 
         list = when() //
-            .get("/api/folders/datasets?folder={folder}", "/beer") ///
-            .asString();
+                .get("/api/folders/datasets?folder={folder}", "/beer") ///
+                .asString();
 
-        //  /beer has not anymore content
-        folderContent = objectMapper.readValue( list, FolderContent.class);
+        // /beer has not anymore content
+        folderContent = objectMapper.readValue(list, FolderContent.class);
 
-        Assertions.assertThat( folderContent.getDatasets() ).isEmpty();
+        Assertions.assertThat(folderContent.getDatasets()).isEmpty();
 
-    }    
-
+    }
 
     @Test
     public void testDataSetGetWithSample() throws Exception {
@@ -632,8 +619,7 @@ public class DataSetAPITest extends ApiServiceTestBase {
         final String dataSetId = createDataset("t-shirt_100.csv", "test_sample", "text/csv");
 
         // when 0
-        String contentAsString = when().get("/api/datasets/{id}?metadata=false&columns=false&sample=0", dataSetId)
-                .asString();
+        String contentAsString = when().get("/api/datasets/{id}?metadata=false&columns=false&sample=0", dataSetId).asString();
 
         // then full content
         ObjectMapper mapper = new ObjectMapper();
@@ -690,7 +676,8 @@ public class DataSetAPITest extends ApiServiceTestBase {
     @Test
     public void testDataSetColumnSuggestions() throws Exception {
         // given
-        final String columnDescription = IOUtils.toString(PreparationAPITest.class.getResourceAsStream("suggestions/firstname_column_metadata.json"));
+        final String columnDescription = IOUtils
+                .toString(PreparationAPITest.class.getResourceAsStream("suggestions/firstname_column_metadata.json"));
 
         // when
         final String content = given().body(columnDescription).when().post("/api/transform/suggest/column").asString();
@@ -702,7 +689,8 @@ public class DataSetAPITest extends ApiServiceTestBase {
     @Test
     public void testDataSetColumnActions() throws Exception {
         // given
-        final String columnDescription = IOUtils.toString(PreparationAPITest.class.getResourceAsStream("suggestions/firstname_column_metadata.json"));
+        final String columnDescription = IOUtils
+                .toString(PreparationAPITest.class.getResourceAsStream("suggestions/firstname_column_metadata.json"));
 
         // when
         final String content = given().body(columnDescription).when().post("/api/transform/actions/column").asString();
@@ -820,8 +808,9 @@ public class DataSetAPITest extends ApiServiceTestBase {
 
         // then
         Response response = given() //
-            .body(IOUtils.toByteArray(DataSetAPITest.class.getResourceAsStream("dataset/Talend_Desk-Tableau_de_Bord-011214.xls"))) //
-            .when().post("/api/datasets");
+                .body(IOUtils
+                        .toByteArray(DataSetAPITest.class.getResourceAsStream("dataset/Talend_Desk-Tableau_de_Bord-011214.xls"))) //
+                .when().post("/api/datasets");
 
         assertThat(response.getStatusCode(), is(200));
         String datasetId = response.asString();
@@ -846,6 +835,5 @@ public class DataSetAPITest extends ApiServiceTestBase {
         assertThat(encodings.get(0), is("UTF-8"));
         assertThat(encodings.get(1), is("UTF-16"));
     }
-
 
 }
