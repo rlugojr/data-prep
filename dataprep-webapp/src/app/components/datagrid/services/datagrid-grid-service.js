@@ -25,17 +25,19 @@
  */
 export default class DatagridGridService {
 
-    constructor($timeout, state, StateService, DatagridService,
+    constructor($timeout, $log, state, StateService, DatagridService, PlaygroundService,
         DatagridStyleService, DatagridColumnService, DatagridSizeService, DatagridExternalService, DatagridTooltipService) {
         'ngInject';
 
         this.grid = null;
         this.changeActiveTimeout = null;
 
+        this.$log = $log;
         this.$timeout = $timeout;
         this.state = state;
         this.StateService = StateService;
         this.DatagridService = DatagridService;
+        this.PlaygroundService = PlaygroundService;
 
         this.gridServices = [
             DatagridColumnService,
@@ -91,11 +93,33 @@ export default class DatagridGridService {
         });
 
         this.grid.onColumnsReordered.subscribe((e, args) => {
+
             let cols = args.grid.getColumns();
+            let index = 0;
+            //let previous = null;
+            let selected = null;
+            let target = null;
             _.forEach(cols, (col) => {
-                let id = col.id;
-                id++;
+                
+                if( col.tdpColMetadata ) { //} == null || ( col.cssClass && col.cssClass.indexOf('index-column')<0)) {
+                    this.$log.info( 'col.id:' + col.id +', index:' + index );
+                    index++;
+                    /*if (col.cssClass && col.cssClass.indexOf('selected') > -1){
+                        selected = col.id;
+                        target = previous.id;
+                    } else {
+                        previous = col;
+                    }*/
+                }
             });
+
+            selected = {id: "0000"};
+            target = {id:"0002"};
+
+            this.$log.info( 'target:' + target +', selected:' + selected );
+            this.PlaygroundService.appendStep('reorder',
+                                             {selected_column:target.id,scope:"column",column_id:selected.id,column_name:"zip"});
+
         });
     }
 

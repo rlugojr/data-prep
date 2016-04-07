@@ -31,7 +31,8 @@ import org.talend.dataprep.transformation.api.action.parameters.Parameter;
 import org.talend.dataprep.transformation.api.action.parameters.ParameterType;
 
 /**
- * 
+ * This action reorder columns. The column will be move to the selected column.
+ * All other columns will be moved as well.
  */
 @Component( Reorder.ACTION_BEAN_PREFIX + Reorder.REORDER_ACTION_NAME )
 public class Reorder extends ActionMetadata implements ColumnAction {
@@ -148,13 +149,13 @@ public class Reorder extends ActionMetadata implements ColumnAction {
         String columnValue = row.get( columnId );
         String selectedColumnValue = row.get( selectedColumn.getId() );
 
-        row.set( columnId, columnValue == null ? StringUtils.EMPTY : columnValue );
-        row.set( selectedColumn.getId(), selectedColumnValue == null ? StringUtils.EMPTY : selectedColumnValue );
+        row.set( columnId, selectedColumnValue == null ? StringUtils.EMPTY : selectedColumnValue );
+        row.set( selectedColumn.getId(), columnValue == null ? StringUtils.EMPTY : columnValue );
     }
 
     @Override
     public Set<Behavior> getBehavior() {
-        return EnumSet.of(Behavior.VALUES_COLUMN);
+        return Collections.emptySet();
     }
 
 }
