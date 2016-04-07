@@ -51,7 +51,7 @@ public class Documentation {
     @Value("${service.documentation.name}")
     private String serviceDisplayName;
 
-    @Value("${service.documentation.description}")
+    @Value("${service.documentation.parameters}")
     private String serviceDescription;
 
     @Value("#{'${service.paths}'.split(',')}")

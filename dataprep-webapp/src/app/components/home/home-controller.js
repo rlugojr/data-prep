@@ -45,7 +45,8 @@ export default function HomeCtrl($window, $document, $state,
     vm.importTypes = [
         {id: 'local', name: 'Local file'},
         {id: 'http', name: 'from HTTP'},
-        {id: 'hdfs', name: 'from HDFS'}
+        {id: 'hdfs', name: 'from HDFS'},
+        {id: 'job', name: 'from Talend Job'}
     ];
 
     /**
@@ -157,6 +158,10 @@ export default function HomeCtrl($window, $document, $state,
                 // show hdfs dataset form
                 vm.datasetHdfsModal = true;
                 break;
+            case 'job':
+                // show job dataset form
+                vm.datasetJobModal = true;
+                break;
             default:
         }
     };
@@ -218,6 +223,36 @@ export default function HomeCtrl($window, $document, $state,
                 StateService.finishUploadingDataset(dataset);
             });
     };
+
+    /**
+     * @ngdoc method
+     * @name importJobDataSet
+     * @methodOf data-prep.home.controller:HomeCtrl
+     * @description Import a Talend job dataset.
+     */
+    vm.importJobDataSet = function () {
+        var importParameters = {
+            type: 'job',
+            name: vm.datasetName,
+            jobName: vm.datasetJob
+        };
+
+        var dataset = DatasetService.createDatasetInfo(null, importParameters.name);
+        StateService.startUploadingDataset(dataset);
+
+        DatasetService.import(importParameters, state.inventory.currentFolder)
+            .then(function (event) {
+                DatasetService.getDatasetById(event.data).then(UploadWorkflowService.openDataset);
+                FolderService.getContent(state.inventory.currentFolder);
+            })
+            .catch(function () {
+                dataset.error = true;
+            })
+            .finally(function () {
+                StateService.finishUploadingDataset(dataset);
+            });
+    };
+
 
     /**
      * @ngdoc method

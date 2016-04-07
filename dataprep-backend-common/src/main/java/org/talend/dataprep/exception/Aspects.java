@@ -54,7 +54,7 @@ class Aspects {
             LOG.error("Unexpected exception occurred in '" + pjp.getSignature().toShortString() + "'", e);
             final ExceptionContext context = ExceptionContext.build();
             if (apiOperation != null && !StringUtils.isEmpty(apiOperation.value())) {
-                // Build message as a "Unable to " + <api operation description> (with first character as lower case).
+                // Build message as a "Unable to " + <api operation parameters> (with first character as lower case).
                 String messageSuffix = apiOperation.value();
                 if (Character.isUpperCase(messageSuffix.charAt(0))) {
                     messageSuffix = Character.toLowerCase(messageSuffix.charAt(0)) + messageSuffix.substring(1);
