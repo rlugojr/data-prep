@@ -11,12 +11,12 @@
 
   ============================================================================*/
 
-describe('Suggestions Profile directive', function () {
+describe('Suggestions Profile directive', () => {
     'use strict';
 
-    var scope, createElement, element, stateMock;
+    let scope, createElement, element, stateMock;
 
-    beforeEach(angular.mock.module('data-prep.suggestions-stats', function ($provide) {
+    beforeEach(angular.mock.module('data-prep.suggestions-stats', ($provide) => {
         stateMock = {
             playground: {
                 suggestions: {
@@ -29,7 +29,7 @@ describe('Suggestions Profile directive', function () {
     }));
     beforeEach(angular.mock.module('htmlTemplates'));
 
-    beforeEach(inject(function ($rootScope, $compile, $timeout) {
+    beforeEach(inject(($rootScope, $compile, $timeout) => {
         scope = $rootScope.$new();
         createElement = function () {
             element = angular.element('<column-profile></column-profile>');
@@ -40,12 +40,12 @@ describe('Suggestions Profile directive', function () {
         };
     }));
 
-    afterEach(function () {
+    afterEach(() => {
         scope.$destroy();
         element.remove();
     });
 
-    it('should render chart ghost when fetching statistics', inject(function ($q) {
+    it('should render chart ghost when fetching statistics', inject(() => {
         //given
         stateMock.playground.isFetchingStats = true;
 
@@ -57,20 +57,15 @@ describe('Suggestions Profile directive', function () {
         expect(element.find('#column-profile-chart').length).toBe(0);
     }));
 
-    it('should render a control div with "insertion-charts-control" attribute', function () {
-        //given
-        stateMock.playground.statistics.histogram = {};
-
+    it('should render column profile options', () => {
         //when
         createElement();
 
         //then
-        var control = element.find('#column-profile-chart > .column-profile-options > .column-profile-chart-control');
-        expect(control.length).toBe(1);
-        expect(control.eq(0)[0].hasAttribute('insertion-charts-control')).toBe(true);
+        expect(element.find('column-profile-options').length).toBe(1);
     });
 
-    it('should render a chart div with "insertion-charts" attribute', function () {
+    it('should render a chart div with "insertion-charts" attribute', () => {
         //given
         stateMock.playground.statistics.histogram = {};
 

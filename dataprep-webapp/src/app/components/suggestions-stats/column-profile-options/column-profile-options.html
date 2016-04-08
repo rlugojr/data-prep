@@ -1,0 +1,68 @@
+<!--
+  ~ ============================================================================
+  ~
+  ~  Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+  ~
+  ~  This source code is available under agreement available at
+  ~  https://github.com/Talend/data-prep/blob/master/LICENSE
+  ~
+  ~  You should have received a copy of the agreement
+  ~  along with this program; if not, write to Talend SA
+  ~  9 rue Pages 92150 Suresnes, France
+  ~
+  ~ ============================================================================
+  -->
+
+<div class="column-profile-options">
+    <div id="chart-control" class="chart-control" insertion-charts-control>
+        <talend-dropdown class="chart-control-options"
+                         on-open="$ctrl.resetSelected()"
+                         close-on-select="false">
+            <div class="dropdown-container">
+                <div class="dropdown-action dropdown-button chart-control-trigger" ng-bind="$ctrl.shortDescription"></div>
+            </div>
+            <form id="chart-control-form" class="dropdown-menu chart-control-form" ng-submit="$ctrl.changeAggregation()">
+                <div>
+                    <span translate-once="COLUMN"></span>
+                    <select id="chart-control-aggregation-column"
+                            ng-model="$ctrl.selected.column"
+                            ng-options="column.name for column in $ctrl.filteredNumericColumns track by column.id"
+                            ng-change="$ctrl.selectColumn()">
+                        <option value="" translate-once="CURRENT_NO_AGGREGATION"></option>
+                    </select>
+                </div>
+
+                <div ng-if="$ctrl.selected.column">
+                    <span translate-once="AGGREGATION"></span>
+                    <select id="chart-control-aggregation-type"
+                            ng-model="$ctrl.selected.aggregation"
+                            ng-options="aggreg | translate for aggreg in $ctrl.aggregations track by aggreg"
+                            ng-change="$ctrl.updateSelectedDescription()"></select>
+                </div>
+
+                <div ng-if="$ctrl.selected.description"
+                     ng-bind-html="$ctrl.selected.description"
+                     class="aggregation-description">
+                </div>
+
+                <div class="chart-control-buttons">
+                    <button id="chart-control-aggregation-remove"
+                            type="button"
+                            class="btn-secondary dropdown-close"
+                            translate-once="REMOVE"
+                            ng-click="$ctrl.removeAggregation()"></button>
+                    <button id="chart-control-aggregation-cancel"
+                            type="button"
+                            class="btn-secondary dropdown-close"
+                            translate-once="CANCEL"></button>
+                    <button id="chart-control-aggregation-ok"
+                            type="submit"
+                            class="btn-primary dropdown-close"
+                            translate-once="OK"></button>
+                </div>
+            </form>
+        </talend-dropdown>
+    </div>
+
+    <div id="aggregation-description" class="aggregation-description" ng-bind-html="$ctrl.description"></div>
+</div>

@@ -1,0 +1,53 @@
+/*  ============================================================================
+
+  Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+
+  This source code is available under agreement available at
+  https://github.com/Talend/data-prep/blob/master/LICENSE
+
+  You should have received a copy of the agreement
+  along with this program; if not, write to Talend SA
+  9 rue Pages 92150 Suresnes, France
+
+  ============================================================================*/
+
+.column-profile-options {
+  @include flex-column();
+  padding: 10px 10px;
+
+  .chart-control {
+    @include flex-row();
+    @include align-items(center);
+
+    .chart-control-options {
+
+      .chart-control-trigger {
+        border: 1px solid;
+        border-radius: 3px;
+        max-width: 240px;
+        padding: 5px 10px;
+        text-transform: uppercase;
+      }
+
+      .chart-control-form {
+        cursor: default;
+        min-width: 300px;
+        padding: 20px;
+      }
+
+      .chart-control-buttons {
+        @include flex-row();
+        @include justify-content(flex-end);
+        margin-top: 10px;
+      }
+    }
+  }
+
+  .aggregation-description {
+    padding: 10px 5px;
+
+    .highlight {
+      font-weight: bold;
+    }
+  }
+}

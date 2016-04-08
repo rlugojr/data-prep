@@ -100,6 +100,7 @@
   "EXPORT_XLS": "Export to XLSX",
   "OK": "OK",
   "CONFIRM": "Confirm",
+  "REMOVE": "Remove",
 
   "_comment": "Add datasets",
   "IMPORT_DATASET": "Add Dataset",
@@ -233,6 +234,10 @@
   "SUM": "Sum",
   "AVERAGE": "Average",
   "GROUP_BY": "group by ",
+  "CURRENT_NO_AGGREGATION": "Current (no aggregation)",
+  "COLUMN": "Column",
+  "AGGREGATION": "Aggregation",
+  "AGGREGATION_DETAILS": "{{aggreg}} <span class=\"highlight\">{{col}}</span> group by <span class=\"highlight\">{{group}}</span>",
   "APPLY_TO_ALL_CELLS": "Apply to all cells with this value",
   "STRING": "TEXT",
   "FLOAT": "DECIMAL",
