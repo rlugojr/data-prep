@@ -16,7 +16,6 @@ function listFiles() {
     });
 
     var patterns = wiredep(wiredepOptions).js
-        .concat(['./node_modules/phantomjs-polyfill/bind-polyfill.js'])
         .concat([
             path.join(conf.paths.src, '/app/**/*-module.js'),
             path.join(conf.paths.src, '/app/**/' + (argv.folder ? argv.folder + '/**/' : '') + '*.spec.js'),
