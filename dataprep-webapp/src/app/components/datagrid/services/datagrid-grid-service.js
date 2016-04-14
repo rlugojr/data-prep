@@ -114,7 +114,7 @@ export default class DatagridGridService {
             });
 
             selected = {id: "0000"};
-            target = {id:"0002"};
+            target = {id:"0003"};
 
             this.$log.info( 'target:' + target +', selected:' + selected );
             this.PlaygroundService.appendStep('reorder',

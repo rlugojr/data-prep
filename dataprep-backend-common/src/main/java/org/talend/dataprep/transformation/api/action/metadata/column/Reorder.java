@@ -87,43 +87,121 @@ public class Reorder extends ActionMetadata implements ColumnAction {
 
         RowMetadata rowMetadata = actionContext.getRowMetadata();
 
-        ColumnMetadata selectedColumn = rowMetadata.getById(parameters.get(OtherColumnParameters.SELECTED_COLUMN_PARAMETER));
+        String targetColumnId = parameters.get(OtherColumnParameters.SELECTED_COLUMN_PARAMETER);
+
+        ColumnMetadata selectedColumn = rowMetadata.getById(targetColumnId);
 
         if (selectedColumn == null){
             return;
         }
 
-        String columnId = parameters.get( ImplicitParameters.COLUMN_ID.getKey() );
+        String originColumnId = parameters.get( ImplicitParameters.COLUMN_ID.getKey() );
 
-        ColumnMetadata originColumn = rowMetadata.getById( columnId );
+        // get the origin column
+        ColumnMetadata originColumn = rowMetadata.getById( originColumnId );
 
-        ColumnMetadata selectedColumnCopy = ColumnMetadata.Builder.column().copy( selectedColumn ).build();
 
-        swapColumnMetadata( originColumn, selectedColumn );
-        swapColumnMetadata( selectedColumnCopy, originColumn );
+        // column id may be different from index in the list
+        // we cannot rely on id as index
+        // so we have to find first the origin and target index
+        int index = 0, originIndex = 0, targetIndex = 0;
+        for (ColumnMetadata columnMetadata : rowMetadata.getColumns()){
+            if (StringUtils.equals( columnMetadata.getId(), originColumnId)){
+                originIndex = index;
+            }
+            if (StringUtils.equals( columnMetadata.getId(), targetColumnId )){
+                targetIndex = index;
+            }
+            index++;
+        }
+
+        // now we have both index so we can iterate again and swap few columns
+        // we have different case as target can he lower than origin or the opposite
+        boolean forwardMove = targetIndex > originIndex;
+        /*
+        if (!forwardMove) {
+            int tmp = targetIndex;
+            targetIndex = originIndex;
+            originIndex = tmp;
+            forwardMove = true;
+        }*/
+
+        if (forwardMove) {
+            index = 0;
+            for ( int size = rowMetadata.getColumns().size(); index < size; index++) {
+                if (index >= originIndex && index < targetIndex) {
+                    swapColumnMetadata( rowMetadata.getColumns().get( index ), rowMetadata.getColumns().get( index + 1 ) );
+                }
+
+            }
+        } else {
+            index = rowMetadata.getColumns().size() - 1;
+            for (; index>0; index--){
+                if (index > targetIndex && index <= originIndex) {
+                    swapColumnMetadata( rowMetadata.getColumns().get( index ), rowMetadata.getColumns().get( index - 1 ) );
+                }
+            }
+        }
+
 
     }
     
     
     protected void swapColumnMetadata( ColumnMetadata originColumn, ColumnMetadata targetColumn ) {
 
+
+        ColumnMetadata targetColumnCopy = ColumnMetadata.Builder.column().copy( targetColumn ).build();
+
         targetColumn.setId( originColumn.getId() );
+        originColumn.setId( targetColumnCopy.getId() );
+
         targetColumn.setName( originColumn.getName());
+        originColumn.setName( targetColumnCopy.getName() );
+
         Quality originalQuality = originColumn.getQuality();
+        Quality targetQualityCopty = targetColumnCopy.getQuality();
+
         targetColumn.getQuality().setEmpty( originalQuality.getEmpty() );
+        originalQuality.setEmpty( targetQualityCopty.getEmpty() );
+
         targetColumn.getQuality().setInvalid( originalQuality.getInvalid() );
+        originalQuality.setInvalid( targetQualityCopty.getInvalid() );
+
         targetColumn.getQuality().setValid( originalQuality.getValid() );
+        originalQuality.setValid( targetQualityCopty.getValid() );
+
         targetColumn.getQuality().setInvalidValues( originalQuality.getInvalidValues() );
+        originalQuality.setInvalidValues( targetQualityCopty.getInvalidValues() );
+
         targetColumn.setHeaderSize( originColumn.getHeaderSize() );
+        originColumn.setHeaderSize( targetColumnCopy.getHeaderSize() );
+
         targetColumn.setType(originColumn.getType());
+        originColumn.setType( targetColumnCopy.getType() );
+
         targetColumn.setDiffFlagValue( originColumn.getDiffFlagValue() );
+        originColumn.setDiffFlagValue( targetColumnCopy.getDiffFlagValue() );
+
         targetColumn.setStatistics( originColumn.getStatistics() );
+        originColumn.setStatistics( targetColumnCopy.getStatistics() );
+
         targetColumn.setDomain( originColumn.getDomain() );
+        originColumn.setDomain( targetColumnCopy.getDomain() );
+
         targetColumn.setDomainLabel( originColumn.getDomainLabel() );
+        originColumn.setDomainLabel( targetColumnCopy.getDomainLabel() );
+
         targetColumn.setDomainFrequency( originColumn.getDomainFrequency());
+        originColumn.setDomainFrequency( targetColumnCopy.getDomainFrequency() );
+
         targetColumn.setSemanticDomains( originColumn.getSemanticDomains() );
+        originColumn.setSemanticDomains( targetColumnCopy.getSemanticDomains() );
+
         targetColumn.setDomainForced( originColumn.isDomainForced() );
+        originColumn.setDomainForced( targetColumnCopy.isDomainForced() );
+
         targetColumn.setTypeForced( originColumn.isTypeForced() );
+        originColumn.setTypeForced( targetColumnCopy.isTypeForced() );
         
     } 
         
@@ -133,6 +211,7 @@ public class Reorder extends ActionMetadata implements ColumnAction {
      */
     @Override
     public void applyOnColumn(DataSetRow row, ActionContext context) {
+        /*
         RowMetadata rowMetadata = context.getRowMetadata();
         Map<String, String> parameters = context.getParameters();
 
@@ -151,6 +230,7 @@ public class Reorder extends ActionMetadata implements ColumnAction {
 
         row.set( columnId, selectedColumnValue == null ? StringUtils.EMPTY : selectedColumnValue );
         row.set( selectedColumn.getId(), columnValue == null ? StringUtils.EMPTY : columnValue );
+        */
     }
 
     @Override
