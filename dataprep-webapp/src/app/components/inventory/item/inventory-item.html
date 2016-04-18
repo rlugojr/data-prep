@@ -45,7 +45,9 @@
               class="inventory-title"
               ng-bind-html="inventoryItemCtrl.item.name"
               title="{{inventoryItemCtrl.item.tooltipName}}"></span>
-        <div class="inventory-description" ng-bind-html="inventoryItemCtrl.details | translate:inventoryItemCtrl.item"></div>
+        <div class="inventory-description"
+             ng-bind-html="inventoryItemCtrl.details | translate:inventoryItemCtrl.item">
+        </div>
     </div>
 
     <!-- Draft actions icons -->
@@ -121,7 +123,7 @@
            translate-values="{type: inventoryItemCtrl.type, name: inventoryItemCtrl.item.name}"
            ng-click="inventoryItemCtrl.processCertification(inventoryItemCtrl.item)"></a>
 
-        <a data-icon="f" ng-if="inventoryItemCtrl.open && inventoryItemCtrl.type !== 'folder'"
+        <a data-icon="f" ng-if="inventoryItemCtrl.open && inventoryItemCtrl.type === 'dataset'"
            class="btn-icon favorite"
            translate-once-title="FAVORITE_ACTION"
            translate-values="{type: inventoryItemCtrl.type, name: inventoryItemCtrl.item.name}"

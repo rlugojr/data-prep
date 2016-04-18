@@ -40,6 +40,7 @@
 
   "_comment": "Inventory",
   "DATASET_DETAILS": "owned by {{author}}, created {{created | TDPMoment}}, contains {{records}} line(s)",
+  "PREPARATION_DETAILS": "<span class=\"preparation-description\" title=\"{{dataset.name}}\">{{dataset.name}}</span> - {{dataset.records}} row(s),  owned by {{author}}, last change: {{lastModificationDate | TDPMoment}}, contains {{steps.length - 1}} step(s)",
   "SEARCH_DATASET_DETAILS": "Home/{{path}}, owned by {{author}}, created {{created | TDPMoment}}, contains {{records}} line(s)",
   "SEARCH_PREPARATION_DETAILS": "owned by {{author}}, created {{creationDate | TDPMoment}}, contains {{steps.length-1}} step(s)",
   "FOLDER_DETAILS": "created {{creationDate | TDPMoment}}, contains {{nbDatasets}} dataset(s)",
