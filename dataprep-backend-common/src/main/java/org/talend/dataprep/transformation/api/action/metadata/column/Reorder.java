@@ -42,7 +42,6 @@ public class Reorder extends ActionMetadata implements ColumnAction {
      */
     public static final String REORDER_ACTION_NAME = "reorder"; //$NON-NLS-1$
 
-
     /**
      * @see ActionMetadata#getName()
      */

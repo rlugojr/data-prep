@@ -356,4 +356,95 @@ describe('Datagrid column service', function () {
             expect(angular.element(columnsArgs.node).find('datagrid-header').length).toBe(0);
         }));
     });
+
+    describe('on column header reorder event', function() {
+
+        beforeEach(inject(function(DatagridColumnService) {
+        }));
+
+        it('should find move columns 2 steps', inject(function(DatagridColumnService) {
+            var original = [
+                {id: "0000"},{id: "0001"},{id: "0002"},{id: "0003"}
+            ];
+            var newCols = [
+                {id: "0001"},{id: "0002"},{id: "0000"},{id: "0003"}
+            ];
+
+            var moved = DatagridColumnService._findMoveCols(original,newCols);
+            expect(moved.selected).toEqual('0000');
+            expect(moved.target).toEqual('0002');
+
+        }));
+
+        it('should find move columns simple swap', inject(function(DatagridColumnService) {
+            var original = [
+                {id: "0000"},{id: "0001"},{id: "0002"},{id: "0003"}
+            ];
+            var newCols = [
+                {id: "0000"},{id: "0002"},{id: "0001"},{id: "0003"}
+            ];
+
+            var moved = DatagridColumnService._findMoveCols(original,newCols);
+            expect(moved.selected).toEqual('0001');
+            expect(moved.target).toEqual('0002');
+
+        }));
+
+        it('should find move columns 3 steps', inject(function(DatagridColumnService) {
+            var original = [
+                {id: "0000"},{id: "0001"},{id: "0002"},{id: "0003"}
+            ];
+            var newCols = [
+                {id: "0001"},{id: "0002"},{id: "0003"},{id: "0000"}
+            ];
+
+            var moved = DatagridColumnService._findMoveCols(original,newCols);
+            expect(moved.selected).toEqual('0000');
+            expect(moved.target).toEqual('0003');
+
+        }));
+
+        it('should find not moved', inject(function(DatagridColumnService) {
+            var original = [
+                {id: "0000"},{id: "0001"},{id: "0002"},{id: "0003"}
+            ];
+            var newCols = [
+                {id: "0000"},{id: "0001"},{id: "0002"},{id: "0003"}
+            ];
+
+            var moved = DatagridColumnService._findMoveCols(original,newCols);
+            expect(moved.selected).not.toBeDefined();
+            expect(moved.target).not.toBeDefined();
+        }));
+
+        it('should find move columns 2 steps backward', inject(function(DatagridColumnService) {
+            var original = [
+                {id: "0000"},{id: "0001"},{id: "0002"},{id: "0003"}
+            ];
+            var newCols = [
+                {id: "0002"},{id: "0000"},{id: "0001"},{id: "0003"}
+            ];
+
+            var moved = DatagridColumnService._findMoveCols(original,newCols);
+            expect(moved.selected).toEqual('0002');
+            expect(moved.target).toEqual('0000');
+
+        }));
+
+        it('should find move columns 2 steps backward in the middle', inject(function(DatagridColumnService) {
+            var original = [
+                {id: "0000"},{id: "0001"},{id: "0002"},{id: "0003"},,{id: "0004"}
+            ];
+            var newCols = [
+                {id: "0000"},{id: "0003"},{id: "0001"},{id: "0002"},{id: "0004"}
+            ];
+
+            var moved = DatagridColumnService._findMoveCols(original,newCols);
+            expect(moved.selected).toEqual('0003');
+            expect(moved.target).toEqual('0001');
+
+        }));
+
+    });
+
 });
