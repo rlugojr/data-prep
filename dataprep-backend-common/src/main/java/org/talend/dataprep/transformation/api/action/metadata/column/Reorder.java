@@ -28,12 +28,12 @@ import org.talend.dataprep.api.dataset.ColumnMetadata;
 import org.talend.dataprep.api.dataset.DataSetRow;
 import org.talend.dataprep.api.dataset.Quality;
 import org.talend.dataprep.api.dataset.RowMetadata;
+import org.talend.dataprep.api.dataset.statistics.Statistics;
 import org.talend.dataprep.exception.TDPException;
 import org.talend.dataprep.exception.error.CommonErrorCodes;
 import org.talend.dataprep.transformation.api.action.context.ActionContext;
 import org.talend.dataprep.transformation.api.action.metadata.category.ActionCategory;
 import org.talend.dataprep.transformation.api.action.metadata.common.ActionMetadata;
-import org.talend.dataprep.transformation.api.action.metadata.common.ColumnAction;
 import org.talend.dataprep.transformation.api.action.metadata.common.DataSetAction;
 import org.talend.dataprep.transformation.api.action.metadata.common.ImplicitParameters;
 import org.talend.dataprep.transformation.api.action.metadata.common.OtherColumnParameters;
@@ -96,11 +96,10 @@ public class Reorder extends ActionMetadata implements DataSetAction
     }
 
     @Override
-    public void compile( ActionContext actionContext )
-    {
-        super.compile( actionContext );
+    public void compile(ActionContext actionContext) {
+        super.compile(actionContext);
 
-        Map<String,String> parameters = actionContext.getParameters();
+        Map<String, String> parameters = actionContext.getParameters();
 
         RowMetadata rowMetadata = actionContext.getRowMetadata();
 
@@ -108,25 +107,24 @@ public class Reorder extends ActionMetadata implements DataSetAction
 
         ColumnMetadata selectedColumn = rowMetadata.getById(targetColumnId);
 
-        if (selectedColumn == null){
+        if (selectedColumn == null) {
             return;
         }
 
-        String originColumnId = parameters.get( ImplicitParameters.COLUMN_ID.getKey() );
+        String originColumnId = parameters.get(ImplicitParameters.COLUMN_ID.getKey());
 
         // get the origin column
-        ColumnMetadata originColumn = rowMetadata.getById( originColumnId );
-
+        ColumnMetadata originColumn = rowMetadata.getById(originColumnId);
 
         // column id may be different from index in the list
         // we cannot rely on id as index
         // so we have to find first the origin and target index
         int index = 0, originIndex = 0, targetIndex = 0;
-        for (ColumnMetadata columnMetadata : rowMetadata.getColumns()){
-            if (StringUtils.equals( columnMetadata.getId(), originColumnId)){
+        for (ColumnMetadata columnMetadata : rowMetadata.getColumns()) {
+            if (StringUtils.equals(columnMetadata.getId(), originColumnId)) {
                 originIndex = index;
             }
-            if (StringUtils.equals( columnMetadata.getId(), targetColumnId )){
+            if (StringUtils.equals(columnMetadata.getId(), targetColumnId)) {
                 targetIndex = index;
             }
             index++;
@@ -135,13 +133,6 @@ public class Reorder extends ActionMetadata implements DataSetAction
         // now we have both index so we can iterate again and swap few columns
         // we have different case as target can he lower than origin or the opposite
         boolean forwardMove = targetIndex > originIndex;
-        /*
-        if (!forwardMove) {
-            int tmp = targetIndex;
-            targetIndex = originIndex;
-            originIndex = tmp;
-            forwardMove = true;
-        }*/
 
         try {
             if (forwardMove) {
@@ -166,95 +157,33 @@ public class Reorder extends ActionMetadata implements DataSetAction
                     ExceptionContext.build().put("message", e.getMessage()));
         }
 
-
     }
-    
-    
-    protected void swapColumnMetadata( ColumnMetadata originColumn, ColumnMetadata targetColumn ) throws Exception {
 
-        
-        ColumnMetadata targetColumnCopy = ColumnMetadata.Builder.column().copy( targetColumn ).build();
+    protected void swapColumnMetadata(ColumnMetadata originColumn, ColumnMetadata targetColumn) throws Exception {
 
-        BeanUtils.copyProperties( targetColumn, originColumn  );
-        BeanUtils.copyProperties( originColumn, targetColumnCopy );
+        ColumnMetadata targetColumnCopy = ColumnMetadata.Builder.column().copy(targetColumn).build();
+
+        BeanUtils.copyProperties(targetColumn, originColumn);
+        BeanUtils.copyProperties(originColumn, targetColumnCopy);
 
         Quality originalQuality = originColumn.getQuality();
         Quality targetQualityCopty = targetColumnCopy.getQuality();
 
-        BeanUtils.copyProperties( targetColumn.getQuality(), originalQuality );
-        BeanUtils.copyProperties( originalQuality, targetQualityCopty );        
-        
-        /*
-        targetColumn.setId( originColumn.getId() );
-        originColumn.setId( targetColumnCopy.getId() );
+        BeanUtils.copyProperties(targetColumn.getQuality(), originalQuality);
+        BeanUtils.copyProperties(originalQuality, targetQualityCopty);
 
-        targetColumn.setName( originColumn.getName());
-        originColumn.setName( targetColumnCopy.getName() );
-        
-        targetColumn.setHeaderSize( originColumn.getHeaderSize() );
-        originColumn.setHeaderSize( targetColumnCopy.getHeaderSize() );
+        Statistics originalStatistics = originColumn.getStatistics();
+        Statistics targetStatistics = targetColumnCopy.getStatistics();
 
-        targetColumn.setType(originColumn.getType());
-        originColumn.setType( targetColumnCopy.getType() );
+        BeanUtils.copyProperties(targetColumn.getStatistics(), originalStatistics);
+        BeanUtils.copyProperties(originalStatistics, targetStatistics);
 
-        targetColumn.setDiffFlagValue( originColumn.getDiffFlagValue() );
-        originColumn.setDiffFlagValue( targetColumnCopy.getDiffFlagValue() );
-
-        targetColumn.setStatistics( originColumn.getStatistics() );
-        originColumn.setStatistics( targetColumnCopy.getStatistics() );
-
-        targetColumn.setDomain( originColumn.getDomain() );
-        originColumn.setDomain( targetColumnCopy.getDomain() );
-
-        targetColumn.setDomainLabel( originColumn.getDomainLabel() );
-        originColumn.setDomainLabel( targetColumnCopy.getDomainLabel() );
-
-        targetColumn.setDomainFrequency( originColumn.getDomainFrequency());
-        originColumn.setDomainFrequency( targetColumnCopy.getDomainFrequency() );
-
-        targetColumn.setSemanticDomains( originColumn.getSemanticDomains() );
-        originColumn.setSemanticDomains( targetColumnCopy.getSemanticDomains() );
-
-        targetColumn.setDomainForced( originColumn.isDomainForced() );
-        originColumn.setDomainForced( targetColumnCopy.isDomainForced() );
-
-        targetColumn.setTypeForced( originColumn.isTypeForced() );
-        originColumn.setTypeForced( targetColumnCopy.isTypeForced() );
-
-        Quality originalQuality = originColumn.getQuality();
-        Quality targetQualityCopty = targetColumnCopy.getQuality();
-        
-        targetColumn.getQuality().setEmpty( originalQuality.getEmpty() );
-        originalQuality.setEmpty( targetQualityCopty.getEmpty() );
-
-        targetColumn.getQuality().setInvalid( originalQuality.getInvalid() );
-        originalQuality.setInvalid( targetQualityCopty.getInvalid() );
-
-        targetColumn.getQuality().setValid( originalQuality.getValid() );
-        originalQuality.setValid( targetQualityCopty.getValid() );
-
-        targetColumn.getQuality().setInvalidValues( originalQuality.getInvalidValues() );
-        originalQuality.setInvalidValues( targetQualityCopty.getInvalidValues() );
-        */
-        
     }
-
 
     @Override
-    public void applyOnDataSet( DataSetRow row, ActionContext context )
-    {
-        //
+    public void applyOnDataSet(DataSetRow row, ActionContext context) {
+        // no op
     }
-
-    /**
-     * @see ColumnAction#applyOnColumn(DataSetRow, ActionContext)
-     */
-    /*@Override
-    public void applyOnColumn(DataSetRow row, ActionContext context) {
-       // no op
-    }*/
-
-
 
     @Override
     public Set<Behavior> getBehavior() {

@@ -174,8 +174,4 @@ public class ReorderColumnTest extends AbstractMetadataBaseTest {
         assertTrue(action.acceptColumn(getColumn(Type.ANY)));
     }
 
-    @Override
-    protected ColumnMetadata.Builder columnBaseBuilder() {
-        return super.columnBaseBuilder().headerSize(12).valid(5).invalid(2);
-    }
 }
