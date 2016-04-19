@@ -124,7 +124,7 @@ export default function DatagridColumnService($rootScope, $compile, $log, $trans
             selectable: false
         });
 
-        var columns = _.union(colIndexArray, _.map(columnsMetadata, function (col,index) {
+        var columns = _.union(colIndexArray, _.map(columnsMetadata, function (col) {
             return createColumnDefinition(col, preview);
         }));
 
@@ -146,7 +146,7 @@ export default function DatagridColumnService($rootScope, $compile, $log, $trans
         PlaygroundService.appendStep('reorder',
                                           {
                                               selected_column:result.target,
-                                              scope:"column",
+                                              scope:'dataset',
                                               column_id:result.selected,
                                               column_name:result.name
                                           });

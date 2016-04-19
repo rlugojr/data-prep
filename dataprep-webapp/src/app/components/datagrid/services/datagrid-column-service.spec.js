@@ -380,7 +380,7 @@ describe('Datagrid column service', function () {
             expect(PlaygroundService.appendStep).toHaveBeenCalledWith('reorder',
                                                                       {
                                                                           selected_column:"0002",
-                                                                          scope:"column",
+                                                                          scope:"dataset",
                                                                           column_id:"0000",
                                                                           column_name:"beer"
                                                                       });

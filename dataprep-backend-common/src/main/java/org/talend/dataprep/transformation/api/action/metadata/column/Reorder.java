@@ -34,6 +34,7 @@ import org.talend.dataprep.transformation.api.action.context.ActionContext;
 import org.talend.dataprep.transformation.api.action.metadata.category.ActionCategory;
 import org.talend.dataprep.transformation.api.action.metadata.common.ActionMetadata;
 import org.talend.dataprep.transformation.api.action.metadata.common.ColumnAction;
+import org.talend.dataprep.transformation.api.action.metadata.common.DataSetAction;
 import org.talend.dataprep.transformation.api.action.metadata.common.ImplicitParameters;
 import org.talend.dataprep.transformation.api.action.metadata.common.OtherColumnParameters;
 import org.talend.dataprep.transformation.api.action.parameters.Parameter;
@@ -44,7 +45,8 @@ import org.talend.dataprep.transformation.api.action.parameters.ParameterType;
  * All other columns will be moved as well.
  */
 @Component( Reorder.ACTION_BEAN_PREFIX + Reorder.REORDER_ACTION_NAME )
-public class Reorder extends ActionMetadata implements ColumnAction {
+public class Reorder extends ActionMetadata implements DataSetAction
+{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Reorder.class);
     
@@ -235,16 +237,24 @@ public class Reorder extends ActionMetadata implements ColumnAction {
         originalQuality.setInvalidValues( targetQualityCopty.getInvalidValues() );
         */
         
-    } 
-        
+    }
+
+
+    @Override
+    public void applyOnDataSet( DataSetRow row, ActionContext context )
+    {
+        //
+    }
 
     /**
      * @see ColumnAction#applyOnColumn(DataSetRow, ActionContext)
      */
-    @Override
+    /*@Override
     public void applyOnColumn(DataSetRow row, ActionContext context) {
        // no op
-    }
+    }*/
+
+
 
     @Override
     public Set<Behavior> getBehavior() {
