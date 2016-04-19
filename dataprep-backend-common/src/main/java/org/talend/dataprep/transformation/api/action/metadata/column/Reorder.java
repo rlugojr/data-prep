@@ -13,14 +13,23 @@
 
 package org.talend.dataprep.transformation.api.action.metadata.column;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.talend.daikon.exception.ExceptionContext;
 import org.talend.dataprep.api.dataset.ColumnMetadata;
 import org.talend.dataprep.api.dataset.DataSetRow;
 import org.talend.dataprep.api.dataset.Quality;
 import org.talend.dataprep.api.dataset.RowMetadata;
+import org.talend.dataprep.exception.TDPException;
+import org.talend.dataprep.exception.error.CommonErrorCodes;
 import org.talend.dataprep.transformation.api.action.context.ActionContext;
 import org.talend.dataprep.transformation.api.action.metadata.category.ActionCategory;
 import org.talend.dataprep.transformation.api.action.metadata.common.ActionMetadata;
@@ -37,6 +46,8 @@ import org.talend.dataprep.transformation.api.action.parameters.ParameterType;
 @Component( Reorder.ACTION_BEAN_PREFIX + Reorder.REORDER_ACTION_NAME )
 public class Reorder extends ActionMetadata implements ColumnAction {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(Reorder.class);
+    
     /**
      * The action name.
      */
@@ -66,6 +77,11 @@ public class Reorder extends ActionMetadata implements ColumnAction {
         List<Parameter> parameters = super.getParameters();
         parameters.add(new Parameter( OtherColumnParameters.SELECTED_COLUMN_PARAMETER, ParameterType.COLUMN, StringUtils.EMPTY, false, false));
         return parameters;
+    }
+
+    @Override
+    public List<String> getActionScope() {
+        return Collections.emptyList();
     }
 
     /**
@@ -125,53 +141,54 @@ public class Reorder extends ActionMetadata implements ColumnAction {
             forwardMove = true;
         }*/
 
-        if (forwardMove) {
-            index = 0;
-            for ( int size = rowMetadata.getColumns().size(); index < size; index++) {
-                if (index >= originIndex && index < targetIndex) {
-                    swapColumnMetadata( rowMetadata.getColumns().get( index ), rowMetadata.getColumns().get( index + 1 ) );
-                }
+        try {
+            if (forwardMove) {
+                index = 0;
+                for (int size = rowMetadata.getColumns().size(); index < size; index++) {
+                    if (index >= originIndex && index < targetIndex) {
+                        swapColumnMetadata(rowMetadata.getColumns().get(index), rowMetadata.getColumns().get(index + 1));
+                    }
 
-            }
-        } else {
-            index = rowMetadata.getColumns().size() - 1;
-            for (; index>0; index--){
-                if (index > targetIndex && index <= originIndex) {
-                    swapColumnMetadata( rowMetadata.getColumns().get( index ), rowMetadata.getColumns().get( index - 1 ) );
+                }
+            } else {
+                index = rowMetadata.getColumns().size() - 1;
+                for (; index > 0; index--) {
+                    if (index > targetIndex && index <= originIndex) {
+                        swapColumnMetadata(rowMetadata.getColumns().get(index), rowMetadata.getColumns().get(index - 1));
+                    }
                 }
             }
+        } catch (Exception e) {
+            LOGGER.debug("cannot swap columns: {}", e.getMessage());
+            throw new TDPException(CommonErrorCodes.UNEXPECTED_EXCEPTION,
+                    ExceptionContext.build().put("message", e.getMessage()));
         }
 
 
     }
     
     
-    protected void swapColumnMetadata( ColumnMetadata originColumn, ColumnMetadata targetColumn ) {
+    protected void swapColumnMetadata( ColumnMetadata originColumn, ColumnMetadata targetColumn ) throws Exception {
 
-
+        
         ColumnMetadata targetColumnCopy = ColumnMetadata.Builder.column().copy( targetColumn ).build();
 
+        BeanUtils.copyProperties( targetColumn, originColumn  );
+        BeanUtils.copyProperties( originColumn, targetColumnCopy );
+
+        Quality originalQuality = originColumn.getQuality();
+        Quality targetQualityCopty = targetColumnCopy.getQuality();
+
+        BeanUtils.copyProperties( targetColumn.getQuality(), originalQuality );
+        BeanUtils.copyProperties( originalQuality, targetQualityCopty );        
+        
+        /*
         targetColumn.setId( originColumn.getId() );
         originColumn.setId( targetColumnCopy.getId() );
 
         targetColumn.setName( originColumn.getName());
         originColumn.setName( targetColumnCopy.getName() );
-
-        Quality originalQuality = originColumn.getQuality();
-        Quality targetQualityCopty = targetColumnCopy.getQuality();
-
-        targetColumn.getQuality().setEmpty( originalQuality.getEmpty() );
-        originalQuality.setEmpty( targetQualityCopty.getEmpty() );
-
-        targetColumn.getQuality().setInvalid( originalQuality.getInvalid() );
-        originalQuality.setInvalid( targetQualityCopty.getInvalid() );
-
-        targetColumn.getQuality().setValid( originalQuality.getValid() );
-        originalQuality.setValid( targetQualityCopty.getValid() );
-
-        targetColumn.getQuality().setInvalidValues( originalQuality.getInvalidValues() );
-        originalQuality.setInvalidValues( targetQualityCopty.getInvalidValues() );
-
+        
         targetColumn.setHeaderSize( originColumn.getHeaderSize() );
         originColumn.setHeaderSize( targetColumnCopy.getHeaderSize() );
 
@@ -201,6 +218,22 @@ public class Reorder extends ActionMetadata implements ColumnAction {
 
         targetColumn.setTypeForced( originColumn.isTypeForced() );
         originColumn.setTypeForced( targetColumnCopy.isTypeForced() );
+
+        Quality originalQuality = originColumn.getQuality();
+        Quality targetQualityCopty = targetColumnCopy.getQuality();
+        
+        targetColumn.getQuality().setEmpty( originalQuality.getEmpty() );
+        originalQuality.setEmpty( targetQualityCopty.getEmpty() );
+
+        targetColumn.getQuality().setInvalid( originalQuality.getInvalid() );
+        originalQuality.setInvalid( targetQualityCopty.getInvalid() );
+
+        targetColumn.getQuality().setValid( originalQuality.getValid() );
+        originalQuality.setValid( targetQualityCopty.getValid() );
+
+        targetColumn.getQuality().setInvalidValues( originalQuality.getInvalidValues() );
+        originalQuality.setInvalidValues( targetQualityCopty.getInvalidValues() );
+        */
         
     } 
         
@@ -210,26 +243,7 @@ public class Reorder extends ActionMetadata implements ColumnAction {
      */
     @Override
     public void applyOnColumn(DataSetRow row, ActionContext context) {
-        /*
-        RowMetadata rowMetadata = context.getRowMetadata();
-        Map<String, String> parameters = context.getParameters();
-
-        ColumnMetadata selectedColumn = rowMetadata.getById(parameters.get(OtherColumnParameters.SELECTED_COLUMN_PARAMETER));
-
-        if (selectedColumn == null){
-            return;
-        }
-
-        final String columnId = context.getColumnId();
-
-        // row values still have references to previous id so we need to mimic "swap" :-) to ensure the values are
-        // filled with the values from the correct column
-        String columnValue = row.get( columnId );
-        String selectedColumnValue = row.get( selectedColumn.getId() );
-
-        row.set( columnId, selectedColumnValue == null ? StringUtils.EMPTY : selectedColumnValue );
-        row.set( selectedColumn.getId(), columnValue == null ? StringUtils.EMPTY : columnValue );
-        */
+       // no op
     }
 
     @Override

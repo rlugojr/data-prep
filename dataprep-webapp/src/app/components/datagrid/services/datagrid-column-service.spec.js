@@ -359,87 +359,136 @@ describe('Datagrid column service', function () {
 
     describe('on column header reorder event', function() {
 
-        beforeEach(inject(function(DatagridColumnService) {
+        beforeEach(inject(function(PlaygroundService) {
+            spyOn(PlaygroundService, 'appendStep');
         }));
 
-        it('should find move columns 2 steps', inject(function(DatagridColumnService) {
+
+        it('should call PlaygroundService move columns 2 steps', inject(function(DatagridColumnService, PlaygroundService) {
+            //given
             var original = [
-                {id: "0000"},{id: "0001"},{id: "0002"},{id: "0003"}
+                {id: "0000", tdpColMetadata: {name: "beer"}},{id: "0001"},{id: "0002"},{id: "0003"}
             ];
             var newCols = [
                 {id: "0001"},{id: "0002"},{id: "0000"},{id: "0003"}
             ];
 
+            //when
+            DatagridColumnService.columnsOrderChanged(newCols, original);
+
+            //then
+            expect(PlaygroundService.appendStep).toHaveBeenCalledWith('reorder',
+                                                                      {
+                                                                          selected_column:"0002",
+                                                                          scope:"column",
+                                                                          column_id:"0000",
+                                                                          column_name:"beer"
+                                                                      });
+
+        }));
+
+        it('should find move columns 2 steps', inject(function(DatagridColumnService) {
+            //given
+            var original = [
+                {id: "0000", tdpColMetadata: {name: "beer"}},{id: "0001"},{id: "0002"},{id: "0003"}
+            ];
+            var newCols = [
+                {id: "0001"},{id: "0002"},{id: "0000"},{id: "0003"}
+            ];
+
+            //when
             var moved = DatagridColumnService._findMoveCols(original,newCols);
+
+            //then
             expect(moved.selected).toEqual('0000');
+            expect(moved.name).toEqual('beer');
             expect(moved.target).toEqual('0002');
 
         }));
 
         it('should find move columns simple swap', inject(function(DatagridColumnService) {
+            //given
             var original = [
-                {id: "0000"},{id: "0001"},{id: "0002"},{id: "0003"}
+                {id: "0000"},{id: "0001", tdpColMetadata: {name: "beer"}},{id: "0002"},{id: "0003"}
             ];
             var newCols = [
                 {id: "0000"},{id: "0002"},{id: "0001"},{id: "0003"}
             ];
 
+            //when
             var moved = DatagridColumnService._findMoveCols(original,newCols);
+
+            //then
             expect(moved.selected).toEqual('0001');
+            expect(moved.name).toEqual('beer');
             expect(moved.target).toEqual('0002');
 
         }));
 
         it('should find move columns 3 steps', inject(function(DatagridColumnService) {
+            //given
             var original = [
-                {id: "0000"},{id: "0001"},{id: "0002"},{id: "0003"}
+                {id: "0000", tdpColMetadata: {name: "beer"}},{id: "0001"},{id: "0002"},{id: "0003"}
             ];
             var newCols = [
                 {id: "0001"},{id: "0002"},{id: "0003"},{id: "0000"}
             ];
-
+            //when
             var moved = DatagridColumnService._findMoveCols(original,newCols);
+
+            //then
             expect(moved.selected).toEqual('0000');
+            expect(moved.name).toEqual('beer');
             expect(moved.target).toEqual('0003');
 
         }));
 
         it('should find not moved', inject(function(DatagridColumnService) {
+            //given
             var original = [
-                {id: "0000"},{id: "0001"},{id: "0002"},{id: "0003"}
+                {id: "0000", tdpColMetadata: {name: "beer"}},{id: "0001"},{id: "0002"},{id: "0003"}
             ];
             var newCols = [
                 {id: "0000"},{id: "0001"},{id: "0002"},{id: "0003"}
             ];
-
+            //when
             var moved = DatagridColumnService._findMoveCols(original,newCols);
+
+            //then
             expect(moved.selected).not.toBeDefined();
+            expect(moved.name).not.toBeDefined();
             expect(moved.target).not.toBeDefined();
         }));
 
         it('should find move columns 2 steps backward', inject(function(DatagridColumnService) {
+            //given
             var original = [
                 {id: "0000"},{id: "0001"},{id: "0002"},{id: "0003"}
             ];
             var newCols = [
                 {id: "0002"},{id: "0000"},{id: "0001"},{id: "0003"}
             ];
-
+            //when
             var moved = DatagridColumnService._findMoveCols(original,newCols);
+
+            //then
             expect(moved.selected).toEqual('0002');
             expect(moved.target).toEqual('0000');
 
         }));
 
         it('should find move columns 2 steps backward in the middle', inject(function(DatagridColumnService) {
+            //given
             var original = [
                 {id: "0000"},{id: "0001"},{id: "0002"},{id: "0003"},,{id: "0004"}
             ];
             var newCols = [
                 {id: "0000"},{id: "0003"},{id: "0001"},{id: "0002"},{id: "0004"}
             ];
-
+            //when
             var moved = DatagridColumnService._findMoveCols(original,newCols);
+
+            //then
             expect(moved.selected).toEqual('0003');
             expect(moved.target).toEqual('0001');
 

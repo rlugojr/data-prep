@@ -137,10 +137,11 @@ export default function DatagridColumnService($rootScope, $compile, $log, $trans
      * @name columnsOrderChanged
      * @methodOf data-prep.datagrid.service:DatagridColumnService
      * @param {object[]} columnsMetadata Columns details
+     * @param {object[]} originals the optional original columns if null the field will be used originalColumns
      * @description method trigger on columns reorder
      */
-    function columnsOrderChanged(columnsMetadata){
-        let result = _findMoveCols(originalColumns, columnsMetadata);
+    function columnsOrderChanged(columnsMetadata, originals){
+        let result = _findMoveCols(originals?originals:originalColumns, columnsMetadata);
         
         PlaygroundService.appendStep('reorder',
                                           {
@@ -156,25 +157,29 @@ export default function DatagridColumnService($rootScope, $compile, $log, $trans
      *
      * @param originalCols
      * @param newCols
-     * @returns {{}}
+     * @returns Object with fields :
+     *  <ul>
+     *    <li>selected: containing the column id to move</li>
+     *    <li>target: containing the column id where to move</li>
+     *    <li>name: the name of the moved field</li>
      * @private
      * @description find which columnMetadata has been moved between the two arrays during a reorder columsn.
      * We iterate on array and so some comparaisons.
      */
     function _findMoveCols(originalCols, newCols){
-
         let result = {};
         let index = 0;
         let movedIndex = 0;
         let movedCol = null;
         _.forEach(originalCols, (col) => {
             if (!movedCol && col.id){
+                // move forward case
                 if (col.id != newCols[index].id && originalCols[index+1].id==newCols[index].id){
                     movedCol=col;
                     movedIndex = index;
                     // find new index of movedCol
                     result.selected = movedCol.id;
-                    result.name = movedCol.tdpColMetadata.name;
+                    result.name = _.get(movedCol, 'tdpColMetadata.name');
                     index = 0;
                     _.forEach(newCols, (col) => {
                         if (col.id && col.id==movedCol.id){
@@ -183,11 +188,12 @@ export default function DatagridColumnService($rootScope, $compile, $log, $trans
                         index++;
                     });
                     return result;
+                // move backward case    
                 } else if (col.id != newCols[index].id && col.id==newCols[index+1].id ) {
                     movedCol=col;
                     movedIndex = index;
                     result.selected = newCols[movedIndex].id;
-                    result.name = newCols[movedIndex].tdpColMetadata.name;
+                    result.name = _.get(newCols[movedIndex], 'tdpColMetadata.name');
                     result.target = originalCols[movedIndex].id;
                     return result;
                 }
