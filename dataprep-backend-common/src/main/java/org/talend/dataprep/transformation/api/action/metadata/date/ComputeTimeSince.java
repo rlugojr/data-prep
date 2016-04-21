@@ -14,9 +14,11 @@
 package org.talend.dataprep.transformation.api.action.metadata.date;
 
 import static org.talend.dataprep.api.type.Type.INTEGER;
+import static org.talend.dataprep.transformation.api.action.metadata.common.OtherColumnParameters.*;
 
 import java.time.DateTimeException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalUnit;
@@ -35,8 +37,9 @@ import org.talend.dataprep.api.dataset.statistics.Statistics;
 import org.talend.dataprep.transformation.api.action.context.ActionContext;
 import org.talend.dataprep.transformation.api.action.metadata.common.ActionMetadata;
 import org.talend.dataprep.transformation.api.action.metadata.common.ColumnAction;
-import org.talend.dataprep.parameters.Parameter;
-import org.talend.dataprep.parameters.SelectParameter;
+import org.talend.dataprep.transformation.api.action.parameters.Parameter;
+import org.talend.dataprep.transformation.api.action.parameters.ParameterType;
+import org.talend.dataprep.transformation.api.action.parameters.SelectParameter;
 
 @Component(ComputeTimeSince.ACTION_BEAN_PREFIX + ComputeTimeSince.TIME_SINCE_ACTION_NAME)
 public class ComputeTimeSince extends AbstractDate implements ColumnAction {
@@ -45,6 +48,12 @@ public class ComputeTimeSince extends AbstractDate implements ColumnAction {
      * The action name.
      */
     public static final String TIME_SINCE_ACTION_NAME = "compute_time_since"; //$NON-NLS-1$
+
+    public static final String SINCE_WHEN_PARAMETER = "since_when_value"; //$NON-NLS-1$
+
+    public static final String DATE_PATTERN = "dd/MM/yyyy HH:mm:ss";
+
+    public static final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ofPattern( DATE_PATTERN);
 
     /**
      * The column prefix.
@@ -80,6 +89,7 @@ public class ComputeTimeSince extends AbstractDate implements ColumnAction {
     @Override
     public List<Parameter> getParameters() {
         List<Parameter> parameters = super.getParameters();
+
         parameters.add(SelectParameter.Builder.builder() //
                 .name(TIME_UNIT_PARAMETER) //
                 .item(ChronoUnit.YEARS.name()) //
@@ -89,6 +99,23 @@ public class ComputeTimeSince extends AbstractDate implements ColumnAction {
                 .defaultValue(ChronoUnit.HOURS.name()) //
                 .build());
 
+        Parameter constantParameter = //
+            new Parameter( SINCE_WHEN_PARAMETER, //
+                           ParameterType.DATE, //
+                           "now", //DEFAULT_FORMATTER.format(LocalDateTime.now()), //
+                           false, //
+                           false, //
+                           getMessagesBundle());
+
+        parameters.add(SelectParameter.Builder.builder() //
+                .name(MODE_PARAMETER) //
+                .item(CONSTANT_MODE, constantParameter) //
+                .item(OTHER_COLUMN_MODE,
+                        new Parameter(SELECTED_COLUMN_PARAMETER, ParameterType.COLUMN, //
+                                StringUtils.EMPTY, false, false, getMessagesBundle())) //
+                .defaultValue(CONSTANT_MODE) //
+                .build());
+        
         return parameters;
     }
 
@@ -128,7 +155,10 @@ public class ComputeTimeSince extends AbstractDate implements ColumnAction {
         final String columnId = context.getColumnId();
 
         TemporalUnit unit = ChronoUnit.valueOf(parameters.get(TIME_UNIT_PARAMETER).toUpperCase());
-        Temporal now = LocalDateTime.now();
+
+        String dateToCompare = parameters.get( SINCE_WHEN_PARAMETER );
+        // FIXME column to compare with
+        LocalDateTime since = StringUtils.isBlank( dateToCompare) ? LocalDateTime.now() : LocalDateTime.parse( dateToCompare, DEFAULT_FORMATTER );
 
         final ColumnMetadata column = context.getRowMetadata().getById(columnId);
 
@@ -140,7 +170,7 @@ public class ComputeTimeSince extends AbstractDate implements ColumnAction {
         try {
             final LocalDateTime temporalAccessor = dateParser.parse(value, context.getRowMetadata().getById(columnId));
             final Temporal valueAsDate = LocalDateTime.from(temporalAccessor);
-            final long newValue = unit.between(valueAsDate, now);
+            final long newValue = unit.between(valueAsDate, since);
             row.set(computeTimeSinceColumn, String.valueOf(newValue));
         } catch (DateTimeException e) {
             // Nothing to do: in this case, temporalAccessor is left null

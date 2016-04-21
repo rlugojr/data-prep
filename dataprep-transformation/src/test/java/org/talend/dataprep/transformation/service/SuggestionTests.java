@@ -19,11 +19,25 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.text.StrSubstitutor;
 import org.junit.Test;
+import org.talend.dataprep.api.preparation.Action;
 import org.talend.dataprep.transformation.Application;
 
 import com.jayway.restassured.path.json.JsonPath;
+import org.talend.dataprep.transformation.api.action.metadata.common.ActionMetadata;
+import org.talend.dataprep.transformation.api.action.metadata.date.ComputeTimeSince;
+import org.talend.dataprep.transformation.api.action.parameters.Parameter;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Integration tests on suggestions.
@@ -198,7 +212,7 @@ public class SuggestionTests extends TransformationServiceBaseTests {
         // given
         final String columnMetadata = IOUtils
                 .toString(Application.class.getResourceAsStream("suggestions/date_column_string_type.json"));
-        final String expectedSuggestions = IOUtils
+        String expectedSuggestions = IOUtils
                 .toString(Application.class.getResourceAsStream("suggestions/date_column_string_type_suggestions.json"));
 
         // when
@@ -208,6 +222,28 @@ public class SuggestionTests extends TransformationServiceBaseTests {
                 .when() //
                 .post("/suggest/column?limit=10") //
                 .asString();
+
+
+        // well we need to know what is value for now as it is generated as an action parameter
+        // then replace it in the json (so we even validate the json structure first :-)
+
+        ObjectMapper mapper = builder.build();
+        JsonNode jsonNode = mapper.readTree( response );
+        List<ComputeTimeSince> actionMetadatas = mapper.readValue( response, new TypeReference<List<ComputeTimeSince>>(){});
+
+        Map<String,String> values = Maps.newHashMap();
+        for (ActionMetadata actionMetadata : actionMetadatas){
+            if( StringUtils.equals( actionMetadata.getName(), "compute_time_since" )){
+                /*for ( Parameter parameter : actionMetadata.getParameters()){
+                    if (StringUtils.equals( parameter.getName(), "mode" )){
+                        values.put( "now.value", (String) parameter.getConfiguration().get( "default" ) );
+                        break;
+                    }
+                }*/
+            }
+        }
+
+        expectedSuggestions = StrSubstitutor.replace( expectedSuggestions, values);
 
         // then
         assertEquals(expectedSuggestions, response, false);

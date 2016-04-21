@@ -511,6 +511,50 @@
         "description": "The unit in which you want the result",
         "label": "Time Unit",
         "default": "HOURS"
+      },
+      {
+        "name": "mode",
+        "type": "select",
+        "implicit": false,
+        "canBeBlank": false,
+        "configuration": {
+          "values": [
+            {
+              "value": "constant_mode",
+              "label": "No other column",
+              "parameters": [
+                {
+                  "name": "since_when_value",
+                  "type": "date",
+                  "implicit": false,
+                  "canBeBlank": false,
+                  "default": "${now.value}",
+                  "description": "Since when",
+                  "label": "Since when"
+                }
+              ]
+            },
+            {
+              "value": "other_column_mode",
+              "label": "Another column",
+              "parameters": [
+                {
+                  "name": "selected_column",
+                  "type": "column",
+                  "implicit": false,
+                  "canBeBlank": false,
+                  "default": "",
+                  "description": "Combine the current column with this one",
+                  "label": "Column"
+                }
+              ]
+            }
+          ],
+          "multiple": false
+        },
+        "default": "constant_mode",
+        "description": "Select if you want to use a constant value or another column",
+        "label": "Use with"
       }
     ],
     "category": "dates",
