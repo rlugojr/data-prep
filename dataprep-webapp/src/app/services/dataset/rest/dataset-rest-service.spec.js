@@ -132,7 +132,7 @@ describe('Dataset Rest Service', function () {
                 .respond(200, 'e85afAa78556d5425bc2');
 
             //when
-            DatasetRestService.create(dataset, folder).then(function (res) {
+            DatasetRestService.create(folder, dataset).then(function (res) {
                 datasetId = res.data;
             });
             $httpBackend.flush();
@@ -154,7 +154,7 @@ describe('Dataset Rest Service', function () {
                 .respond(200, 'e85afAa78556d5425bc2');
 
             //when
-            DatasetRestService.create(dataset, folder).then(function (res) {
+            DatasetRestService.create(folder, dataset).then(function (res) {
                 datasetId = res.data;
             });
             $httpBackend.flush();
@@ -164,57 +164,65 @@ describe('Dataset Rest Service', function () {
             expect(datasetId).toBe('e85afAa78556d5425bc2');
         }));
 
-        it('should call dataset creation rest service with import parameters for remote http with root folder path', inject(function ($rootScope, DatasetRestService, RestURLs) {
+        it('should call dataset creation rest service with parameters', inject(function ($rootScope, DatasetRestService, RestURLs) {
             //given
             var datasetId = null;
+            var contentType = 'application/vnd.remote-ds.http';
+            var folder = {id : '', path: '', name: 'Home'};
             var importParameters = {
                 type: 'http',
                 name: 'greatremotedataset',
                 url: 'moc.dnelat//:ptth'
             };
-            var headers = {'Content-Type': 'application/vnd.remote-ds.http', 'Accept': 'application/json, text/plain, */*'};
-            var folder = {id : '', path: '', name: 'Home'};
+            var file = null;
+            var headers = {'Content-Type': 'application/vnd.remote-ds.http', "Accept":"application/json, text/plain, */*"};
 
             $httpBackend
                 .expectPOST(RestURLs.datasetUrl + '?name=greatremotedataset&folderPath=%2F', importParameters, headers)
-                .respond(200, '54g5g4d3fg4d3f5q5g4');
+
+                .respond(200, 'e85afAa78556d5425bc2');
 
             //when
-            DatasetRestService.import(importParameters, folder).then(function (res) {
+            DatasetRestService.create(folder, importParameters, contentType, file).then(function (res) {
                 datasetId = res.data;
             });
             $httpBackend.flush();
             $rootScope.$digest();
 
             //then
-            expect(datasetId).toBe('54g5g4d3fg4d3f5q5g4');
+            expect(datasetId).toBe('e85afAa78556d5425bc2');
         }));
 
-        it('should call dataset creation rest service with import parameters for remote http with a folder path', inject(function ($rootScope, DatasetRestService, RestURLs) {
+        it('should call dataset creation rest service with file', inject(function ($rootScope, DatasetRestService, RestURLs) {
             //given
             var datasetId = null;
+            var contentType = 'text/plain';
+            var folder = {id : '', path: '', name: 'Home'};
             var importParameters = {
                 type: 'http',
                 name: 'greatremotedataset',
                 url: 'moc.dnelat//:ptth'
             };
-            var headers = {'Content-Type': 'application/vnd.remote-ds.http', 'Accept': 'application/json, text/plain, */*'};
-            var folder = {id : '1', path: '1', name: '1'};
+            var file = {id: '0001'};
+            var headers = {'Content-Type': 'text/plain', "Accept":"application/json, text/plain, */*"};
 
             $httpBackend
-                .expectPOST(RestURLs.datasetUrl + '?name=greatremotedataset&folderPath=1', importParameters, headers)
-                .respond(200, '54g5g4d3fg4d3f5q5g4');
+                .expectPOST(RestURLs.datasetUrl + '?name=greatremotedataset&folderPath=%2F', file, headers)
+
+                .respond(200, 'e85afAa78556d5425bc2');
 
             //when
-            DatasetRestService.import(importParameters, folder).then(function (res) {
+            DatasetRestService.create(folder, importParameters, contentType, file).then(function (res) {
                 datasetId = res.data;
             });
             $httpBackend.flush();
             $rootScope.$digest();
 
             //then
-            expect(datasetId).toBe('54g5g4d3fg4d3f5q5g4');
+            expect(datasetId).toBe('e85afAa78556d5425bc2');
         }));
+
+
     });
 
     describe('update', function() {

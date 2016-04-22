@@ -27,7 +27,6 @@ export default function DatasetService($q, state, StateService, DatasetListServi
 
     return {
         //lifecycle
-        import: DatasetListService.importRemoteDataset,
         create: DatasetListService.create,
         update: DatasetListService.update,
         delete: deleteDataset,
