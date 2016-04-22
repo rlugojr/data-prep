@@ -34,7 +34,8 @@ describe('Playground header directive', function () {
                 <playground-header dataset="dataset"
                     display-nb-lines="displayNbLines"
                     preview="preview"
-                    lookup="lookup"
+                    lookup-visible="lookupVisible"
+                    parameters-visible="parametersVisible"
                     on-parameters="onParameters()"
                     on-lookup="onLookup()"
                     on-onboarding="onOnboarding()"
@@ -109,6 +110,30 @@ describe('Playground header directive', function () {
             expect(element.find('#playground-left-header').eq(0)[0].hasAttribute('insertion-playground-left-header')).toBe(true);
         });
 
+        it('should dataset parameters toggle button looks inactive by default', function () {
+            //given
+            createElement();
+
+            //when
+            let playgroundGearIcon = element.find('#playground-gear-icon');
+
+            //then
+            expect(playgroundGearIcon.hasClass('pressed')).toBe(false);
+        });
+
+        it('should dataset parameters toggle button looks active when its panel is shown', function () {
+            //given
+            scope.parametersVisible = true;
+            createElement();
+
+            //when
+            let playgroundGearIcon = element.find('#playground-gear-icon');
+            playgroundGearIcon.click();
+
+            //then
+            expect(playgroundGearIcon.hasClass('pressed')).toBe(true);
+        });
+
         it('should call parameters callback', function () {
             //given
             scope.onParameters = jasmine.createSpy('onParameters');
@@ -123,6 +148,30 @@ describe('Playground header directive', function () {
     });
 
     describe('right header', function() {
+        it('should lookup toggle button looks inactive by default', function () {
+            //given
+            createElement();
+
+            //when
+            let playgroundLookupIcon = element.find('#playground-lookup-icon');
+
+            //then
+            expect(playgroundLookupIcon.hasClass('pressed')).toBe(false);
+        });
+
+        it('should lookup toggle button looks active when its panel is shown', function () {
+            //given
+            scope.lookupVisible = true;
+            createElement();
+
+            //when
+            let playgroundLookupIcon = element.find('#playground-lookup-icon');
+            playgroundLookupIcon.click();
+
+            //then
+            expect(playgroundLookupIcon.hasClass('pressed')).toBe(true);
+        });
+
         it('should call lookup callback', function () {
             //given
             scope.onLookup = jasmine.createSpy('onLookup');

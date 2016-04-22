@@ -44,6 +44,10 @@ $navigation-item-space: 10px;
     &:hover {
       color: $white;
     }
+
+    &.pressed {
+      @include background(linear-gradient(#4D4D50, #6E6D71) left repeat);
+    }
   }
 
   #playground-left-header {
@@ -64,6 +68,8 @@ $navigation-item-space: 10px;
     }
 
     #playground-gear-icon {
+      margin-left: 5px;
+      padding: 8px 8px 12px;
       font-size: 0.6em;
       vertical-align: top;
     }
@@ -94,9 +100,7 @@ $navigation-item-space: 10px;
         width: 90%;
       }
 
-      &.pressed {
-        @include background(linear-gradient(#4D4D50, #6E6D71) left repeat);
-      }
+
     }
 
     #playground-close-container {
