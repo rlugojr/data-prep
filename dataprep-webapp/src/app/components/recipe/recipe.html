@@ -43,11 +43,11 @@
                 <span translate-once="RECIPE_ITEM_ON_LINE" translate-values="{rowId: step.row.id}"></span>
             </span>
 
-            <span ng-switch-when="dataset" ng-if="!step.actionParameters.parameters.lookup_ds_name">
+            <span ng-switch-when="dataset" ng-if="step.actionParameters.parameters.dataset_action_display_type == 'column'">
                 <span translate-once="RECIPE_ITEM_ON_COL" translate-values="{columnName: step.column.name.toUpperCase()}"></span>
             </span>
 
-            <span ng-switch-when="dataset" ng-if="step.actionParameters.parameters.lookup_ds_name">
+            <span ng-switch-when="dataset" ng-if="step.actionParameters.parameters.dataset_action_display_type == 'lookup'">
 
                 <span translate-once="RECIPE_LOOKUP_OF_DS"></span>
                 <span class="recipe-column-name">{{::step.actionParameters.parameters.lookup_ds_name}}.</span>

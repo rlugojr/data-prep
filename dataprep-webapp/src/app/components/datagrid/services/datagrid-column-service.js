@@ -148,7 +148,8 @@ export default function DatagridColumnService($rootScope, $compile, $log, $trans
                                               selected_column:result.target,
                                               scope:'dataset',
                                               column_id:result.selected,
-                                              column_name:result.name
+                                              column_name:result.name,
+                                              dataset_action_display_type: 'column'
                                           });
 
     }

@@ -379,10 +379,11 @@ describe('Datagrid column service', function () {
             //then
             expect(PlaygroundService.appendStep).toHaveBeenCalledWith('reorder',
                                                                       {
-                                                                          selected_column:"0002",
-                                                                          scope:"dataset",
-                                                                          column_id:"0000",
-                                                                          column_name:"beer"
+                                                                          selected_column:'0002',
+                                                                          scope:'dataset',
+                                                                          column_id:'0000',
+                                                                          column_name:'beer',
+                                                                          dataset_action_display_type: 'column'
                                                                       });
 
         }));

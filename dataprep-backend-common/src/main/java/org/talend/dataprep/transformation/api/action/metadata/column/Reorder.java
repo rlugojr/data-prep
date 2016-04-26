@@ -13,7 +13,10 @@
 
 package org.talend.dataprep.transformation.api.action.metadata.column;
 
+import static org.talend.dataprep.transformation.api.action.metadata.common.ActionMetadata.Behavior.VALUES_COLUMN;
+
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,12 +47,11 @@ import org.talend.dataprep.transformation.api.action.parameters.ParameterType;
  * This action reorder columns. The column will be move to the selected column.
  * All other columns will be moved as well.
  */
-@Component( Reorder.ACTION_BEAN_PREFIX + Reorder.REORDER_ACTION_NAME )
-public class Reorder extends ActionMetadata implements DataSetAction
-{
+@Component(Reorder.ACTION_BEAN_PREFIX + Reorder.REORDER_ACTION_NAME)
+public class Reorder extends ActionMetadata implements DataSetAction {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Reorder.class);
-    
+
     /**
      * The action name.
      */
@@ -77,7 +79,9 @@ public class Reorder extends ActionMetadata implements DataSetAction
     @Override
     public List<Parameter> getParameters() {
         List<Parameter> parameters = super.getParameters();
-        parameters.add(new Parameter( OtherColumnParameters.SELECTED_COLUMN_PARAMETER, ParameterType.COLUMN, StringUtils.EMPTY, false, false));
+        parameters.add(new Parameter(OtherColumnParameters.SELECTED_COLUMN_PARAMETER, ParameterType.COLUMN, StringUtils.EMPTY,
+                false, false));
+        parameters.add(new Parameter(DISPLAY_TYPE_PARAMETER, ParameterType.HIDDEN, "column", true, true, getMessagesBundle()));
         return parameters;
     }
 
@@ -162,21 +166,22 @@ public class Reorder extends ActionMetadata implements DataSetAction
     protected void swapColumnMetadata(ColumnMetadata originColumn, ColumnMetadata targetColumn) throws Exception {
 
         ColumnMetadata targetColumnCopy = ColumnMetadata.Builder.column().copy(targetColumn).build();
+        ColumnMetadata originColumnCopy = ColumnMetadata.Builder.column().copy(originColumn).build();
 
         BeanUtils.copyProperties(targetColumn, originColumn);
         BeanUtils.copyProperties(originColumn, targetColumnCopy);
 
-        Quality originalQuality = originColumn.getQuality();
-        Quality targetQualityCopty = targetColumnCopy.getQuality();
-
-        BeanUtils.copyProperties(targetColumn.getQuality(), originalQuality);
-        BeanUtils.copyProperties(originalQuality, targetQualityCopty);
-
-        Statistics originalStatistics = originColumn.getStatistics();
+        Statistics originalStatistics = originColumnCopy.getStatistics();
         Statistics targetStatistics = targetColumnCopy.getStatistics();
 
         BeanUtils.copyProperties(targetColumn.getStatistics(), originalStatistics);
-        BeanUtils.copyProperties(originalStatistics, targetStatistics);
+        BeanUtils.copyProperties(originColumn.getStatistics(), targetStatistics);
+
+        Quality originalQuality = originColumnCopy.getQuality();
+        Quality targetQualityCopty = targetColumnCopy.getQuality();
+
+        BeanUtils.copyProperties(targetColumn.getQuality(), originalQuality);
+        BeanUtils.copyProperties(originColumn.getQuality(), targetQualityCopty);
 
     }
 
@@ -187,7 +192,7 @@ public class Reorder extends ActionMetadata implements DataSetAction
 
     @Override
     public Set<Behavior> getBehavior() {
-        return Collections.emptySet();
+        return EnumSet.of(VALUES_COLUMN);
     }
 
 }

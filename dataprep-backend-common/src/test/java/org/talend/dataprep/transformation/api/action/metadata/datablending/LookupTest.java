@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -119,13 +120,16 @@ public class LookupTest {
                 "lookup_ds_id", //
                 "lookup_join_on", //
                 "lookup_join_on_name", //
-                "lookup_selected_cols");
+                "lookup_selected_cols", //
+                "dataset_action_display_type");
 
         // when
         final List<Parameter> parameters = action.getParameters();
 
         // then
-        assertEquals(expectedParametersName.size(), parameters.size());
+        Assertions.assertThat( parameters ) //
+            .isNotEmpty() //
+            .hasSize( expectedParametersName.size() );
         parameters.forEach(p -> assertTrue(expectedParametersName.contains(p.getName())));
 
     }

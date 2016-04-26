@@ -52,7 +52,11 @@ public enum ParameterType {
     /**
     * This kind of parameter allow users to pass along multiple values as an array.
     */
-    LIST;
+    LIST,
+    /**
+     * This kind of parameter wil not be displayed.
+     */
+    HIDDEN;
     public String asString() {
         return this.name().toLowerCase();
     }
