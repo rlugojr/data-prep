@@ -73,7 +73,7 @@ describe('Transformation column param directive', function () {
 
         //then
         expect(element.find('.param-name').text().trim()).toBe('The Column to concatenate:');
-        expect(element.find('.param-input').find('option').length).toBe(stateMock.playground.data.metadata.columns.length - 1);
+        expect(element.find('.param-input').find('option').length).toBe(stateMock.playground.data.metadata.columns.length);
 
     });
 });
