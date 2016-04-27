@@ -51,8 +51,6 @@ export function StateService(RouteStateService, routeState, //
         setPreparationName: PlaygroundStateService.setPreparationName,
         updateDatasetStatistics: PlaygroundStateService.updateDatasetStatistics,
         updateDatasetRecord: PlaygroundStateService.updateDatasetRecord,
-        setCandidatePreparations: PlaygroundStateService.setCandidatePreparations,
-        updatePreparationPickerDisplay: PlaygroundStateService.updatePreparationPickerDisplay,
 
         //playground - dataset parameters
         toggleDatasetParameters: PlaygroundStateService.toggleDatasetParameters,
@@ -115,6 +113,7 @@ export function StateService(RouteStateService, routeState, //
         disableEasterEgg: EasterEggsStateService.disableEasterEgg,
 
         //inventory
+        setDatasetName: InventoryStateService.setDatasetName,
         setPreparations: InventoryStateService.setPreparations,
         removePreparation: InventoryStateService.removePreparation,
         setDatasets: InventoryStateService.setDatasets,

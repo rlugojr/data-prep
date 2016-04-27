@@ -1,15 +1,15 @@
-//  ============================================================================
+// ============================================================================
 //
-//  Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
-//  This source code is available under agreement available at
-//  https://github.com/Talend/data-prep/blob/master/LICENSE
+// This source code is available under agreement available at
+// https://github.com/Talend/data-prep/blob/master/LICENSE
 //
-//  You should have received a copy of the agreement
-//  along with this program; if not, write to Talend SA
-//  9 rue Pages 92150 Suresnes, France
+// You should have received a copy of the agreement
+// along with this program; if not, write to Talend SA
+// 9 rue Pages 92150 Suresnes, France
 //
-//  ============================================================================
+// ============================================================================
 
 package org.talend.dataprep.transformation.api.action.metadata.math;
 
@@ -19,30 +19,28 @@ import static org.talend.dataprep.api.dataset.ColumnMetadata.Builder.column;
 import static org.talend.dataprep.transformation.api.action.metadata.ActionMetadataTestUtils.getColumn;
 
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.talend.dataprep.api.dataset.ColumnMetadata;
-import org.talend.dataprep.api.dataset.DataSetRow;
 import org.talend.dataprep.api.type.Type;
-import org.talend.dataprep.transformation.api.action.ActionTestWorkbench;
-import org.talend.dataprep.transformation.api.action.metadata.AbstractMetadataBaseTest;
 import org.talend.dataprep.transformation.api.action.metadata.ActionMetadataTestUtils;
 import org.talend.dataprep.transformation.api.action.metadata.category.ActionCategory;
 
 /**
- * Test class for RoundDown action. Creates one consumer, and test it.
+ * Test class for RoundCeil action. Creates one consumer, and test it.
  *
- * @see RoundDown
+ * @see RoundCeil
  */
-public class RoundDownTest extends AbstractMetadataBaseTest {
+public class RoundDownTest extends AbstractRoundTest {
 
     /** The action ton test. */
     @Autowired
-    private RoundDown action;
+    private RoundDownReal action;
 
     private Map<String, String> parameters;
 
@@ -53,7 +51,7 @@ public class RoundDownTest extends AbstractMetadataBaseTest {
 
     @Test
     public void testName() {
-        assertEquals(RoundDown.ACTION_NAME, action.getName());
+        assertEquals(RoundDownReal.ACTION_NAME, action.getName());
     }
 
     @Test
@@ -68,61 +66,77 @@ public class RoundDownTest extends AbstractMetadataBaseTest {
         assertThat(action.getCategory(), is(ActionCategory.MATH.getDisplayName()));
     }
 
-    public void testCommon(String input, String expected) {
-        // given
-        final Map<String, String> values = new HashMap<>();
-        values.put("aNumber", input);
-        final DataSetRow row = new DataSetRow(values);
-
-        // when
-        ActionTestWorkbench.test(row, factory.create(action, parameters));
-
-        // then
-        assertEquals(expected, row.get("aNumber"));
-    }
 
     @Test
     public void testPositive() {
-        testCommon("5.0", "5");
-        testCommon("5.1", "5");
-        testCommon("5.5", "5");
-        testCommon("5.8", "5");
+        testCommon("5.0", "5", 0);
+        testCommon("5.1", "5", 0);
+        testCommon("5.5", "5", 0);
+        testCommon("5.8", "5", 0);
+
+        testCommon("5.0", "5.0", 1);
+        testCommon("5.1", "5.1", 1);
+        testCommon("5.5", "5.5", 1);
+        testCommon("5.8", "5.8", 1);
+
+        testCommon("5.0", "5.00", 2);
+        testCommon("5.1", "5.10", 2);
+        testCommon("5.5", "5.50", 2);
+        testCommon("5.8", "5.80", 2);
+
+        testCommon("5.0", "5", -2);
+        testCommon("5.1", "5", -2);
+        testCommon("5.5", "5", -2);
+        testCommon("5.8", "5", -2);
     }
 
     @Test
     public void testNegative() {
-        testCommon("-5.0", "-5");
-        testCommon("-5.4", "-5");
-        testCommon("-5.6", "-5");
+        testCommon("-5.0", "-5", 0);
+        testCommon("-5.4", "-5", 0);
+        testCommon("-5.6", "-5", 0);
+
+        testCommon("-5.0", "-5.0", 1);
+        testCommon("-5.4", "-5.4", 1);
+        testCommon("-5.6", "-5.6", 1);
+
+        testCommon("-5.00", "-5.0", 1);
+        testCommon("-5.45", "-5.4", 1);
+        testCommon("-5.63", "-5.6", 1);
     }
 
     @Test
-    public void test_huge_number() {
-        testCommon("1234567890.1", "1234567890");
-        testCommon("891234567897.9", "891234567897");
-        testCommon("891234567899.9", "891234567899");
-        testCommon("999999999999.9", "999999999999");
+    public void test_huge_numbers_positive() {
+        testCommon("131234567890.1", "131234567890", 0);
+        testCommon("89891234567897.9", "89891234567897", 0);
+        testCommon("34891234567899.9", "34891234567899", 0);
+        testCommon("678999999999999.9", "678999999999999", 0);
     }
 
     @Test
-    public void test_huge_number_negative() {
-        testCommon("-1234567890.1", "-1234567890");
-        testCommon("-891234567897.9", "-891234567897");
-        testCommon("-891234567899.9", "-891234567899");
-        testCommon("-999999999999.9", "-999999999999");
+    public void test_huge_numbers_negative() {
+        testCommon("-131234567890.1", "-131234567890", 0);
+        testCommon("-89891234567897.9", "-89891234567897", 0);
+        testCommon("-34891234567899.9", "-34891234567899", 0);
+        testCommon("-678999999999999.9", "-678999999999999", 0);
     }
 
     @Test
     public void testInteger() {
-        testCommon("5", "5");
-        testCommon("-5", "-5");
+        testCommon("5", "5", 0);
+        testCommon("-5", "-5", 0);
+
+        testCommon("5", "5.0", 1);
+        testCommon("-5", "-5.0", 1);
     }
 
     @Test
     public void testString() {
-        testCommon("tagada", "tagada");
-        testCommon("", "");
-        testCommon("null", "null");
+        for (int precision = 0; precision <= 5; precision++) {
+            testCommon("tagada", "tagada", precision);
+            testCommon("", "", precision);
+            testCommon("null", "null", precision);
+        }
     }
 
     @Test
@@ -139,4 +153,20 @@ public class RoundDownTest extends AbstractMetadataBaseTest {
         assertFalse(action.acceptColumn(getColumn(Type.DATE)));
         assertFalse(action.acceptColumn(getColumn(Type.BOOLEAN)));
     }
+
+    @Override
+    protected AbstractRound getAction() {
+        return action;
+    }
+
+    @Override
+    protected Map<String, String> getParameters() {
+        return parameters;
+    }
+
+    @Override
+    protected List<String> getExpectedParametersName() {
+        return Arrays.asList("column_id", "row_id", "scope", "filter", "precision");
+    }
+
 }

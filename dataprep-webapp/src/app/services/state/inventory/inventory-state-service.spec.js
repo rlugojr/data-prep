@@ -211,8 +211,8 @@ describe('Inventory state service', function () {
             //given
             inventoryState.foldersStack = [];
             const foldersStack = [
-                {'id': '', 'path': '', 'name': 'Home'},
-                {'id': 'lookups', 'path': 'lookups', 'name': 'lookups'}
+                { 'id': '', 'path': '', 'name': 'Home' },
+                { 'id': 'lookups', 'path': 'lookups', 'name': 'lookups' }
             ];
 
             //when
@@ -264,6 +264,42 @@ describe('Inventory state service', function () {
 
             //then
             expect(inventoryState.order).toBe('desc');
+        }));
+    });
+
+    describe('update dataset name', () => {
+        it('should update name in all dataset list', inject((inventoryState, InventoryStateService) => {
+            // given
+            inventoryState.datasets = [
+                { id: '1', name: 'toto' },
+                { id: '2', name: 'tata' },
+                { id: '3', name: 'titi' },
+                { id: '4', name: 'tutu' },
+            ];
+
+            // when
+            InventoryStateService.setDatasetName('2', 'tonton');
+
+            // then
+            expect(inventoryState.datasets[1].name).toBe('tonton');
+        }));
+
+        it('should update name in folder content list', inject((inventoryState, InventoryStateService) => {
+            // given
+            inventoryState.currentFolderContent = {
+                datasets: [
+                    { id: '1', name: 'toto' },
+                    { id: '2', name: 'tata' },
+                    { id: '3', name: 'titi' },
+                    { id: '4', name: 'tutu' },
+                ],
+            };
+
+            // when
+            InventoryStateService.setDatasetName('2', 'tonton');
+
+            // then
+            expect(inventoryState.currentFolderContent.datasets[1].name).toBe('tonton');
         }));
     });
 });

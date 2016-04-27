@@ -3,7 +3,7 @@
     {
       "action": "negate",
       "parameters": {
-        "column_id": "active",
+        "column_id": "0002",
         "scope": "column"
       }
     }

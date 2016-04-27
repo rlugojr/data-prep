@@ -10,16 +10,16 @@
  9 rue Pages 92150 Suresnes, France
 
  ============================================================================*/
+import inventoryTile from './inventory-tile-directive';
 
-import PreparationPickerCtrl from './preparation-picker-controller';
+(() => {
 
-const PreparationPicker = {
-    bindings: {
-        datasetName: '@',
-        datasetId: '@'
-    },
-    controller: PreparationPickerCtrl,
-    templateUrl: 'app/components/playground/preparation-picker/preparation-picker.html'
-};
+    /**
+     * @ngdoc object
+     * @name data-prep.inventory-tile
+     * @description This module contains the inventory tile used for preparation display
+     */
 
-export default PreparationPicker
+    angular.module('data-prep.inventory-tile', ['data-prep.services.utils'])
+        .directive('inventoryTile', inventoryTile);
+})();

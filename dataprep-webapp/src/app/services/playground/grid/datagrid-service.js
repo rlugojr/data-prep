@@ -35,7 +35,6 @@ export default function DatagridService(state, StateService, ConverterService) {
         updateData: updateData, //updata data in the current dataset
         getColumns: getColumns,
         getColumnsContaining: getColumnsContaining,
-        getNumericColumns: getNumericColumns,
 
         //preview
         execute: execute,
@@ -247,25 +246,5 @@ export default function DatagridService(state, StateService, ConverterService) {
         }
 
         return results;
-    }
-
-    /**
-     * @ngdoc method
-     * @name getNumericColumns
-     * @methodOf data-prep.services.playground.service:DatagridService
-     * @param {object} columnToSkip The column to skip
-     * @description Filter numeric columns
-     * @returns {array} The numeric columns
-     */
-    function getNumericColumns(columnToSkip) {
-        return _.chain(state.playground.data.metadata.columns)
-            .filter(function (column) {
-                return !columnToSkip || column.id !== columnToSkip.id;
-            })
-            .filter(function (column) {
-                var simpleType = ConverterService.simplifyType(column.type);
-                return simpleType === 'integer' || simpleType === 'decimal';
-            })
-            .value();
     }
 }

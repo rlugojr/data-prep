@@ -41,9 +41,9 @@ import org.talend.dataprep.transformation.api.action.metadata.category.ActionCat
  */
 public class AbsoluteTest extends AbstractMetadataBaseTest {
 
-    private static final String FLOAT_COLUMN = "float_column"; //$NON-NLS-1$
+    private static final String FLOAT_COLUMN = "0000"; //$NON-NLS-1$
 
-    private static final String INT_COLUMN = "int_column"; //$NON-NLS-1$
+    private static final String INT_COLUMN = "0000"; //$NON-NLS-1$
 
     @Autowired
     private Absolute absolute;
@@ -51,6 +51,22 @@ public class AbsoluteTest extends AbstractMetadataBaseTest {
     private Map<String, String> absFloatParameters;
 
     private Map<String, String> absIntParameters;
+
+    private void assertInteger(DataSetRow row, String expected) {
+        // when
+        ActionTestWorkbench.test(row, factory.create(absolute, absIntParameters));
+
+        // then
+        assertEquals(expected, row.get(INT_COLUMN)); //$NON-NLS-1$
+    }
+
+    private void assertFloat(DataSetRow row, String expected) {
+        // when
+        ActionTestWorkbench.test(row, factory.create(absolute, absFloatParameters));
+
+        // then
+        assertEquals(expected, row.get(FLOAT_COLUMN)); //$NON-NLS-1$
+    }
 
     @Before
     public void init() throws IOException {
@@ -86,11 +102,7 @@ public class AbsoluteTest extends AbstractMetadataBaseTest {
         values.put(FLOAT_COLUMN, "5.42"); //$NON-NLS-1$
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, factory.create(absolute, absFloatParameters));
-
-        // then
-        assertEquals("5.42", row.get(FLOAT_COLUMN)); //$NON-NLS-1$
+       assertFloat(row, "5.42");
     }
 
     @Test
@@ -100,11 +112,7 @@ public class AbsoluteTest extends AbstractMetadataBaseTest {
         values.put(FLOAT_COLUMN, "12345678.1"); //$NON-NLS-1$
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, factory.create(absolute, absFloatParameters));
-
-        // then
-        assertEquals("12345678.1", row.get(FLOAT_COLUMN)); //$NON-NLS-1$
+        assertFloat(row, "12345678.1");
     }
 
     @Test
@@ -114,11 +122,7 @@ public class AbsoluteTest extends AbstractMetadataBaseTest {
         values.put(FLOAT_COLUMN, "-12345678.1"); //$NON-NLS-1$
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, factory.create(absolute, absFloatParameters));
-
-        // then
-        assertEquals("12345678.1", row.get(FLOAT_COLUMN)); //$NON-NLS-1$
+        assertFloat(row, "12345678.1");
     }
 
     @Test
@@ -128,11 +132,7 @@ public class AbsoluteTest extends AbstractMetadataBaseTest {
         values.put(INT_COLUMN, "5.42"); //$NON-NLS-1$
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, factory.create(absolute, absIntParameters));
-
-        // then
-        assertEquals("5.42", row.get(INT_COLUMN)); //$NON-NLS-1$
+        assertInteger(row, "5.42");
     }
 
     @Test
@@ -142,11 +142,7 @@ public class AbsoluteTest extends AbstractMetadataBaseTest {
         values.put(FLOAT_COLUMN, "-5.42"); //$NON-NLS-1$
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, factory.create(absolute, absFloatParameters));
-
-        // then
-        assertEquals("5.42", row.get(FLOAT_COLUMN)); //$NON-NLS-1$
+        assertFloat(row, "5.42");
     }
 
     @Test
@@ -156,11 +152,7 @@ public class AbsoluteTest extends AbstractMetadataBaseTest {
         values.put(FLOAT_COLUMN, "-891234567898"); //$NON-NLS-1$
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, factory.create(absolute, absFloatParameters));
-
-        // then
-        assertEquals("891234567898", row.get(FLOAT_COLUMN)); //$NON-NLS-1$
+        assertFloat(row, "891234567898");
     }
 
     @Test
@@ -170,11 +162,7 @@ public class AbsoluteTest extends AbstractMetadataBaseTest {
         values.put(FLOAT_COLUMN, "-5,42"); //$NON-NLS-1$
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, factory.create(absolute, absFloatParameters));
-
-        // then
-        assertEquals("5.42", row.get(FLOAT_COLUMN)); //$NON-NLS-1$
+        assertFloat(row, "5.42");
     }
 
     @Test
@@ -184,11 +172,7 @@ public class AbsoluteTest extends AbstractMetadataBaseTest {
         values.put(FLOAT_COLUMN, "-1.2E3"); //$NON-NLS-1$
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, factory.create(absolute, absFloatParameters));
-
-        // then
-        assertEquals("1200", row.get(FLOAT_COLUMN)); //$NON-NLS-1$
+        assertFloat(row, "1200");
     }
 
     @Test
@@ -196,13 +180,8 @@ public class AbsoluteTest extends AbstractMetadataBaseTest {
         // given
         final Map<String, String> values = new HashMap<>();
         values.put(INT_COLUMN, "-5.42"); //$NON-NLS-1$
-        final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, factory.create(absolute, absIntParameters));
-
-        // then
-        assertEquals("5.42", row.get(INT_COLUMN)); //$NON-NLS-1$
+        assertInteger(new DataSetRow(values), "5.42");
     }
 
     @Test
@@ -212,11 +191,7 @@ public class AbsoluteTest extends AbstractMetadataBaseTest {
         values.put(FLOAT_COLUMN, "42"); //$NON-NLS-1$
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, factory.create(absolute, absFloatParameters));
-
-        // then
-        assertEquals("42", row.get(FLOAT_COLUMN)); //$NON-NLS-1$
+        assertFloat(row, "42");
     }
 
     @Test
@@ -226,11 +201,7 @@ public class AbsoluteTest extends AbstractMetadataBaseTest {
         values.put(INT_COLUMN, "42"); //$NON-NLS-1$
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, factory.create(absolute, absIntParameters));
-
-        // then
-        assertEquals("42", row.get(INT_COLUMN)); //$NON-NLS-1$
+        assertInteger(row, "42");
     }
 
     @Test
@@ -240,11 +211,7 @@ public class AbsoluteTest extends AbstractMetadataBaseTest {
         values.put(FLOAT_COLUMN, "-542"); //$NON-NLS-1$
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, factory.create(absolute, absFloatParameters));
-
-        // then
-        assertEquals("542", row.get(FLOAT_COLUMN)); //$NON-NLS-1$
+        assertFloat(row, "542");
     }
 
     @Test
@@ -254,11 +221,7 @@ public class AbsoluteTest extends AbstractMetadataBaseTest {
         values.put(INT_COLUMN, "-542"); //$NON-NLS-1$
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, factory.create(absolute, absIntParameters));
-
-        // then
-        assertEquals("542", row.get(INT_COLUMN)); //$NON-NLS-1$
+        assertInteger(row, "542");
     }
 
     @Test
@@ -268,11 +231,7 @@ public class AbsoluteTest extends AbstractMetadataBaseTest {
         values.put(FLOAT_COLUMN, "-0"); //$NON-NLS-1$
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, factory.create(absolute, absFloatParameters));
-
-        // then
-        assertEquals("0", row.get(FLOAT_COLUMN)); //$NON-NLS-1$
+        assertFloat(row, "0");
     }
 
     @Test
@@ -282,11 +241,7 @@ public class AbsoluteTest extends AbstractMetadataBaseTest {
         values.put(INT_COLUMN, "-0"); //$NON-NLS-1$
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, factory.create(absolute, absIntParameters));
-
-        // then
-        assertEquals("0", row.get(INT_COLUMN)); //$NON-NLS-1$
+        assertInteger(row, "0");
     }
 
     @Test
@@ -296,11 +251,7 @@ public class AbsoluteTest extends AbstractMetadataBaseTest {
         values.put(FLOAT_COLUMN, ""); //$NON-NLS-1$
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, factory.create(absolute, absFloatParameters));
-
-        // then
-        assertEquals("", row.get(FLOAT_COLUMN)); //$NON-NLS-1$
+        assertFloat(row, "");
     }
 
     @Test
@@ -310,11 +261,7 @@ public class AbsoluteTest extends AbstractMetadataBaseTest {
         values.put(INT_COLUMN, ""); //$NON-NLS-1$
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, factory.create(absolute, absIntParameters));
-
-        // then
-        assertEquals("", row.get(INT_COLUMN)); //$NON-NLS-1$
+        assertInteger(row, "");
     }
 
     @Test
@@ -324,11 +271,7 @@ public class AbsoluteTest extends AbstractMetadataBaseTest {
         values.put(FLOAT_COLUMN, "foobar"); //$NON-NLS-1$
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, factory.create(absolute, absFloatParameters));
-
-        // then
-        assertEquals("foobar", row.get(FLOAT_COLUMN)); //$NON-NLS-1$
+        assertFloat(row, "foobar");
     }
 
     @Test
@@ -338,11 +281,7 @@ public class AbsoluteTest extends AbstractMetadataBaseTest {
         values.put(INT_COLUMN, "foobar"); //$NON-NLS-1$
         final DataSetRow row = new DataSetRow(values);
 
-        // when
-        ActionTestWorkbench.test(row, factory.create(absolute, absIntParameters));
-
-        // then
-        assertEquals("foobar", row.get(INT_COLUMN)); //$NON-NLS-1$
+        assertInteger(row, "foobar");
     }
 
     @Test

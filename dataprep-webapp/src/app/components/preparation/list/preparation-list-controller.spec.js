@@ -229,7 +229,6 @@ describe('Preparation list controller', function () {
             //then
             expect(PreparationService.setName).not.toHaveBeenCalled();
             expect(MessageService.success).not.toHaveBeenCalled();
-
         }));
     });
 
@@ -278,7 +277,5 @@ describe('Preparation list controller', function () {
             //then
             expect($rootScope.$emit).toHaveBeenCalledWith('talend.loading.stop');
         }));
-
     });
-
 });

@@ -19,8 +19,8 @@ describe('Route state service', () => {
     describe('previous', () => {
         it('should init previous route', inject((routeState) => {
             //then
-            expect(routeState.previous).toBe('nav.index.datasets');
-            expect(routeState.previousOptions).toEqual({folderPath: ''});
+            expect(routeState.previous).toBe('nav.index.preparations');
+            expect(routeState.previousOptions).toEqual(null);
         }));
 
         it('should set previous route', inject((routeState, RouteStateService) => {
@@ -70,16 +70,16 @@ describe('Route state service', () => {
             RouteStateService.resetPrevious();
 
             //then
-            expect(routeState.previous).toBe('nav.index.datasets');
-            expect(routeState.previousOptions).toEqual({folderPath: ''});
+            expect(routeState.previous).toBe('nav.index.preparations');
+            expect(routeState.previousOptions).toEqual(null);
         }));
     });
 
     describe('next', () => {
         it('should init next route', inject((routeState) => {
             //then
-            expect(routeState.next).toBe('nav.index.datasets');
-            expect(routeState.nextOptions).toEqual({folderPath: ''});
+            expect(routeState.next).toBe('nav.index.preparations');
+            expect(routeState.nextOptions).toEqual(null);
         }));
 
         it('should set next route', inject((routeState, RouteStateService) => {
@@ -129,8 +129,8 @@ describe('Route state service', () => {
             RouteStateService.resetNext();
 
             //then
-            expect(routeState.next).toBe('nav.index.datasets');
-            expect(routeState.nextOptions).toEqual({folderPath: ''});
+            expect(routeState.next).toBe('nav.index.preparations');
+            expect(routeState.nextOptions).toEqual(null);
         }));
     });
 
@@ -153,10 +153,10 @@ describe('Route state service', () => {
             RouteStateService.reset();
 
             //then
-            expect(routeState.previous).toBe('nav.index.datasets');
-            expect(routeState.previousOptions).toEqual({folderPath: ''});
-            expect(routeState.next).toBe('nav.index.datasets');
-            expect(routeState.nextOptions).toEqual({folderPath: ''});
+            expect(routeState.previous).toBe('nav.index.preparations');
+            expect(routeState.previousOptions).toEqual(null);
+            expect(routeState.next).toBe('nav.index.preparations');
+            expect(routeState.nextOptions).toEqual(null);
         }));
     });
 });

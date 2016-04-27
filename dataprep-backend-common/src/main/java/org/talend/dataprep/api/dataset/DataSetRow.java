@@ -73,7 +73,7 @@ public class DataSetRow implements Cloneable {
     public DataSetRow(Map<String, String> values) {
         this.values.putAll(values);
         List<ColumnMetadata> columns = values.keySet().stream() //
-                .map(columnName -> ColumnMetadata.Builder.column().computedId(columnName).name(columnName).type(Type.STRING).build()) //
+                .map(columnName -> ColumnMetadata.Builder.column().name(columnName).type(Type.STRING).build()) //
                 .collect(Collectors.toList());
         rowMetadata = new RowMetadata(columns);
     }

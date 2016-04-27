@@ -12,9 +12,12 @@
 //  ============================================================================
 package org.talend.dataprep.transformation.api.action.metadata.math;
 
+import static org.talend.dataprep.transformation.api.action.parameters.ParameterType.INTEGER;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 
 import org.talend.daikon.number.BigDecimalParser;
@@ -25,11 +28,15 @@ import org.talend.dataprep.transformation.api.action.context.ActionContext;
 import org.talend.dataprep.transformation.api.action.metadata.category.ActionCategory;
 import org.talend.dataprep.transformation.api.action.metadata.common.ActionMetadata;
 import org.talend.dataprep.transformation.api.action.metadata.common.ColumnAction;
+import org.talend.dataprep.transformation.api.action.parameters.Parameter;
 
 /**
  * Abstract class for Math operation on {@link Type#NUMERIC} values
  */
 public abstract class AbstractRound extends ActionMetadata implements ColumnAction {
+
+    /** Number of digit after the decimal symbol. */
+    protected static final String PRECISION = "precision"; //$NON-NLS-1$
 
     /**
      * @see ActionMetadata#getCategory()
@@ -40,7 +47,28 @@ public abstract class AbstractRound extends ActionMetadata implements ColumnActi
     }
 
     @Override
+    public List<Parameter> getParameters() {
+        final List<Parameter> parameters = super.getParameters();
+        parameters.add(new Parameter(PRECISION, INTEGER, "0"));
+        return parameters;
+    }
+
+    @Override
     public void applyOnColumn(final DataSetRow row, final ActionContext context) {
+        final String precisionAsString = context.getParameters().get(PRECISION);
+        
+        int precision = 0;
+
+        try {
+            precision = Integer.parseInt(precisionAsString);
+        } catch (Exception e) {
+            // Nothing to do, precision cannot be parsed to integer, in this case we keep 0
+        }
+
+        if (precision < 0) {
+            precision = 0;
+        }
+
         final String columnId = context.getColumnId();
         final String value = row.get(columnId);
         if (value == null) {
@@ -49,9 +77,8 @@ public abstract class AbstractRound extends ActionMetadata implements ColumnActi
 
         try {
             BigDecimal bd = BigDecimalParser.toBigDecimal(value);
-            bd = bd.setScale(0, getRoundingMode());
-            long result = bd.longValue();
-            row.set(columnId, String.valueOf(result));
+            bd = bd.setScale(precision, getRoundingMode());
+            row.set(columnId, String.valueOf(bd));
         } catch (NumberFormatException nfe2) {
             // Nan: nothing to do, but fail silently (no change in value)
         }

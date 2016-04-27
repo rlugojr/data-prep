@@ -67,42 +67,42 @@ public class TrimTest extends AbstractMetadataBaseTest {
     public void should_trim_value() {
         // given
         final Map<String, String> values = new HashMap<>();
-        values.put("band", " the beatles ");
+        values.put("0000", " the beatles ");
         final DataSetRow row = new DataSetRow(values);
 
         //when
         ActionTestWorkbench.test(row, factory.create(action, parameters));
 
         // then
-        assertEquals("the beatles", row.get("band"));
+        assertEquals("the beatles", row.get("0000"));
     }
 
     @Test
     public void should_not_change_a_trimed_value() {
         // given
         final Map<String, String> values = new HashMap<>();
-        values.put("band", "The  Beatles");
+        values.put("0000", "The  Beatles");
         final DataSetRow row = new DataSetRow(values);
 
         //when
         ActionTestWorkbench.test(row, factory.create(action, parameters));
 
         // then
-        assertEquals("The  Beatles", row.get("band"));
+        assertEquals("The  Beatles", row.get("0000"));
     }
 
     @Test
     public void should_not_change_other_column_values() {
         // given
         final Map<String, String> values = new HashMap<>();
-        values.put("bando", "the beatles");
+        values.put("0000", "the beatles");
         final DataSetRow row = new DataSetRow(values);
 
         //when
         ActionTestWorkbench.test(row, factory.create(action, parameters));
 
         // then
-        assertEquals("the beatles", row.get("bando"));
+        assertEquals("the beatles", row.get("0000"));
     }
 
     @Test

@@ -3,7 +3,7 @@
     {
       "action": "absolute",
       "parameters": {
-        "column_id": "int_column",
+        "column_id": "0000",
         "scope": "column"
       }
     }

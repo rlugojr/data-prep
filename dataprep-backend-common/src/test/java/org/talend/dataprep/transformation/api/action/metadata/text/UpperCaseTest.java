@@ -20,6 +20,7 @@ import static org.talend.dataprep.transformation.api.action.metadata.ActionMetad
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.junit.Before;
@@ -68,13 +69,13 @@ public class UpperCaseTest extends AbstractMetadataBaseTest {
     public void should_uppercase() {
         // given
         final Map<String, String> values = new HashMap<>();
-        values.put("city", "Vancouver");
-        values.put("country", "Canada");
+        values.put("0000", "Vancouver");
+        values.put("0001", "Canada");
         final DataSetRow row = new DataSetRow(values);
 
-        final Map<String, Object> expectedValues = new HashMap<>();
-        expectedValues.put("city", "VANCOUVER"); // Vancouver --> VANCOUVER
-        expectedValues.put("country", "Canada");
+        final Map<String, Object> expectedValues = new LinkedHashMap<>();
+        expectedValues.put("0000", "VANCOUVER"); // Vancouver --> VANCOUVER
+        expectedValues.put("0001", "Canada");
 
         //when
         ActionTestWorkbench.test(row, factory.create(action, parameters));
@@ -87,13 +88,13 @@ public class UpperCaseTest extends AbstractMetadataBaseTest {
     public void should_do_nothing_since_column_does_not_exist() {
         // given
         final Map<String, String> values = new HashMap<>();
-        values.put("country", "Canada");
-        values.put("capital", "Ottawa");
+        values.put("0001", "Canada");
+        values.put("0002", "Ottawa");
         final DataSetRow row = new DataSetRow(values);
 
-        final Map<String, Object> expectedValues = new HashMap<>();
-        expectedValues.put("country", "Canada");
-        expectedValues.put("capital", "Ottawa");
+        final Map<String, Object> expectedValues = new LinkedHashMap<>();
+        expectedValues.put("0001", "Canada");
+        expectedValues.put("0002", "Ottawa");
 
         //when
         ActionTestWorkbench.test(row, factory.create(action, parameters));

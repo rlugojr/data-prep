@@ -1,0 +1,59 @@
+<!--
+  ~ ============================================================================
+  ~
+  ~  Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+  ~
+  ~  This source code is available under agreement available at
+  ~  https://github.com/Talend/data-prep/blob/master/LICENSE
+  ~
+  ~  You should have received a copy of the agreement
+  ~  along with this program; if not, write to Talend SA
+  ~  9 rue Pages 92150 Suresnes, France
+  ~
+  ~ ============================================================================
+  -->
+<div class="inventory-tile" ng-click="inventoryTileCtrl.onClick({preparation: inventoryTileCtrl.preparation})">
+    <div class="information">
+        <div ng-if="::inventoryTileCtrl.editableTitle">
+            <talend-editable-text text="inventoryTileCtrl.preparation.name"
+                                  text-class="title"
+                                  on-text-click="inventoryTileCtrl.onTitleClick({preparation: inventoryTileCtrl.preparation})"
+                                  on-validate="inventoryTileCtrl.onRename({preparation: inventoryTileCtrl.preparation, text: text})"
+                                  text-title="{{inventoryTileCtrl.preparation.name}}"
+                                  validate-only-on-change></talend-editable-text>
+        </div>
+
+        <div ng-if="!inventoryTileCtrl.editableTitle">
+            <span
+                    class="title"
+                    title="{{inventoryTileCtrl.preparation.name}}"
+                    ng-click="inventoryTileCtrl.onTitleClick({preparation: inventoryTileCtrl.preparation})">
+                {{inventoryTileCtrl.preparation.name}}
+            </span>
+        </div>
+
+        <p class="description">
+            <span translate-once="OWNED_BY"></span>
+            <span class="important" title="{{inventoryTileCtrl.preparation.author}}" >{{inventoryTileCtrl.preparation.author}}</span>
+            <br/>
+            <span translate-once="LAST_MODIFICATION"></span>
+            <span translate-once="COLON"></span>
+            {{inventoryTileCtrl.preparation.lastModificationDate | TDPMoment}}
+        </p>
+
+        <p class="details">
+            <span class="important name" title="{{inventoryTileCtrl.dataset.name}}">{{inventoryTileCtrl.dataset.name}}</span>
+            &nbsp;- {{ inventoryTileCtrl.dataset.records}}
+            <span translate-once="ROWS"></span>
+        </p>
+        <p class="details">
+            <span class="important">{{inventoryTileCtrl.preparation.steps.length - 1}}</span> <span class="important" translate-once="STEPS"></span> <span translate-once="RECIPE"></span>
+        </p>
+    </div>
+
+    <div class="actions">
+        <a ng-if="::inventoryTileCtrl.showFavoriteIcon" class="favorite" data-icon="f" ng-class="{selected: inventoryTileCtrl.preparation.favorite}" ng-click="inventoryTileCtrl.onFavorite({preparation: inventoryTileCtrl.preparation})"></a>
+        <a ng-if="::inventoryTileCtrl.showCloneIcon" class="clone hidden-action" data-icon="B" ng-click="inventoryTileCtrl.onClone({preparation: inventoryTileCtrl.preparation})" id="clone_btn_{{inventoryTileCtrl.preparation.id}}"></a>
+        <a ng-if="::inventoryTileCtrl.showRemoveIcon" class="remove hidden-action" data-icon="e" ng-click="inventoryTileCtrl.onRemove({preparation: inventoryTileCtrl.preparation})" id="trash_btn_{{inventoryTileCtrl.preparation.id}}"></a>
+    </div>
+</div>

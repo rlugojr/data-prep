@@ -109,7 +109,7 @@
                 })
                 .state('playground.preparation', { url: '/preparation?prepid' })
                 .state('playground.dataset', { url: '/dataset?datasetid' });
-            $urlRouterProvider.otherwise('/index/datasets/');
+            $urlRouterProvider.otherwise('/index/preparations');
         })
 
         // Language to use at startup (for now only english)

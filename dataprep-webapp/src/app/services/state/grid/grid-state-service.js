@@ -1,17 +1,22 @@
 /*  ============================================================================
 
-  Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+ Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 
-  This source code is available under agreement available at
-  https://github.com/Talend/data-prep/blob/master/LICENSE
+ This source code is available under agreement available at
+ https://github.com/Talend/data-prep/blob/master/LICENSE
 
-  You should have received a copy of the agreement
-  along with this program; if not, write to Talend SA
-  9 rue Pages 92150 Suresnes, France
+ You should have received a copy of the agreement
+ along with this program; if not, write to Talend SA
+ 9 rue Pages 92150 Suresnes, France
 
-  ============================================================================*/
+ ============================================================================*/
 
-export const gridState = {dataView: new Slick.Data.DataView({inlineFilters: false})};
+export const gridState = {
+    dataView: new Slick.Data.DataView({inlineFilters: false}),
+    numericColumns: [],
+};
+
+const NUMERIC_TYPES = ['numeric', 'integer', 'double', 'float', 'decimal'];
 
 /**
  * @ngdoc service
@@ -49,7 +54,7 @@ export function GridStateService() {
      */
     function updateFilteredRecords() {
         gridState.filteredRecords = [];
-        for (var i = 0; i < gridState.dataView.getLength(); i++) {
+        for (let i = 0; i < gridState.dataView.getLength(); i++) {
             gridState.filteredRecords.push(gridState.dataView.getItem(i));
         }
         updateFilteredOccurrencesOnSelectedColumn();
@@ -90,14 +95,14 @@ export function GridStateService() {
          * @description Filter function. It iterates over all filters and return if the provided item fit the predicates
          * @returns {boolean} True if the item pass all the filters
          */
-        var allFilterFn = function allFilterFn(item, args) {
+        const allFilterFn = function allFilterFn(item, args) {
             //init filters with actual data
-            var initializedFilters = _.map(args.filters, function (filter) {
+            const initializedFilters = _.map(args.filters, function (filter) {
                 return filter(data);
             });
             //execute each filter on the value
-            for (var i = 0; i < initializedFilters.length; i++) {
-                var filter = initializedFilters[i];
+            for (let i = 0; i < initializedFilters.length; i++) {
+                const filter = initializedFilters[i];
                 if (!filter(item)) {
                     return false;
                 }
@@ -141,6 +146,7 @@ export function GridStateService() {
         updateSelectedLine(data);
         updateSelectedColumn(data);
         updateFilteredRecords();
+        updateNumericColumns(data);
     }
 
     /**
@@ -167,6 +173,13 @@ export function GridStateService() {
         updateFilteredOccurrencesOnSelectedColumn();
     }
 
+    /**
+     * @ngdoc method
+     * @name updateSelectedLine
+     * @methodOf data-prep.services.state.service:GridStateService
+     * @param {object} data The new data
+     * @description Set the selected line with the new record object ref
+     */
     function updateSelectedLine(data) {
         //in preview we do not change anything
         if (data.preview) {
@@ -188,13 +201,29 @@ export function GridStateService() {
      * @description Set the actual selected column and line
      */
     function setGridSelection(column, lineIndex) {
-        var hasIndex = !isNaN(lineIndex);
+        const hasIndex = !isNaN(lineIndex);
 
         gridState.selectedColumn = column;
         gridState.lineIndex = hasIndex ? lineIndex : null;
         gridState.selectedLine = hasIndex ? gridState.dataView.getItem(lineIndex) : null;
 
         updateFilteredOccurrencesOnSelectedColumn();
+    }
+
+    /**
+     * @ngdoc method
+     * @name updateNumericColumns
+     * @methodOf data-prep.services.state.service:GridStateService
+     * @param {object} data The new data
+     * @description Filter the columns list to have only numeric type ones
+     */
+    function updateNumericColumns(data) {
+        if(data.preview) {
+            return;
+        }
+
+        gridState.numericColumns = data.metadata.columns
+            .filter((col) => NUMERIC_TYPES.indexOf(col.type.toLowerCase()) > -1);
     }
 
     /**
@@ -209,5 +238,6 @@ export function GridStateService() {
         gridState.selectedLine = null;
         gridState.filteredRecords = [];
         gridState.filteredOccurences = {};
+        gridState.numericColumns = [];
     }
 }

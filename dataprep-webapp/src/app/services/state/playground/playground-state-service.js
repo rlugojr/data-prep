@@ -46,8 +46,6 @@ export function PlaygroundStateService(RecipeStateService, recipeState,
         setData: setData,
         updateDatasetRecord: updateDatasetRecord,
         updateDatasetStatistics: updateDatasetStatistics,
-        setCandidatePreparations: setCandidatePreparations,
-        updatePreparationPickerDisplay: updatePreparationPickerDisplay,
 
         //parameters
         toggleDatasetParameters: toggleDatasetParameters,
@@ -147,13 +145,6 @@ export function PlaygroundStateService(RecipeStateService, recipeState,
         playgroundState.isFetchingStats = value;
     }
 
-    function setCandidatePreparations (preparationsList) {
-        playgroundState.candidatePreparations = preparationsList;
-    }
-
-    function updatePreparationPickerDisplay (display) {
-        playgroundState.displayPreparationPicker = display;
-    }
     //--------------------------------------------------------------------------------------------------------------
     //-------------------------------------------------PARAMETERS---------------------------------------------------
     //--------------------------------------------------------------------------------------------------------------

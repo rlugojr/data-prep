@@ -215,60 +215,8 @@ describe('ColumnProfile controller', () => {
         }));
     });
 
-    describe('external bindings', () => {
-        it('should bind aggregationColumns getter to StatisticsService.getAggregationColumns()', inject((StatisticsService) => {
-            //given
-            const ctrl = createController();
-
-            const numericColumns = [{id: '0001'}, {id: '0002'}];
-            spyOn(StatisticsService, 'getAggregationColumns').and.returnValue(numericColumns);
-
-            //then
-            expect(ctrl.aggregationColumns).toBe(numericColumns);
-        }));
-    });
-
-    describe('aggregation', () => {
-
-        it('should get the current aggregation name', () => {
-            //given
-            const ctrl = createController();
-            stateMock.playground.statistics.histogram = {
-                aggregation: 'MAX'
-            };
-
-            //when
-            const aggregation = ctrl.getCurrentAggregation();
-
-            //then
-            expect(aggregation).toBe('MAX');
-        });
-
-        it('should get the default aggregation name when there is no histogram', () => {
-            //given
-            const ctrl = createController();
-            stateMock.playground.statistics.histogram = null;
-
-            //when
-            const aggregation = ctrl.getCurrentAggregation();
-
-            //then
-            expect(aggregation).toBe('LINE_COUNT');
-        });
-
-        it('should get the default aggregation name when histogram is not an aggregation', () => {
-            //given
-            const ctrl = createController();
-            stateMock.playground.statistics.histogram = {data: []};
-
-            //when
-            const aggregation = ctrl.getCurrentAggregation();
-
-            //then
-            expect(aggregation).toBe('LINE_COUNT');
-        });
-
-        it('should change aggregation chart', inject((StatisticsService) => {
+    describe('change aggregation', () => {
+        it('should process new aggregation', inject((StatisticsService) => {
             //given
             spyOn(StatisticsService, 'processAggregation').and.returnValue();
             const ctrl = createController();
@@ -288,35 +236,13 @@ describe('ColumnProfile controller', () => {
             spyOn(StatisticsService, 'processAggregation').and.returnValue();
             spyOn(StatisticsService, 'processClassicChart').and.returnValue();
             const ctrl = createController();
-            const column = {id: '0001'};
 
             //when
-            ctrl.changeAggregation(column);
+            ctrl.changeAggregation();
 
             //then
             expect(StatisticsService.processAggregation).not.toHaveBeenCalled();
             expect(StatisticsService.processClassicChart).toHaveBeenCalled();
-        }));
-
-        it('should do nothing if the current histogram is already the wanted aggregation', inject((StatisticsService) => {
-            //given
-            const column = {id: '0001'};
-            const aggregation = {name: 'MAX'};
-
-            spyOn(StatisticsService, 'processAggregation').and.returnValue();
-            stateMock.playground.statistics.histogram = {
-                aggregation: aggregation,
-                aggregationColumn: column,
-                data: [{field: 'toto', value: 2}]
-            };
-
-            const ctrl = createController();
-
-            //when
-            ctrl.changeAggregation(column, aggregation);
-
-            //then
-            expect(StatisticsService.processAggregation).not.toHaveBeenCalled();
         }));
     });
 });

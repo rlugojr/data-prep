@@ -72,8 +72,8 @@ public class DeleteOnValueTest extends AbstractMetadataBaseTest {
     public void should_delete() {
         //given
         final Map<String, String> values = new HashMap<>();
-        values.put("name", "David Bowie");
-        values.put("city", "Berlin");
+        values.put("0000", "David Bowie");
+        values.put("0001", "Berlin");
         final DataSetRow row = new DataSetRow(values);
 
         //when
@@ -81,16 +81,16 @@ public class DeleteOnValueTest extends AbstractMetadataBaseTest {
 
         //then
         assertTrue(row.isDeleted());
-        assertEquals("David Bowie", row.get("name"));
-        assertEquals("Berlin", row.get("city"));
+        assertEquals("David Bowie", row.get("0000"));
+        assertEquals("Berlin", row.get("0001"));
     }
 
     @Test
     public void should_not_delete_even_with_leading_space() {
         //given
         final Map<String, String> values = new HashMap<>();
-        values.put("name", "David Bowie");
-        values.put("city", " Berlin"); // notice the space before ' Berlin'
+        values.put("0000", "David Bowie");
+        values.put("0001", " Berlin"); // notice the space before ' Berlin'
         final DataSetRow row = new DataSetRow(values);
 
         //when
@@ -98,16 +98,16 @@ public class DeleteOnValueTest extends AbstractMetadataBaseTest {
 
         //then
         assertFalse(row.isDeleted());
-        assertEquals("David Bowie", row.get("name"));
-        assertEquals(" Berlin", row.get("city"));
+        assertEquals("David Bowie", row.get("0000"));
+        assertEquals(" Berlin", row.get("0001"));
     }
 
     @Test
     public void should_not_delete_even_with_trailing_space() {
         //given
         final Map<String, String> values = new HashMap<>();
-        values.put("name", "David Bowie");
-        values.put("city", "Berlin "); // notice the space after 'Berlin '
+        values.put("0000", "David Bowie");
+        values.put("0001", "Berlin "); // notice the space after 'Berlin '
         final DataSetRow row = new DataSetRow(values);
 
         //when
@@ -115,16 +115,16 @@ public class DeleteOnValueTest extends AbstractMetadataBaseTest {
 
         //then
         assertFalse(row.isDeleted());
-        assertEquals("David Bowie", row.get("name"));
-        assertEquals("Berlin ", row.get("city"));
+        assertEquals("David Bowie", row.get("0000"));
+        assertEquals("Berlin ", row.get("0001"));
     }
 
     @Test
     public void should_not_delete_even_with_enclosing_spaces() {
         //given
         final Map<String, String> values = new HashMap<>();
-        values.put("name", "David Bowie");
-        values.put("city", " Berlin "); // notice the spaces enclosing ' Berlin '
+        values.put("0000", "David Bowie");
+        values.put("0001", " Berlin "); // notice the spaces enclosing ' Berlin '
         final DataSetRow row = new DataSetRow(values);
 
         //when
@@ -132,16 +132,16 @@ public class DeleteOnValueTest extends AbstractMetadataBaseTest {
 
         //then
         assertFalse(row.isDeleted());
-        assertEquals("David Bowie", row.get("name"));
-        assertEquals(" Berlin ", row.get("city"));
+        assertEquals("David Bowie", row.get("0000"));
+        assertEquals(" Berlin ", row.get("0001"));
     }
 
     @Test
     public void should_delete_because_regexp_is_used() throws IOException {
         // given
         final Map<String, String> values = new HashMap<>();
-        values.put("name", "David Bowie");
-        values.put("city", "AAA Berlin BBB"); // notice the space after 'Berlin '
+        values.put("0000", "David Bowie");
+        values.put("0001", "AAA Berlin BBB"); // notice the space after 'Berlin '
         final DataSetRow row = new DataSetRow(values);
 
         Map<String, String> regexpParameters = ActionMetadataTestUtils.parseParameters( //
@@ -153,16 +153,16 @@ public class DeleteOnValueTest extends AbstractMetadataBaseTest {
 
         // then
         assertTrue(row.isDeleted());
-        assertEquals("David Bowie", row.get("name"));
-        assertEquals("AAA Berlin BBB", row.get("city"));
+        assertEquals("David Bowie", row.get("0000"));
+        assertEquals("AAA Berlin BBB", row.get("0001"));
     }
 
     @Test
     public void test_TDP_663() throws IOException {
         // given
         final Map<String, String> values = new HashMap<>();
-        values.put("name", "David Bowie");
-        values.put("city", "AAA Berlin BBB"); // notice the space after 'Berlin '
+        values.put("0000", "David Bowie");
+        values.put("0001", "AAA Berlin BBB"); // notice the space after 'Berlin '
         final DataSetRow row = new DataSetRow(values);
 
         Map<String, String> regexpParameters = ActionMetadataTestUtils.parseParameters( //
@@ -175,8 +175,8 @@ public class DeleteOnValueTest extends AbstractMetadataBaseTest {
 
         // then
         assertFalse(row.isDeleted());
-        assertEquals("David Bowie", row.get("name"));
-        assertEquals("AAA Berlin BBB", row.get("city"));
+        assertEquals("David Bowie", row.get("0000"));
+        assertEquals("AAA Berlin BBB", row.get("0001"));
     }
 
 
@@ -184,8 +184,8 @@ public class DeleteOnValueTest extends AbstractMetadataBaseTest {
     public void test_TDP_958() throws IOException {
         // given
         final Map<String, String> values = new HashMap<>();
-        values.put("name", "David Bowie");
-        values.put("city", "AAA Ber BBB"); // notice the space after 'Berlin '
+        values.put("0000", "David Bowie");
+        values.put("0001", "AAA Ber BBB"); // notice the space after 'Berlin '
         final DataSetRow row = new DataSetRow(values);
 
         Map<String, String> regexpParameters = ActionMetadataTestUtils.parseParameters( //
@@ -197,15 +197,15 @@ public class DeleteOnValueTest extends AbstractMetadataBaseTest {
 
         // then
         assertFalse(row.isDeleted());
-        assertEquals("David Bowie", row.get("name"));
-        assertEquals("AAA Ber BBB", row.get("city"));
+        assertEquals("David Bowie", row.get("0000"));
+        assertEquals("AAA Ber BBB", row.get("0001"));
     }
 
     @Test
     public void should_not_delete_because_value_not_found() {
         //given
         final Map<String, String> values = new HashMap<>();
-        values.put("name", "David Bowie");
+        values.put("0000", "David Bowie");
         final DataSetRow row = new DataSetRow(values);
 
         //when
@@ -213,15 +213,15 @@ public class DeleteOnValueTest extends AbstractMetadataBaseTest {
 
         //then
         assertFalse(row.isDeleted());
-        assertEquals("David Bowie", row.get("name"));
+        assertEquals("David Bowie", row.get("0000"));
     }
 
     @Test
     public void should_not_delete_because_of_case() {
         //given
         final Map<String, String> values = new HashMap<>();
-        values.put("name", "David Bowie");
-        values.put("city", "berlin");
+        values.put("0000", "David Bowie");
+        values.put("0001", "berlin");
         final DataSetRow row = new DataSetRow(values);
 
         //when
@@ -229,16 +229,16 @@ public class DeleteOnValueTest extends AbstractMetadataBaseTest {
 
         //then
         assertFalse(row.isDeleted());
-        assertEquals("David Bowie", row.get("name"));
-        assertEquals("berlin", row.get("city"));
+        assertEquals("David Bowie", row.get("0000"));
+        assertEquals("berlin", row.get("0001"));
     }
 
     @Test
     public void should_not_delete_because_value_different() {
         //given
         final Map<String, String> values = new HashMap<>();
-        values.put("name", "David Bowie");
-        values.put("city", "youhou");
+        values.put("0000", "David Bowie");
+        values.put("0001", "youhou");
         final DataSetRow row = new DataSetRow(values);
 
         //when
@@ -246,8 +246,8 @@ public class DeleteOnValueTest extends AbstractMetadataBaseTest {
 
         //then
         assertFalse(row.isDeleted());
-        assertEquals("David Bowie", row.get("name"));
-        assertEquals("youhou", row.get("city"));
+        assertEquals("David Bowie", row.get("0000"));
+        assertEquals("youhou", row.get("0001"));
     }
 
     @Test

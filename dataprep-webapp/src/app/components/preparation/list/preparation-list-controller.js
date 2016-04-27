@@ -33,7 +33,7 @@ export default function PreparationListCtrl($rootScope, $state, state, StateServ
     /**
      * @ngdoc method
      * @name load
-     * @methodOf data-prep.preparation-list.controller:PreparationListCtrl
+     * @methodOf data-prep.preparation.controller:PreparationListCtrl
      * @param {object} preparation - the preparation to load
      * @description Load a preparation in the playground
      */
@@ -68,7 +68,7 @@ export default function PreparationListCtrl($rootScope, $state, state, StateServ
     /**
      * @ngdoc method
      * @name rename
-     * @methodOf data-prep.preparation-list.controller:PreparationListCtrl
+     * @methodOf data-prep.preparation.controller:PreparationListCtrl
      * @param {object} preparation The preparation to rename
      * @param {string} newName The new name for the given preparation
      * @description Trigger backend call to update preparation name
@@ -90,7 +90,7 @@ export default function PreparationListCtrl($rootScope, $state, state, StateServ
     /**
      * @ngdoc method
      * @name clone
-     * @methodOf data-prep.preparation-list.controller:PreparationListCtrl
+     * @methodOf data-prep.preparation.controller:PreparationListCtrl
      * @param {object} preparation - the preparation to clone
      * @description trigger backend call to clone preparation
      */

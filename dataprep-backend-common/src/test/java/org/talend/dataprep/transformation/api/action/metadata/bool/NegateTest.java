@@ -74,32 +74,32 @@ public class NegateTest extends AbstractMetadataBaseTest {
     public void should_negate_true() {
         // given
         Map<String, String> values = new HashMap<>();
-        values.put("name", "Vincent");
-        values.put("entity", "R&D");
-        values.put("active", "true");
+        values.put("0000", "Vincent");
+        values.put("0001", "R&D");
+        values.put("0002", "true");
         DataSetRow row = new DataSetRow(values);
 
         //when
         ActionTestWorkbench.test(row, factory.create(action, parameters));
 
         // then
-        assertThat(row.get("active"), is("False"));
+        assertThat(row.get("0002"), is("False"));
     }
 
     @Test
     public void should_negate_false() {
         // given
         Map<String, String> values = new HashMap<>();
-        values.put("name", "Vincent");
-        values.put("entity", "R&D");
-        values.put("active", "false");
+        values.put("0000", "Vincent");
+        values.put("0001", "R&D");
+        values.put("0002", "false");
         DataSetRow row = new DataSetRow(values);
 
         //when
         ActionTestWorkbench.test(row, factory.create(action, parameters));
 
         // then
-        assertThat(row.get("active"), is("True"));
+        assertThat(row.get("0002"), is("True"));
     }
 
     @Test

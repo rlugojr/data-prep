@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 import org.talend.dataprep.api.dataset.statistics.PatternFrequency;
 import org.talend.dataprep.transformation.api.action.metadata.math.Absolute;
 import org.talend.dataprep.transformation.api.action.metadata.math.DeleteNegativeValues;
-import org.talend.dataprep.transformation.api.action.metadata.math.RoundDown;
+import org.talend.dataprep.transformation.api.action.metadata.math.RemoveFractionalPart;
 import org.talend.dataprep.transformation.api.action.metadata.math.RoundHalfUp;
 import org.talend.dataprep.transformation.api.transformer.suggestion.SuggestionEngineRule;
 
@@ -53,7 +53,7 @@ public class IntegerRules extends BasicRules {
      */
     @Bean
     public static SuggestionEngineRule integerRule() {
-        return forActions(RoundDown.ACTION_NAME, RoundHalfUp.ACTION_NAME) //
+        return forActions(RemoveFractionalPart.ACTION_NAME, RoundHalfUp.ACTION_NAME) //
                 .when(IS_NUMERIC) //
                 .then(columnMetadata -> {
                     final List<PatternFrequency> patterns = columnMetadata.getStatistics().getPatternFrequencies();

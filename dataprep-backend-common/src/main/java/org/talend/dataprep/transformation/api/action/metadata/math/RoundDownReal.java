@@ -22,11 +22,12 @@ import org.talend.dataprep.transformation.api.action.metadata.common.ActionMetad
  * 
  * @see RoundingMode#DOWN
  */
-@Component(RoundDown.ACTION_BEAN_PREFIX + RoundDown.ACTION_NAME)
-public class RoundDown extends AbstractRound {
+@Component(RoundDownReal.ACTION_BEAN_PREFIX + RoundDownReal.ACTION_NAME)
+public class RoundDownReal extends AbstractRound {
 
-    /** The action name. */
-    public static final String ACTION_NAME = "round_down"; //$NON-NLS-1$
+    /** The action name.
+     * round_down was taken by RemoveFractionalPart action, and i don't want to change its id */
+    public static final String ACTION_NAME = "round_down_real"; //$NON-NLS-1$
 
     /**
      * @see ActionMetadata#getName()

@@ -134,8 +134,8 @@ export default function PreparationRestService($http, RestURLs) {
      * @name update
      * @methodOf data-prep.services.preparation.service:PreparationRestService
      * @param {string} preparationId The preparation id
-     * @param {string} name The new preparation name
-     * @description Update the current preparation name
+     * @param {Object} newData The new preparation data to update
+     * @description Update the current preparation with the given data
      * @returns {promise} The PUT promise
      */
     function update(preparationId, newData) {

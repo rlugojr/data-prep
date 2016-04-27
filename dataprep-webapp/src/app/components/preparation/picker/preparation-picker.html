@@ -1,0 +1,37 @@
+<!--
+  ~ ============================================================================
+  ~
+  ~  Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+  ~
+  ~  This source code is available under agreement available at
+  ~  https://github.com/Talend/data-prep/blob/master/LICENSE
+  ~
+  ~  You should have received a copy of the agreement
+  ~  along with this program; if not, write to Talend SA
+  ~  9 rue Pages 92150 Suresnes, France
+  ~
+  ~ ============================================================================
+  -->
+
+<div class="picker-modal-content">
+
+    <span ng-if="$ctrl.isFetchingPreparations" class="fetching-spinner">
+        <i data-icon="c" class="continuous-rotate icon"></i>
+    </span>
+
+    <span ng-if="!$ctrl.candidatePreparations.length && !$ctrl.isFetchingPreparations"
+          translate-once="NO_COMPATIBLE_PREPARATIONS"
+          translate-values="{name: $ctrl.dataset.name}"
+    ></span>
+
+    <div class="preparation-list inventory-tile-list">
+        <inventory-tile
+                ng-repeat="candidate in $ctrl.candidatePreparations track by $index"
+
+                dataset="candidate.dataset"
+                on-favorite="angular.noop"
+                on-click="$ctrl.selectPreparation(preparation)"
+                preparation="candidate.preparation"
+        ></inventory-tile>
+    </div>
+</div>

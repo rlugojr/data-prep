@@ -42,10 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.talend.daikon.exception.json.JsonErrorCode;
-import org.talend.dataprep.api.dataset.DataSet;
-import org.talend.dataprep.api.dataset.DataSetGovernance;
-import org.talend.dataprep.api.dataset.DataSetMetadata;
-import org.talend.dataprep.api.dataset.DataSetMoveRequest;
+import org.talend.dataprep.api.dataset.*;
 import org.talend.dataprep.api.folder.FolderContent;
 import org.talend.dataprep.api.preparation.Preparation;
 import org.talend.dataprep.exception.error.DataSetErrorCodes;
@@ -86,6 +83,27 @@ public class DataSetAPITest extends ApiServiceTestBase {
         String dataSetContent = when().get("/api/datasets/" + dataSetId + "?metadata=true").asString();
         final String expectedContent = IOUtils.toString(this.getClass().getResourceAsStream("t-shirt_100.csv.expected.json"));
         assertThat(dataSetContent, sameJSONAs(expectedContent).allowingExtraUnexpectedFields());
+    }
+
+    @Test
+    public void testDataSetUpdateMetadata() throws Exception {
+        ObjectMapper mapper = builder.build();
+        // given
+        final String dataSetId = createDataset("dataset/dataset.csv", "tagada", "text/csv");
+
+        // when
+        final String jsonOriginalMetadata = when().get("/api/datasets/{id}/metadata", dataSetId).asString();
+        final DataSetMetadata metadata = mapper.readValue(jsonOriginalMetadata, DataSetMetadata.class);
+        metadata.setName("Toto");
+        final String jsonMetadata = mapper.writeValueAsString(metadata);
+
+        given().body(jsonMetadata).when().put("/api/datasets/{id}/metadata", dataSetId).asString();
+
+        final String jsonUpdatedMetadata = when().get("/api/datasets/{id}/metadata", dataSetId).asString();
+        final DataSetMetadata updatedMetadata = mapper.readValue(jsonUpdatedMetadata, DataSetMetadata.class);
+
+        // then
+        assertEquals(updatedMetadata, metadata);
     }
 
     @Test

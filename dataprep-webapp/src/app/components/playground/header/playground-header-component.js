@@ -35,6 +35,8 @@
  * @param {function} onOnboarding Callback on onboarding icon click
  * @param {function} onFeedback Callback on feedback icon click
  * @param {function} onClose Callback on close icon click
+ * @param {function} onPreparationPicker Callback on open preparation picker
+ * @param {Boolean} preparationPicker display of the button
  */
 const PlaygroundHeader = {
     templateUrl: 'app/components/playground/header/playground-header.html',
@@ -48,8 +50,8 @@ const PlaygroundHeader = {
         onOnboarding: '&',
         onFeedback: '&',
         onClose: '&',
-        onOpenPreparationPicker: '&',
-        activePreparationPickerBtn: '='
+        onPreparationPicker: '&',
+        preparationPicker: '<'
     }
 };
 

@@ -120,23 +120,22 @@ public class CopyColumnTest extends AbstractMetadataBaseTest {
     public void test_TDP_1184() {
         // given
         final List<ColumnMetadata> input = new ArrayList<>();
-        input.add(createMetadata("0000", "recipe"));
-        input.add(createMetadata("0001", "steps"));
-        input.add(createMetadata("0003", "last update"));
+        input.add(columnBaseBuilder().name("recipe").type(Type.STRING).build());
+        input.add(columnBaseBuilder().name("steps").type(Type.STRING).build());
+        input.add(columnBaseBuilder().name("last update").type(Type.STRING).build());
+        input.add(columnBaseBuilder().name("column to delete").type(Type.STRING).build());
         final RowMetadata rowMetadata = new RowMetadata(input);
 
-        final List<ColumnMetadata> expected = new ArrayList<>();
-        expected.add(createMetadata("0000", "recipe"));
-        expected.add(createMetadata("0001", "steps"));
-        expected.add(createMetadata("0004", "steps_copy"));
-        expected.add(createMetadata("0003", "last update"));
-
         // when
+        rowMetadata.deleteColumnById("0003");
         ActionTestWorkbench.test(rowMetadata, factory.create(action, parameters));
 
         // then
         final List<ColumnMetadata> columns = rowMetadata.getColumns();
-        assertEquals(expected, columns);
+        assertEquals(columns.size(), 4);
+        final ColumnMetadata copiedColumn = rowMetadata.getById("0004");
+        assertNotNull(copiedColumn);
+        assertEquals(copiedColumn.getName(), "steps_copy");
     }
 
     @Test

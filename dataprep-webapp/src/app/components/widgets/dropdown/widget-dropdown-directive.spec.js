@@ -252,6 +252,7 @@ describe('Dropdown directive', function () {
                 '            <li class="divider"></li>' +
                 '            <li role="presentation"><a role="menuitem" href="#">Split first Space</a></li>' +
                 '            <li role="presentation"><a role="menuitem" href="#">Uppercase</a></li>' +
+                '            <li role="presentation"><span class="dropdown-close">Uppercase</a></li>' +
                 '        </ul>' +
                 '    </div>' +
                 '</talend-dropdown>';
@@ -269,6 +270,19 @@ describe('Dropdown directive', function () {
 
             //then
             expect(menu.hasClass('show-menu')).toBe(true);
+        });
+
+        it('should hide dropdown-menu on element with "dropdown-close" class', function () {
+            //given
+            var menu = element.find('.dropdown-menu').eq(0);
+            var closeTrigger = element.find('.dropdown-close').eq(0);
+            menu.addClass('show-menu');
+
+            //when
+            closeTrigger.click();
+
+            //then
+            expect(menu.hasClass('show-menu')).toBe(false);
         });
     });
 

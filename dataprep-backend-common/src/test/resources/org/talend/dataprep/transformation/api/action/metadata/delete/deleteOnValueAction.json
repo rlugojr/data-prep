@@ -3,7 +3,7 @@
     {
       "action": "delete_on_value",
       "parameters": {
-        "column_id": "city",
+        "column_id": "0001",
         "value": {
           "token": "Berlin",
           "operator": "regex"

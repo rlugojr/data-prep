@@ -12,10 +12,10 @@
  ============================================================================*/
 
 export const routeState = {
-    previous: 'nav.index.datasets',
-    previousOptions: {folderPath: ''},
-    next: 'nav.index.datasets',
-    nextOptions: {folderPath: ''}
+    previous: 'nav.index.preparations',
+    previousOptions: null,
+    next: 'nav.index.preparations',
+    nextOptions: null
 };
 
 export class RouteStateService {
@@ -36,13 +36,13 @@ export class RouteStateService {
     }
 
     resetPrevious() {
-        routeState.previous = 'nav.index.datasets';
-        routeState.previousOptions = {folderPath: ''};
+        routeState.previous = 'nav.index.preparations';
+        routeState.previousOptions = null;
     }
 
     resetNext() {
-        routeState.next = 'nav.index.datasets';
-        routeState.nextOptions = {folderPath: ''};
+        routeState.next = 'nav.index.preparations';
+        routeState.nextOptions = null;
     }
 
     reset() {

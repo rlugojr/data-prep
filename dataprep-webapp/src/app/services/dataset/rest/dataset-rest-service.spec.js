@@ -223,7 +223,7 @@ describe('Dataset Rest Service', function () {
             var dataset = {name: 'my dataset', file: {path: '/path/to/file'}, error: false, id: 'e85afAa78556d5425bc2'};
 
             $httpBackend
-                .expectPUT(RestURLs.datasetUrl + '/e85afAa78556d5425bc2?name=my%20dataset')
+                .expectPUT(RestURLs.datasetUrl + '/e85afAa78556d5425bc2/metadata')
                 .respond(200);
 
             //when

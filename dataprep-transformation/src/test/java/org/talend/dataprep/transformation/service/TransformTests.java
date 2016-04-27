@@ -231,18 +231,21 @@ public class TransformTests extends TransformationServiceBaseTests {
         // given
         String dataSetId = createDataset("input_dataset.csv", "uppercase", "text/csv");
         String preparationId = createEmptyPreparationFromDataset(dataSetId, "uppercase prep");
-        applyActionFromFile(preparationId, "failed_action.json");
+        applyActionFromFile(preparationId, "failed_transformation.json");
 
         // when
-        String transformedContent = given() //
-                .when() //
-                .get("/apply/preparation/{preparationId}/dataset/{datasetId}/{format}", preparationId, dataSetId, "JSON") //
-                .asString();
+        given() //
+            .when() //
+            .get("/apply/preparation/{preparationId}/dataset/{datasetId}/{format}", preparationId, dataSetId, "JSON") //
+            .asString();
 
         // then
-        // Action failure
-        String expectedContent = IOUtils.toString(this.getClass().getResourceAsStream("no_action_expected.json"));
-        assertEquals(expectedContent, transformedContent, false);
+        // Transformation failure
+        final TransformationCacheKey key = new TransformationCacheKey(preparationId, //
+                dataSetMetadataRepository.get(dataSetId), //
+                "JSON", //
+                getPreparation(preparationId).getHeadId());
+        assertFalse(contentCache.has(key));
     }
 
 }

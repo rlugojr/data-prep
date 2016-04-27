@@ -66,6 +66,8 @@ public class CreateNewColumn extends ActionMetadata implements ColumnAction {
 
     public static final String COLUMN_MODE = "Another column";
 
+    public static final String NEW_COLUMN = "new_column";
+
     /**
      * @see ActionMetadata#getName()
      */
@@ -136,11 +138,10 @@ public class CreateNewColumn extends ActionMetadata implements ColumnAction {
             final RowMetadata rowMetadata = context.getRowMetadata();
             final String columnId = context.getColumnId();
             final Map<String, String> parameters = context.getParameters();
-            final String newColumnName = evalNewColumnName(rowMetadata, parameters);
-            context.column(newColumnName, (r) -> {
+            context.column(NEW_COLUMN, (r) -> {
                 final ColumnMetadata c = ColumnMetadata.Builder //
                         .column() //
-                        .name(newColumnName) //
+                        .name(evalNewColumnName(rowMetadata, parameters)) //
                         .type(Type.STRING) //
                         .build();
                 rowMetadata.insertAfter(columnId, c);
@@ -157,8 +158,7 @@ public class CreateNewColumn extends ActionMetadata implements ColumnAction {
         final RowMetadata rowMetadata = context.getRowMetadata();
         final Map<String, String> parameters = context.getParameters();
 
-        final String newColumnName = evalNewColumnName(rowMetadata, parameters);
-        String newColumn = context.column(newColumnName);
+        String newColumn = context.column("new_column");
 
         String newValue = "";
         switch (parameters.get(MODE_PARAMETER)){

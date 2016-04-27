@@ -1,9 +1,10 @@
 {
   "actions": [
     {
-      "action": "round_down",
+      "action": "round_down_real",
       "parameters": {
-        "column_id": "aNumber",
+        "precision": "0",
+        "column_id": "0000",
         "scope": "column"
       }
     }

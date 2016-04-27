@@ -16,6 +16,7 @@ package org.talend.dataprep.api.dataset;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -41,6 +42,8 @@ public class RowMetadata implements Serializable {
     @JsonDeserialize(using = ColumnContextDeserializer.class)
     private List<ColumnMetadata> columns = new ArrayList<>();
 
+    private int nextId = 0;
+
     /**
      * Default empty constructor.
      */
@@ -61,7 +64,7 @@ public class RowMetadata implements Serializable {
      * @return The metadata of this row's columns.
      */
     public List<ColumnMetadata> getColumns() {
-        return columns;
+        return Collections.unmodifiableList(columns);
     }
 
     /**
@@ -118,24 +121,10 @@ public class RowMetadata implements Serializable {
     private ColumnMetadata addColumn(ColumnMetadata columnMetadata, int index) {
         DecimalFormat format = new DecimalFormat("0000"); //$NON-NLS-1$
         if (StringUtils.isEmpty(columnMetadata.getId())) {
-            int nextId = 0;
-            if (!this.columns.isEmpty()) {
-
-                // Retrieve the current max column id:
-                //@formatter:off
-                int max = this.columns.stream()
-                        .filter(column -> StringUtils.isNumeric(column.getId()))
-                        .map(column -> new Integer(column.getId()))
-                        .max((x, y) -> x.compareTo(y))
-                        .orElse(-1);
-                //@formatter:on
-
-                // Id of the new column, is (previous max) + 1:
-                nextId = max + 1;
-            }
             columnMetadata.setId(format.format(nextId));
         }
         columns.add(index, columnMetadata);
+        nextId++;
         return columnMetadata;
     }
 
@@ -282,6 +271,8 @@ public class RowMetadata implements Serializable {
         // also copy the columns !
         List<ColumnMetadata> copyColumns = new ArrayList<>(columns.size());
         columns.forEach(col -> copyColumns.add(ColumnMetadata.Builder.column().copy(col).build()));
-        return new RowMetadata(new ArrayList<>(copyColumns));
+        final RowMetadata clone = new RowMetadata(new ArrayList<>(copyColumns));
+        clone.nextId = nextId;
+        return clone;
     }
 }

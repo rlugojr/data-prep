@@ -20,6 +20,7 @@ import ColumnProfile from './column-profile-directive';
     angular.module('data-prep.column-profile',
         [
             'talend.widget',
+            'data-prep.column-profile-options',
             'data-prep.services.dataset',
             'data-prep.services.filter',
             'data-prep.services.statistics',

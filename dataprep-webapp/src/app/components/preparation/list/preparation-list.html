@@ -1,0 +1,28 @@
+<!--
+  ~ ============================================================================
+  ~
+  ~  Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+  ~
+  ~  This source code is available under agreement available at
+  ~  https://github.com/Talend/data-prep/blob/master/LICENSE
+  ~
+  ~  You should have received a copy of the agreement
+  ~  along with this program; if not, write to Talend SA
+  ~  9 rue Pages 92150 Suresnes, France
+  ~
+  ~ ============================================================================
+  -->
+
+<div id="preparation-inventory-list" class="inventory-list">
+    <inventory-item
+            id="preparation_{{$index}}"
+            ng-repeat="preparation in preparationListCtrl.state.inventory.preparations track by $index"
+            item="preparation"
+            type="preparation"
+            details="PREPARATION_DETAILS"
+            open="preparationListCtrl.load"
+            remove="preparationListCtrl.remove"
+            rename="preparationListCtrl.rename"
+            copy="preparationListCtrl.clone">
+    </inventory-item>
+</div>

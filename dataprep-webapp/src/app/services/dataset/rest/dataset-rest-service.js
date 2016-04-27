@@ -97,10 +97,10 @@ export default function DatasetRestService($rootScope, $upload, $http, RestURLs)
      */
     function update(dataset) {
         return $upload.http({
-            url: RestURLs.datasetUrl + '/' + dataset.id + '?name=' + encodeURIComponent(dataset.name),
+            url: RestURLs.datasetUrl + '/' + dataset.id + '/metadata',
             method: 'PUT',
-            headers: {'Content-Type': 'text/plain'},
-            data: dataset.file
+            headers: {'Content-Type': 'application/json'},
+            data: dataset
         });
     }
 

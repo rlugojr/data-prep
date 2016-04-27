@@ -85,7 +85,7 @@ public class NumericOperationsTest extends AbstractMetadataBaseTest {
 
     @Test
     public void testCompute() {
-        // valids:
+        // valid
         assertEquals("5", action.compute("3", "+", "2"));
         assertEquals("6", action.compute("3", "x", "2"));
         assertEquals("1", action.compute("3", "-", "2"));

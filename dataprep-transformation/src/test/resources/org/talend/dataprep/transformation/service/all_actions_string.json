@@ -2246,7 +2246,7 @@
     "category": "math",
     "dynamic": false,
     "description": "Round value to the largest integer (3.14 -> 4)",
-    "label": "Floor Value",
+    "label": "Round Value using Floor mode",
     "actionScope": [],
     "parameters": [
       {
@@ -2284,6 +2284,13 @@
         "description": "An optional filter to apply action on matching values only.",
         "label": "Filter",
         "default": ""
+      },
+      {
+        "name": "precision",
+        "type": "integer",
+        "implicit": false,
+        "canBeBlank": true,
+        "default": "0"
       }
     ]
   },
@@ -2338,7 +2345,7 @@
     "category": "math",
     "dynamic": false,
     "description": "Round value to the closest integer (3.14 -> 3)",
-    "label": "Round Value",
+    "label": "Round Value using HalfUp mode",
     "actionScope": [],
     "parameters": [
       {
@@ -2376,6 +2383,13 @@
         "description": "An optional filter to apply action on matching values only.",
         "label": "Filter",
         "default": ""
+      },
+      {
+        "name": "precision",
+        "type": "integer",
+        "implicit": false,
+        "canBeBlank": true,
+        "default": "0"
       }
     ]
   },
@@ -2586,11 +2600,11 @@
     ]
   },
   {
-    "name": "ceil",
+    "name": "round_down_real",
     "category": "math",
     "dynamic": false,
-    "description": "Round value to the smallest integer (3.74 -> 3)",
-    "label": "Ceil Value",
+    "description": "Round towards zero. (3.74 -> 3) and (-3.74 -> -3)",
+    "label": "Round value using Down mode",
     "actionScope": [],
     "parameters": [
       {
@@ -2628,6 +2642,66 @@
         "description": "An optional filter to apply action on matching values only.",
         "label": "Filter",
         "default": ""
+      },
+      {
+        "name": "precision",
+        "type": "integer",
+        "implicit": false,
+        "canBeBlank": true,
+        "default": "0"
+      }
+    ]
+  },
+  {
+    "name": "ceil",
+    "category": "math",
+    "dynamic": false,
+    "description": "Round value to the smallest integer (3.74 -> 3)",
+    "label": "Round Value using Ceil mode",
+    "actionScope": [],
+    "parameters": [
+      {
+        "name": "column_id",
+        "type": "string",
+        "implicit": true,
+        "canBeBlank": true,
+        "description": "The column to which you want to apply this action",
+        "label": "Column",
+        "default": ""
+      },
+      {
+        "name": "row_id",
+        "type": "string",
+        "implicit": true,
+        "canBeBlank": true,
+        "description": "The row to which you want to apply this action",
+        "label": "Row",
+        "default": ""
+      },
+      {
+        "name": "scope",
+        "type": "string",
+        "implicit": true,
+        "canBeBlank": true,
+        "description": "The transformation scope (CELL | LINE | COLUMN | DATASET)",
+        "label": "Scope",
+        "default": ""
+      },
+      {
+        "name": "filter",
+        "type": "filter",
+        "implicit": true,
+        "canBeBlank": true,
+        "description": "An optional filter to apply action on matching values only.",
+        "label": "Filter",
+        "default": ""
+      },
+      {
+        "name": "precision",
+        "type": "integer",
+        "implicit": false,
+        "canBeBlank": true,
+        "default": "0"
       }
     ]
   },
@@ -3180,6 +3254,9 @@
     ]
   },
   {
+    "name": "testtransformationfailure"
+  },
+  {
     "name": "testfailedaction"
   },
   {
@@ -3460,6 +3537,63 @@
     "docUrl": "",
     "actionScope": [],
     "description": "Extract number from the input",
+    "dynamic": false
+  },
+  {
+    "name": "swap_column",
+    "parameters": [
+      {
+        "name": "column_id",
+        "type": "string",
+        "implicit": true,
+        "canBeBlank": true,
+        "default": "",
+        "description": "The column to which you want to apply this action",
+        "label": "Column"
+      },
+      {
+        "name": "row_id",
+        "type": "string",
+        "implicit": true,
+        "canBeBlank": true,
+        "default": "",
+        "description": "The row to which you want to apply this action",
+        "label": "Row"
+      },
+      {
+        "name": "scope",
+        "type": "string",
+        "implicit": true,
+        "canBeBlank": true,
+        "default": "",
+        "description": "The transformation scope (CELL | LINE | COLUMN | DATASET)",
+        "label": "Scope"
+      },
+      {
+        "name": "filter",
+        "type": "filter",
+        "implicit": true,
+        "canBeBlank": true,
+        "default": "",
+        "description": "An optional filter to apply action on matching values only.",
+        "label": "Filter"
+      },
+      {
+        "name": "selected_column",
+        "type": "column",
+        "implicit": false,
+        "canBeBlank": false,
+        "default": "",
+        "description": "Combine the current column with this one",
+        "label": "Column"
+      }
+    ],
+    "actionScope": [
+    ],
+    "category": "columns",
+    "description": "Swap the values with an other column",
+    "label": "Swap columns",
+    "docUrl": "",
     "dynamic": false
   }
 ]

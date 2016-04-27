@@ -20,7 +20,7 @@
  * @requires data-prep.statistics.service:StatisticsTooltipService
  * @requires data-prep.services.filter.service:FilterService
  */
-export default function ColumnProfileCtrl($timeout, state, StatisticsService, StatisticsTooltipService, FilterService) {
+export default function ColumnProfileCtrl($translate, $timeout, state, StatisticsService, StatisticsTooltipService, FilterService) {
     'ngInject';
 
     var vm = this;
@@ -28,7 +28,6 @@ export default function ColumnProfileCtrl($timeout, state, StatisticsService, St
     vm.state = state;
     vm.statisticsService = StatisticsService;
     vm.statisticsTooltipService = StatisticsTooltipService;
-
 
     //------------------------------------------------------------------------------------------------------
     //------------------------------------------------FILTER------------------------------------------------
@@ -87,46 +86,7 @@ export default function ColumnProfileCtrl($timeout, state, StatisticsService, St
             removeFilterFn);
     };
 
-    //------------------------------------------------------------------------------------------------------
-    //----------------------------------------------AGGREGATION---------------------------------------------
-    //------------------------------------------------------------------------------------------------------
-    /**
-     * @ngdoc property
-     * @name aggregations
-     * @propertyOf data-prep.actions-suggestions-stats.controller:ColumnProfileCtrl
-     * @description The list of possible aggregations
-     * @type {array}
-     */
-    vm.aggregations = ['SUM', 'MAX', 'MIN', 'AVERAGE'];
-
-    /**
-     * @ngdoc method
-     * @name getCurrentAggregation
-     * @propertyOf data-prep.actions-suggestions-stats.controller:ColumnProfileCtrl
-     * @description The current aggregations
-     * @return {string} The current aggregation name
-     */
-    vm.getCurrentAggregation = function getCurrentAggregation() {
-        return state.playground.statistics.histogram && state.playground.statistics.histogram.aggregation ?
-            state.playground.statistics.histogram.aggregation :
-            'LINE_COUNT';
-    };
-
-    /**
-     * @ngdoc method
-     * @name changeAggregation
-     * @methodOf data-prep.actions-suggestions-stats.controller:ColumnProfileCtrl
-     * @param {object} column The column to aggregate
-     * @param {object} aggregation The aggregation to perform
-     * @description Trigger a new aggregation graph
-     */
     vm.changeAggregation = function changeAggregation(column, aggregation) {
-        if (state.playground.statistics.histogram &&
-            state.playground.statistics.histogram.aggregationColumn === column &&
-            state.playground.statistics.histogram.aggregation === aggregation) {
-            return;
-        }
-
         if (aggregation) {
             StatisticsService.processAggregation(column, aggregation);
         }
@@ -135,19 +95,3 @@ export default function ColumnProfileCtrl($timeout, state, StatisticsService, St
         }
     };
 }
-
-/**
- * @ngdoc property
- * @name aggregationColumns
- * @propertyOf data-prep.actions-suggestions-stats.controller:ColumnProfileCtrl
- * @description The numeric columns list of the dataset.
- * This is bound to {@link data-prep.statistics:StatisticsService StatisticsService}.getAggregationColumns()
- */
-Object.defineProperty(ColumnProfileCtrl.prototype,
-    'aggregationColumns', {
-        enumerable: true,
-        configurable: true,
-        get: function () {
-            return this.statisticsService.getAggregationColumns();
-        }
-    });
