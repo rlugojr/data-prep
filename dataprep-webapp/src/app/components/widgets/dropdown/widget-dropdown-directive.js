@@ -83,6 +83,7 @@ export default function TalendDropdown($window, $timeout) {
 
                 //Hide current dropdown menu
                 function hideMenu() {
+                    resetMenuPosition();
                     menu.removeClass('show-menu');
                     windowElement.off('scroll', positionMenu);
                 }
@@ -111,6 +112,15 @@ export default function TalendDropdown($window, $timeout) {
                 function alignMenuLeft(position) {
                     menu.removeClass('right');
                     menu.css('left', position.left);
+                    menu.css('right', 'auto');
+                }
+
+                function resetMenuPosition() {
+                    menu.removeClass('top');
+                    menu.removeClass('right');
+                    menu.removeClass('show-menu');
+                    menu.css('top', 'auto');
+                    menu.css('left', 'auto');
                     menu.css('right', 'auto');
                 }
 
@@ -170,6 +180,11 @@ export default function TalendDropdown($window, $timeout) {
                     if(e.target.classList.contains('dropdown-close')) {
                         hideMenu();
                     }
+                });
+
+                windowElement.bind('resize', function(){
+                    resetMenuPosition();
+                    scope.$digest();
                 });
 
                 //Click : hide/show menu on left click
