@@ -3597,5 +3597,8 @@
     "label": "Swap columns",
     "docUrl": "",
     "dynamic": false
+  },{
+    "name": "mask_data_by_domain",
+    "category": "data_masking",
   }
 ]
