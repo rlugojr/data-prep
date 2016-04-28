@@ -11,6 +11,24 @@
 
   ============================================================================*/
 
+@include keyframes(fadeIn) {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@include keyframes(slide) {
+  from {
+    right: -100vw;
+  }
+  to {
+    right: 0;
+  }
+}
+
 typeahead {
   display: block;
   position: relative;
@@ -26,8 +44,9 @@ typeahead {
 
     position: absolute;
     top: 35px;
-    left: 0;
     right: 0;
+
+    @include animation(fadeIn 1.0s ease-in, slide .5s ease);
 
     .highlighted {
       font-weight: 900;
@@ -40,6 +59,10 @@ typeahead {
       color: $black;
       font-weight: 900;
       padding: 10px;
+    }
+
+    .inventory-item {
+      width: 500px;
     }
   }
 
