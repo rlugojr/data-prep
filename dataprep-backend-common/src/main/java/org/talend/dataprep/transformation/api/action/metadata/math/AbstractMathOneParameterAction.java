@@ -55,32 +55,32 @@ public abstract class AbstractMathOneParameterAction extends AbstractMathAction 
     protected abstract String calculateResult(String columnValue, String parameter);
 
     @Override
-    public void applyOnColumn( DataSetRow row, ActionContext context) {
+    public void applyOnColumn(DataSetRow row, ActionContext context) {
         String columnId = context.getColumnId();
         String colValue = row.get(columnId);
 
         Map<String, String> parameters = context.getParameters();
 
-        String mode = parameters.get( OtherColumnParameters.MODE_PARAMETER);
+        String mode = parameters.get(OtherColumnParameters.MODE_PARAMETER);
 
         String parameterValue;
         switch (mode) {
-            case OtherColumnParameters.CONSTANT_MODE:
-                parameterValue = parameters.get(CONSTANT_VALUE);
-                break;
-            case OtherColumnParameters.OTHER_COLUMN_MODE:
-                String otherColId = parameters.get(SELECTED_COLUMN_PARAMETER);
-                parameterValue = row.get(otherColId);
-                break;
-            default:
-                throw new TDPException( CommonErrorCodes.BAD_ACTION_PARAMETER, //
-                                        ExceptionContext.build().put( "paramName", OtherColumnParameters.CONSTANT_MODE));
+        case OtherColumnParameters.CONSTANT_MODE:
+            parameterValue = parameters.get(CONSTANT_VALUE);
+            break;
+        case OtherColumnParameters.OTHER_COLUMN_MODE:
+            String otherColId = parameters.get(SELECTED_COLUMN_PARAMETER);
+            parameterValue = row.get(otherColId);
+            break;
+        default:
+            throw new TDPException(CommonErrorCodes.BAD_ACTION_PARAMETER, //
+                    ExceptionContext.build().put("paramName", OtherColumnParameters.CONSTANT_MODE));
         }
 
         String result = ERROR_RESULT;
 
-        if (NumberUtils.isNumber( colValue ) && NumberUtils.isNumber( parameterValue )){
-            result = calculateResult( colValue, parameterValue );
+        if (NumberUtils.isNumber(colValue) && NumberUtils.isNumber(parameterValue)) {
+            result = calculateResult(colValue, parameterValue);
         }
 
         String newColumnId = context.column("result");
