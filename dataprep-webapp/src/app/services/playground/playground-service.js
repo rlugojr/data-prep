@@ -59,6 +59,9 @@ export default function PlaygroundService($state, $rootScope, $q, $translate, $t
         updateStep: updateStep,
         removeStep: removeStep,
 
+        //preparation picker
+        applyPreparationToDataset: applyPreparationToDataset,
+
         //Preview
         updatePreview: updatePreview,
 
@@ -200,7 +203,8 @@ export default function PlaygroundService($state, $rootScope, $q, $translate, $t
      * @ngdoc method
      * @name updateStatistics
      * @methodOf data-prep.services.playground.service:PlaygroundService
-     * @description Get fresh statistics, set them in current columns metadata, then trigger a new statistics computation
+     * @description Get fresh statistics, set them in current columns metadata, then trigger a new statistics
+     *     computation
      * @returns {Promise} The process promise
      */
     function updateStatistics() {
@@ -426,6 +430,55 @@ export default function PlaygroundService($state, $rootScope, $q, $translate, $t
     }
 
     //------------------------------------------------------------------------------------------------------
+    //---------------------------------------------PREPARATION PICKER---------------------------------------
+    //------------------------------------------------------------------------------------------------------
+    /**
+     * @ngdoc method
+     * @name applyPreparationToDataset
+     * @methodOf data-prep.services.playground.service:PlaygroundService
+     * @param {String} selectedPrepId preparation Id to Apply
+     * @param {String} datasetId The dataset id to which the preparation will be applied
+     * @description applies a preparation to a dataset
+     * @returns {Promise} The process promise
+     */
+    function applyPreparationToDataset(selectedPrepId, datasetId) {
+        let cloneId = null;
+        let updatedId = null;
+        let newPreparationName = state.playground.preparation ?
+            state.playground.preparation.name :
+            state.playground.dataset.name;
+
+        $rootScope.$emit('talend.loading.start');
+        return PreparationService.clone(selectedPrepId)
+            .then((preparationCloneId) => {
+                cloneId = preparationCloneId;
+                return PreparationService.update(preparationCloneId, {
+                    dataSetId: datasetId,
+                    name: newPreparationName
+                });
+            })
+            .then((updatedPreparationId) => {
+                updatedId = updatedPreparationId;
+                return PreparationListService.refreshPreparations();
+            })
+            .catch((error) => {
+                if (updatedId || cloneId) {
+                    PreparationService.delete(updatedId || cloneId);
+                }
+                return $q.reject(error);
+            })
+            .then(() => {
+                if (state.playground.preparation) {
+                    PreparationService.delete(state.playground.preparation.id);
+                }
+                return updatedId;
+            })
+            .finally(() => {
+                $rootScope.$emit('talend.loading.stop');
+            });
+    }
+
+    //------------------------------------------------------------------------------------------------------
     //--------------------------------------------------PREVIEW---------------------------------------------
     //------------------------------------------------------------------------------------------------------
     /**
@@ -434,7 +487,8 @@ export default function PlaygroundService($state, $rootScope, $q, $translate, $t
      * @methodOf data-prep.services.playground.service:PlaygroundService
      * @param {string} updateStep The step position index to update for the preview
      * @param {object} params The new step params
-     * @description [PRIVATE] Call the preview service to display the diff between the original steps and the updated steps
+     * @description [PRIVATE] Call the preview service to display the diff between the original steps and the updated
+     *     steps
      */
     function updatePreview(updateStep, params) {
         var originalParameters = updateStep.actionParameters.parameters;

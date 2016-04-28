@@ -178,6 +178,7 @@
         "implicit": true,
         "canBeBlank": true,
         "default": "",
+        "description": "An optional filter to apply action on matching values only.",
         "label": "Filter"
       },
       {
@@ -1739,10 +1740,12 @@
         "configuration": {
           "values": [
             {
-              "value": ":"
+              "value": ":",
+              "label": ":"
             },
             {
-              "value": "@"
+              "value": "@",
+              "label": "@"
             },
             {
               "value": " ",
@@ -1753,16 +1756,20 @@
               "label": "<tab>"
             },
             {
-              "value": ","
+              "value": ",",
+              "label": ","
             },
             {
-              "value": "-"
+              "value": "-",
+              "label": "-"
             },
             {
-              "value": "_"
+              "value": "_",
+              "label": "_"
             },
             {
-              "value": ";"
+              "value": ";",
+              "label": ";"
             },
             {
               "value": "other (string)",
@@ -2971,7 +2978,7 @@
         "canBeBlank": false,
         "description": "The new column name",
         "label": "New name",
-        "default": "id"
+        "default": ""
       }
     ],
     "category": "column_metadata",
@@ -3254,15 +3261,15 @@
     ]
   },
   {
-    "name": "testfailedaction"
-  },
-  {
     "category": "math",
     "name": "change_number_format"
   },
   {
     "category": "math",
     "name": "compare_numbers"
+  },
+  {
+    "name": "testfailedaction"
   },
   {
     "name": "fuzzy_matching",
@@ -3534,6 +3541,64 @@
     "docUrl": "",
     "actionScope": [],
     "description": "Extract number from the input",
+    "dynamic": false
+  },
+  {
+    "name": "swap_column",
+    "parameters": [
+      {
+        "name": "column_id",
+        "type": "string",
+        "implicit": true,
+        "canBeBlank": true,
+        "default": "",
+        "description": "The column to which you want to apply this action",
+        "label": "Column"
+      },
+      {
+        "name": "row_id",
+        "type": "string",
+        "implicit": true,
+        "canBeBlank": true,
+        "default": "",
+        "description": "The row to which you want to apply this action",
+        "label": "Row"
+      },
+      {
+        "name": "scope",
+        "type": "string",
+        "implicit": true,
+        "canBeBlank": true,
+        "default": "",
+        "description": "The transformation scope (CELL | LINE | COLUMN | DATASET)",
+        "label": "Scope"
+      },
+      {
+        "name": "filter",
+        "type": "filter",
+        "implicit": true,
+        "canBeBlank": true,
+        "default": "",
+        "description": "An optional filter to apply action on matching values only.",
+        "label": "Filter"
+      },
+      {
+        "name": "selected_column",
+        "type": "column",
+        "implicit": false,
+        "canBeBlank": false,
+        "default": "",
+        "description": "Combine the current column with this one",
+        "label": "Column"
+      }
+    ],
+    "actionScope": [
+      "column_metadata"
+    ],
+    "category": "columns",
+    "description": "Swap the values with an other column",
+    "label": "Swap columns",
+    "docUrl": "",
     "dynamic": false
   },
   {

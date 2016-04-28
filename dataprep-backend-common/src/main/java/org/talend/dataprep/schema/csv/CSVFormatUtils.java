@@ -1,20 +1,20 @@
-//  ============================================================================
+// ============================================================================
 //
-//  Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
-//  This source code is available under agreement available at
-//  https://github.com/Talend/data-prep/blob/master/LICENSE
+// This source code is available under agreement available at
+// https://github.com/Talend/data-prep/blob/master/LICENSE
 //
-//  You should have received a copy of the agreement
-//  along with this program; if not, write to Talend SA
-//  9 rue Pages 92150 Suresnes, France
+// You should have received a copy of the agreement
+// along with this program; if not, write to Talend SA
+// 9 rue Pages 92150 Suresnes, France
 //
-//  ============================================================================
+// ============================================================================
 
 package org.talend.dataprep.schema.csv;
 
 import static org.talend.dataprep.exception.error.CommonErrorCodes.UNABLE_TO_SERIALIZE_TO_JSON;
-import static org.talend.dataprep.schema.csv.CSVFormatGuess.*;
+import static org.talend.dataprep.schema.csv.CSVFormatFamily.*;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -65,7 +65,8 @@ public class CSVFormatUtils {
         List<String> header;
         try {
             String jsonMap = parameters.get(HEADER_COLUMNS_PARAMETER);
-            header = builder.build().readValue(jsonMap, new TypeReference<List<String>>() {});
+            header = builder.build().readValue(jsonMap, new TypeReference<List<String>>() {
+            });
         } catch (Exception e) { // NOSONAR no need to log or throw the exception here
             return Collections.emptyList();
         }
@@ -75,8 +76,9 @@ public class CSVFormatUtils {
     /**
      * Retrieve properties (separator, header and the headerNbLines) associated with a dataset content and put them in a
      * map with their corresponding key.
-     *  @param separator     the specified separator
-     * @param header        the specified header
+     * 
+     * @param separator the specified separator
+     * @param header the specified header
      * @param headerNbLines the specified number of lines spanned by the header
      */
     private Map<String, String> compileSeparatorProperties(String separator, List<String> header, int headerNbLines) {
@@ -98,19 +100,19 @@ public class CSVFormatUtils {
     /**
      * Use the separator from the metadata
      *
-     * @param updated  the dataset metadata to use.
+     * @param updated the dataset metadata to use.
      */
     public void useNewSeparator(DataSetMetadata updated) {
 
         final Map<String, String> newParameters = updated.getContent().getParameters();
         final String newSeparator = newParameters.get(SEPARATOR_PARAMETER);
         final String newHeaderLines = newParameters.get(HEADER_NB_LINES_PARAMETER);
-        List<String> newHeaders = Collections.emptyList();
+        List<String> newHeader = Collections.emptyList();
 
         // update the metadata with the new parameters
         final Map<String, String> parameters = compileSeparatorProperties( //
                 newSeparator, //
-                newHeaders, //
+                newHeader, //
                 Integer.valueOf(newHeaderLines) //
         );
         updated.getContent().setParameters(parameters);

@@ -20,6 +20,7 @@ import static org.talend.dataprep.transformation.api.action.metadata.ActionMetad
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.junit.Before;
@@ -68,15 +69,15 @@ public class RemoveNonAlphaNumCharsTest extends AbstractMetadataBaseTest {
     public void test_basic() {
         // given
         final Map<String, String> values = new HashMap<>();
-        values.put("name", "Vincent");
-        values.put("entity", "€10k");
-        values.put("joined", "May 20th 2015");
+        values.put("0000", "Vincent");
+        values.put("0001", "€10k");
+        values.put("0002", "May 20th 2015");
         final DataSetRow row = new DataSetRow(values);
 
-        final Map<String, Object> expectedValues = new HashMap<>();
-        expectedValues.put("name", "Vincent");
-        expectedValues.put("entity", "10k");
-        expectedValues.put("joined", "May 20th 2015");
+        final Map<String, Object> expectedValues = new LinkedHashMap<>();
+        expectedValues.put("0000", "Vincent");
+        expectedValues.put("0001", "10k");
+        expectedValues.put("0002", "May 20th 2015");
 
         //when
         ActionTestWorkbench.test(row, factory.create(action, parameters));

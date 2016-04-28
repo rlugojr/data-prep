@@ -25,7 +25,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.talend.dataprep</groupId>
     <artifactId>dataprep-backend</artifactId>
-    <version>2.0.m1-SNAPSHOT</version>
+    <version>1.2.0.m1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>dataprep-backend</name>
     <properties>
@@ -37,11 +37,11 @@
         <java.version>1.8</java.version>
         <junit.version>4.12</junit.version>
         <org.talend.daikon.version>0.6.0-SNAPSHOT</org.talend.daikon.version>
-        <org.talend.dataquality.version>1.4.3</org.talend.dataquality.version>
-        <org.talend.dataquality.common.version>1.4.3</org.talend.dataquality.common.version>
-        <org.talend.dataquality.semantic.version>1.4.3</org.talend.dataquality.semantic.version>
-        <org.talend.dataquality.statistics.version>1.4.3</org.talend.dataquality.statistics.version>
-        <org.talend.dataquality.record.linkage.version>3.0.0</org.talend.dataquality.record.linkage.version>
+        <org.talend.dataquality.version>1.4.4-SNAPSHOT</org.talend.dataquality.version>
+        <org.talend.dataquality.common.version>1.4.4</org.talend.dataquality.common.version>
+        <org.talend.dataquality.semantic.version>1.4.4</org.talend.dataquality.semantic.version>
+        <org.talend.dataquality.statistics.version>1.4.4</org.talend.dataquality.statistics.version>
+        <org.talend.dataquality.record.linkage.version>3.1.0</org.talend.dataquality.record.linkage.version>
         <project.inceptionYear>2015</project.inceptionYear>
         <project.organization>Talend</project.organization>
     </properties>

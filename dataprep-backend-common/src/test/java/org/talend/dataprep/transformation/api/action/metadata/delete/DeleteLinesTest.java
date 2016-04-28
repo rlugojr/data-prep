@@ -70,8 +70,8 @@ public class DeleteLinesTest extends AbstractMetadataBaseTest {
     public void should_delete() {
         // given
         final Map<String, String> values = new HashMap<>();
-        values.put("name", "David Bowie");
-        values.put("city", "Berlin");
+        values.put("0000", "David Bowie");
+        values.put("0001", "Berlin");
         final DataSetRow row = new DataSetRow(values);
 
         //when
@@ -85,8 +85,8 @@ public class DeleteLinesTest extends AbstractMetadataBaseTest {
     public void should_not_delete() {
         // given
         final Map<String, String> values = new HashMap<>();
-        values.put("name", "David Bowie");
-        values.put("city", "Paris");
+        values.put("0000", "David Bowie");
+        values.put("0001", "Paris");
         final DataSetRow row = new DataSetRow(values);
 
         //when

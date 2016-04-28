@@ -89,6 +89,27 @@ public class DataSetAPITest extends ApiServiceTestBase {
     }
 
     @Test
+    public void testDataSetUpdateMetadata() throws Exception {
+        ObjectMapper mapper = builder.build();
+        // given
+        final String dataSetId = createDataset("dataset/dataset.csv", "tagada", "text/csv");
+
+        // when
+        final String jsonOriginalMetadata = when().get("/api/datasets/{id}/metadata", dataSetId).asString();
+        final DataSetMetadata metadata = mapper.readValue(jsonOriginalMetadata, DataSetMetadata.class);
+        metadata.setName("Toto");
+        final String jsonMetadata = mapper.writeValueAsString(metadata);
+
+        given().body(jsonMetadata).when().put("/api/datasets/{id}/metadata", dataSetId).asString();
+
+        final String jsonUpdatedMetadata = when().get("/api/datasets/{id}/metadata", dataSetId).asString();
+        final DataSetMetadata updatedMetadata = mapper.readValue(jsonUpdatedMetadata, DataSetMetadata.class);
+
+        // then
+        assertEquals(updatedMetadata, metadata);
+    }
+
+    @Test
     public void testDataSetList() throws Exception {
         // given
         final String dataSetId = createDataset("dataset/dataset.csv", "testDataset", "text/csv");
@@ -790,7 +811,6 @@ public class DataSetAPITest extends ApiServiceTestBase {
     }
 
     @Test
-    @Ignore
     public void testDataSetCreateUnsupportedFormat() throws Exception {
         // given
         final String datasetContent = IOUtils.toString(DataSetAPITest.class.getResourceAsStream("dataset/dataset.ods"));

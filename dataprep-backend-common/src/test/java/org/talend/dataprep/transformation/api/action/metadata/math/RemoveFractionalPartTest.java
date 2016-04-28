@@ -46,7 +46,7 @@ public class RemoveFractionalPartTest extends AbstractRoundTest {
 
     @Before
     public void init() throws IOException {
-        parameters = ActionMetadataTestUtils.parseParameters(RemoveFractionalPartTest.class.getResourceAsStream("removeFractionnalPartAction.json"));
+        parameters = ActionMetadataTestUtils.parseParameters(RemoveFractionalPartTest.class.getResourceAsStream("removeFractionalPartAction.json"));
     }
 
     @Test

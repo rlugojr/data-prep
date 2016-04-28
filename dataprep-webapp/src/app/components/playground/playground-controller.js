@@ -60,8 +60,8 @@ export default function PlaygroundCtrl($timeout, $state, $stateParams, state, St
     //--------------------------------------------------------------------------------------------------------------
     //--------------------------------------------------PREPARATION PICKER------------------------------------------
     //--------------------------------------------------------------------------------------------------------------
-    vm.openPreparationPicker = function openPreparationPicker() {
-        StateService.updatePreparationPickerDisplay(!vm.state.playground.displayPreparationPicker);
+    vm.togglePreparationPicker = function togglePreparationPicker() {
+        vm.displayPreparationPicker = !vm.displayPreparationPicker;
     };
 
     //--------------------------------------------------------------------------------------------------------------
@@ -248,7 +248,7 @@ export default function PlaygroundCtrl($timeout, $state, $stateParams, state, St
      * @ngdoc method
      * @name loadDataset
      * @description open a dataset
-     * @param {string} prepid The dataset id
+     * @param {string} datasetid The dataset id
      */
     function loadDataset(datasetid) {
         const dataset = _.find(state.inventory.datasets, {id: datasetid});

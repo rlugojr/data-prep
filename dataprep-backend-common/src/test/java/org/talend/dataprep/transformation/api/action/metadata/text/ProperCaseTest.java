@@ -67,42 +67,42 @@ public class ProperCaseTest extends AbstractMetadataBaseTest {
     public void should_transform_lower_to_proper() {
         // given
         final Map<String, String> values = new HashMap<>();
-        values.put("band", "the beatles");
+        values.put("0000", "the beatles");
         final DataSetRow row = new DataSetRow(values);
 
         //when
         ActionTestWorkbench.test(row, factory.create(action, parameters));
 
         // then
-        assertEquals("The Beatles", row.get("band"));
+        assertEquals("The Beatles", row.get("0000"));
     }
 
     @Test
     public void should_transform_upper_to_proper() {
         // given
         final Map<String, String> values = new HashMap<>();
-        values.put("band", "THE BEATLES");
+        values.put("0000", "THE BEATLES");
         final DataSetRow row = new DataSetRow(values);
 
         //when
         ActionTestWorkbench.test(row, factory.create(action, parameters));
 
         // then
-        assertEquals("The Beatles", row.get("band"));
+        assertEquals("The Beatles", row.get("0000"));
     }
 
     @Test
     public void should_not_change_other_columns() {
         // given
         final Map<String, String> values = new HashMap<>();
-        values.put("bando", "the beatles");
+        values.put("0001", "the beatles");
         final DataSetRow row = new DataSetRow(values);
 
         //when
         ActionTestWorkbench.test(row, factory.create(action, parameters));
 
         // then
-        assertEquals("the beatles", row.get("bando"));
+        assertEquals("the beatles", row.get("0001"));
     }
 
     @Test

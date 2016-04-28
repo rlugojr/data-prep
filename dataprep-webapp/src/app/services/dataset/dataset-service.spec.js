@@ -202,14 +202,14 @@ describe('Dataset Service', () => {
             //given
             const metadata = {id: '7c98ae64154bc', sheetName: 'my old sheet'};
             const sheetName = 'my sheet';
-            spyOn(DatasetRestService, 'updateMetadata').and.returnValue($q.when({}));
+            spyOn(DatasetRestService, 'setMetadata').and.returnValue($q.when({}));
 
             //when
             DatasetService.setDatasetSheet(metadata, sheetName);
 
             //then
             expect(metadata.sheetName).toBe(sheetName);
-            expect(DatasetRestService.updateMetadata).toHaveBeenCalledWith(metadata);
+            expect(DatasetRestService.setMetadata).toHaveBeenCalledWith(metadata);
         }));
     });
 
@@ -242,14 +242,14 @@ describe('Dataset Service', () => {
                 separator: ';',
                 encoding: 'UTF-16'
             };
-            spyOn(DatasetRestService, 'updateMetadata').and.returnValue($q.when());
-            expect(DatasetRestService.updateMetadata).not.toHaveBeenCalled();
+            spyOn(DatasetRestService, 'setMetadata').and.returnValue($q.when());
+            expect(DatasetRestService.setMetadata).not.toHaveBeenCalled();
 
             //when
             DatasetService.updateParameters(metadata, parameters);
 
             //then
-            expect(DatasetRestService.updateMetadata).toHaveBeenCalled();
+            expect(DatasetRestService.setMetadata).toHaveBeenCalled();
             expect(metadata.defaultPreparation).toBeFalsy();
             expect(metadata.preparations).toBeFalsy();
         }));
@@ -267,7 +267,7 @@ describe('Dataset Service', () => {
                 separator: ';',
                 encoding: 'UTF-16'
             };
-            spyOn(DatasetRestService, 'updateMetadata').and.returnValue($q.when());
+            spyOn(DatasetRestService, 'setMetadata').and.returnValue($q.when());
 
             //when
             DatasetService.updateParameters(metadata, parameters);
@@ -293,7 +293,7 @@ describe('Dataset Service', () => {
                 separator: ';',
                 encoding: 'UTF-16'
             };
-            spyOn(DatasetRestService, 'updateMetadata').and.returnValue($q.reject());
+            spyOn(DatasetRestService, 'setMetadata').and.returnValue($q.reject());
 
             //when
             DatasetService.updateParameters(metadata, parameters);

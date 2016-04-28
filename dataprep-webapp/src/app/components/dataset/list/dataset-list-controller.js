@@ -56,6 +56,8 @@ export default class DatasetListCtrl {
         this.goToFolder = this.goToFolder.bind(this);
         this.removeFolder = this.removeFolder.bind(this);
         this.renameFolder = this.renameFolder.bind(this);
+
+        this.renamingList = [];
     }
 
     $onInit() {
@@ -121,7 +123,7 @@ export default class DatasetListCtrl {
      */
     rename(dataset, name) {
         const cleanName = name ? name.trim().toLowerCase() : '';
-        if(!cleanName || dataset.renaming) {
+        if(!cleanName || this.renamingList.indexOf(dataset) > -1) {
             return;
         }
 
@@ -133,16 +135,20 @@ export default class DatasetListCtrl {
             return;
         }
 
+        this.renamingList.push(dataset);
         const oldName = dataset.name;
-        dataset.name = name;
-        dataset.renaming = true;
+        this.StateService.setDatasetName(dataset.id, name);
+
         return this.DatasetService.update(dataset)
             .then(() => this.MessageService.success(
                 'DATASET_RENAME_SUCCESS_TITLE',
                 'DATASET_RENAME_SUCCESS'
             ))
-            .catch(() => { dataset.name = oldName })
-            .finally(() => { dataset.renaming = false });
+            .catch(() => { this.StateService.setDatasetName(dataset.id, oldName) })
+            .finally(() => {
+                const index = this.renamingList.indexOf(dataset);
+                this.renamingList.splice(index, 1);
+            });
     }
 
     /**

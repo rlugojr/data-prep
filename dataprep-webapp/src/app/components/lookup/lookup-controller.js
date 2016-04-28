@@ -33,6 +33,17 @@ export default function LookupCtrl($timeout, state, StateService, LookupService,
     vm.loadFromAction = LookupService.loadFromAction;
     vm.addLookupDatasetModal = false;
 
+
+    /**
+     * @ngdoc method
+     * @name doNothing
+     * @methodOf data-prep.lookup.controller:LookupCtrl
+     * @description function that does nothing
+     */
+    vm.doNothing = function doNothing() {
+        angular.noop();
+    };
+
     /**
      * @ngdoc method
      * @methodOf data-prep.services.lookup.service:LookupService

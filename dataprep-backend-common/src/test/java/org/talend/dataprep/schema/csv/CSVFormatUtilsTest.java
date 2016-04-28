@@ -14,7 +14,7 @@
 package org.talend.dataprep.schema.csv;
 
 import static org.junit.Assert.assertEquals;
-import static org.talend.dataprep.schema.csv.CSVFormatGuess.*;
+import static org.talend.dataprep.schema.csv.CSVFormatFamily.*;
 
 import java.util.Map;
 

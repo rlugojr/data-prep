@@ -47,7 +47,7 @@ public class ValuesContentHandler extends DefaultHandler {
      * flag to manage empty cells (empty String as value)
      */
     private boolean valueFound;
-    
+
     /**
      *
      * @param valueSelector an html element selector corresponding to values "html body table tr td" <b>attributes not
@@ -75,7 +75,7 @@ public class ValuesContentHandler extends DefaultHandler {
         String top = stack.getLast();
         if (StringUtils.equals(top, localName)) {
             if (stack.containsAll(valueStack)) {
-                if (!valueFound){
+                if (!valueFound) {
                     values.get(values.size() - 1).add(StringUtils.EMPTY);
                 }
             } else {
@@ -93,7 +93,7 @@ public class ValuesContentHandler extends DefaultHandler {
     public void characters(char[] chars, int start, int length) throws SAXException {
         if (matchingValuePattern) {
             char[] thechars = new char[length];
-            System.arraycopy( chars, start, thechars, 0, length );
+            System.arraycopy(chars, start, thechars, 0, length);
             String value = new String(thechars);
             LOGGER.debug("value: {}", value);
             if (values.isEmpty()) {
@@ -111,6 +111,5 @@ public class ValuesContentHandler extends DefaultHandler {
             valueFound = true;
         }
     }
-
 
 }

@@ -38,7 +38,7 @@ import org.talend.dataprep.dataset.service.Destinations;
 import org.talend.dataprep.dataset.store.content.DataSetContentStore;
 import org.talend.dataprep.dataset.store.metadata.DataSetMetadataRepository;
 import org.talend.dataprep.lock.DistributedLock;
-import org.talend.dataprep.schema.FormatGuess;
+import org.talend.dataprep.schema.FormatFamily;
 import org.talend.dataprep.user.store.UserDataRepository;
 
 import com.jayway.restassured.RestAssured;
@@ -69,7 +69,7 @@ public abstract class DataSetBaseTest {
     protected DataSetContentStore contentStore;
 
     @Autowired
-    protected FormatGuess.Factory factory;
+    protected FormatFamily.Factory factory;
 
     @Autowired
     protected DataSetMetadataBuilder metadataBuilder;

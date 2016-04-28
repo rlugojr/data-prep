@@ -218,16 +218,16 @@ describe('Dataset Rest Service', function () {
     });
 
     describe('update', function() {
-        it('should call dataset update rest service', inject(function ($rootScope, DatasetRestService, RestURLs) {
+        it('should call dataset updateMetadata rest service', inject(function ($rootScope, DatasetRestService, RestURLs) {
             //given
             var dataset = {name: 'my dataset', file: {path: '/path/to/file'}, error: false, id: 'e85afAa78556d5425bc2'};
 
             $httpBackend
-                .expectPUT(RestURLs.datasetUrl + '/e85afAa78556d5425bc2?name=my%20dataset')
+                .expectPUT(RestURLs.datasetUrl + '/e85afAa78556d5425bc2/metadata')
                 .respond(200);
 
             //when
-            DatasetRestService.update(dataset);
+            DatasetRestService.updateMetadata(dataset);
             $httpBackend.flush();
             $rootScope.$digest();
 
@@ -235,7 +235,7 @@ describe('Dataset Rest Service', function () {
             //expect PUT not to throw any exception
         }));
 
-        it('should call dataset metadata update rest service', inject(function ($rootScope, DatasetRestService, RestURLs) {
+        it('should call dataset setmetadata rest service', inject(function ($rootScope, DatasetRestService, RestURLs) {
             //given
             var metadata = {id: 'e85afAa78556d5425bc2', name: 'my dataset'};
 
@@ -244,7 +244,7 @@ describe('Dataset Rest Service', function () {
                 .respond(200);
 
             //when
-            DatasetRestService.updateMetadata(metadata);
+            DatasetRestService.setMetadata(metadata);
             $httpBackend.flush();
             $rootScope.$digest();
 

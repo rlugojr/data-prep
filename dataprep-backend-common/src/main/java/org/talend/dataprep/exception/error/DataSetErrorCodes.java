@@ -96,6 +96,11 @@ public enum DataSetErrorCodes implements ErrorCode {
      * {@link org.talend.dataprep.schema.FormatGuesser guesser}.
      */
     UNSUPPORTED_CONTENT(BAD_REQUEST.value()),
+
+    /**
+     * Error returned when the encoding of the uploaded content is not supported.
+     */
+    UNSUPPORTED_ENCODING(BAD_REQUEST.value()),
     /**
      * Error return when the uploaded content is mal formatted .
      */

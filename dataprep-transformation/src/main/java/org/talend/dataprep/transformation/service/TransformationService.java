@@ -228,6 +228,12 @@ public class TransformationService extends BaseTransformationService {
         try (final OutputStream newCacheEntry = contentCache.put(key, ContentCache.TimeToLive.DEFAULT)) {
             OutputStream outputStreams = new TeeOutputStream(output, newCacheEntry);
             internalTransform(preparationId, dataSet, outputStreams, formatName, stepId, name, optionalParams);
+        } catch (RuntimeException e) {
+            contentCache.evict(key); // TDP-1729: Don't cache a potentially wrong content.
+            throw e;
+        } catch (Throwable e) { // NOSONAR
+            contentCache.evict(key); // TDP-1729: Don't cache a potentially wrong content.
+            throw new TDPException(TransformationErrorCodes.UNABLE_TO_TRANSFORM_DATASET, e);
         }
     }
 

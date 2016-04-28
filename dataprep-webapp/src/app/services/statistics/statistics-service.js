@@ -51,7 +51,6 @@ export default function StatisticsService($log, $filter, state, StateService,
         //statistics entry points
         processAggregation: processAggregation,             // aggregation charts
         processClassicChart: processClassicChart,           // classic charts (not aggregation)
-        getAggregationColumns: getAggregationColumns,       // possible aggregation columns
         updateStatistics: updateStatistics,                 // update all stats (values, charts)
         updateFilteredStatistics: updateFilteredStatistics, // update filtered entries stats
         reset: reset,                                       // reset charts/statistics/cache
@@ -897,20 +896,6 @@ export default function StatisticsService($log, $filter, state, StateService,
         return StorageService.setAggregation(datasetId, preparationId, columnId, aggregation);
     }
 
-    /**
-     * @ngdoc method
-     * @name getAggregationColumns
-     * @methodOf data-prep.services.statistics.service:StatisticsService
-     * @description Return the columns available for aggregation
-     */
-    function getAggregationColumns() {
-        if (state.playground.data) {
-            var column = state.playground.grid.selectedColumn;
-            //TODO JSO : put a cache again that is invalidated when one of the columns change
-            return DatagridService.getNumericColumns(column);
-        }
-    }
-
     //--------------------------------------------------------------------------------------------------------------
     //-------------------------------------------------COMMON-------------------------------------------------------
     //--------------------------------------------------------------------------------------------------------------
@@ -949,7 +934,7 @@ export default function StatisticsService($log, $filter, state, StateService,
             }
         }
         else {
-            var aggregatedColumn = columnAggregation && _.findWhere(getAggregationColumns(), {id: columnAggregation.aggregationColumnId});
+            var aggregatedColumn = columnAggregation && _.findWhere(state.playground.grid.numericColumns, {id: columnAggregation.aggregationColumnId});
             if (aggregatedColumn) {
                 processAggregation(aggregatedColumn, aggregationName);
             }
@@ -978,7 +963,7 @@ export default function StatisticsService($log, $filter, state, StateService,
         initPatternsFrequency();
 
         var columnAggregation = getSavedColumnAggregation();
-        var aggregatedColumn = columnAggregation && _.findWhere(getAggregationColumns(), {id: columnAggregation.aggregationColumnId});
+        var aggregatedColumn = columnAggregation && _.findWhere(state.playground.grid.numericColumns, {id: columnAggregation.aggregationColumnId});
         var aggregation = columnAggregation && columnAggregation.aggregation;
         if (aggregatedColumn && aggregation) {
             processAggregation(aggregatedColumn, aggregation);

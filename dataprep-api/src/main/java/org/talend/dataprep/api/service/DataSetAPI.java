@@ -95,6 +95,20 @@ public class DataSetAPI extends APIService {
         return result;
     }
 
+    @RequestMapping(value = "/api/datasets/{id}/metadata", method = PUT, consumes = ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Update a data set metadata by id.", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE, //
+            notes = "Update a data set metadata based on content provided in PUT body with given id. For documentation purposes. Returns the id of the updated data set metadata.")
+    public void updateMetadata(
+            @ApiParam(value = "Id of the data set metadata to be updated") @PathVariable(value = "id") String id,
+            @ApiParam(value = "content") InputStream dataSetContent) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Creating or updating dataset #{} (pool: {})...", id, getConnectionStats());
+        }
+        HystrixCommand<String> creation = getCommand(UpdateDataSet.class,id, dataSetContent);
+        creation.execute();
+        LOG.debug("Dataset creation or update for #{} done.", id);
+    }
+
     @RequestMapping(value = "/api/datasets/{id}", method = POST, consumes = ALL_VALUE, produces = TEXT_PLAIN_VALUE)
     @ApiOperation(value = "Update a dataset.", consumes = TEXT_PLAIN_VALUE, produces = TEXT_PLAIN_VALUE, //
     notes = "Update a data set based on content provided in POST body with given id. For documentation purposes, body is typed as 'text/plain' but operation accepts binary content too.")

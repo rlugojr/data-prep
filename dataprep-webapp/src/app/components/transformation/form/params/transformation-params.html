@@ -13,7 +13,7 @@
   ~ ============================================================================
   -->
 
-<div ng-repeat="parameter in paramsCtrl.parameters track by $index"
+<div ng-repeat="parameter in paramsCtrl.parameters"
      ng-switch="paramsCtrl.getParameterType(parameter)">
 
     <transform-simple-param

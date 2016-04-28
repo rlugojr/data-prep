@@ -38,7 +38,7 @@ public class TextClusteringTest extends AbstractMetadataBaseTest {
     @Test
     public void create_should_build_textclustering_consumer() {
         // given
-        final String columnId = "0001";
+        final String columnId = "0000";
 
         final Map<String, String> parameters = new HashMap<>();
         parameters.put("scope", "column");

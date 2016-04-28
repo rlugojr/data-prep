@@ -90,16 +90,16 @@ public class ExtractEmailDomain extends ActionMetadata implements ColumnAction {
             final ColumnMetadata column = rowMetadata.getById(columnId);
             // Perform metadata level actions (add local + domain columns).
             final String local = context.column(
-                    column.getName() + LOCAL,
-                    (r) -> {
+                    LOCAL,
+                    r -> {
                         final ColumnMetadata newColumn = column().name(column.getName() + LOCAL).type(Type.STRING).build();
                         rowMetadata.insertAfter(columnId, newColumn);
                         return newColumn;
                     }
             );
             context.column(
-                    column.getName() + DOMAIN,
-                    (r) -> {
+                    DOMAIN,
+                    r -> {
                         final ColumnMetadata newColumn = column().name(column.getName() + DOMAIN).type(Type.STRING).build();
                         rowMetadata.insertAfter(local, newColumn);
                         return newColumn;
@@ -115,11 +115,9 @@ public class ExtractEmailDomain extends ActionMetadata implements ColumnAction {
     public void applyOnColumn(DataSetRow row, ActionContext context) {
         final String columnId = context.getColumnId();
         final String originalValue = row.get(columnId);
-        final RowMetadata rowMetadata = context.getRowMetadata();
-        final ColumnMetadata column = rowMetadata.getById(columnId);
         // Perform metadata level actions (add local + domain columns).
-        final String local = context.column(column.getName() + LOCAL);
-        final String domain = context.column(column.getName() + DOMAIN);
+        final String local = context.column(LOCAL);
+        final String domain = context.column(DOMAIN);
         // Set the values in newly created columns
         if (originalValue == null) {
             return;

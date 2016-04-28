@@ -39,7 +39,7 @@ public abstract class AbstractRoundTest extends AbstractMetadataBaseTest {
     protected void testCommon(String input, String expected, Integer precision) {
         // given
         final Map<String, String> values = new HashMap<>();
-        values.put("aNumber", input);
+        values.put("0000", input);
         final DataSetRow row = new DataSetRow(values);
 
         if (precision != null) {
@@ -50,7 +50,7 @@ public abstract class AbstractRoundTest extends AbstractMetadataBaseTest {
         ActionTestWorkbench.test(row, factory.create(getAction(), getParameters()));
 
         // then
-        assertEquals(expected, row.get("aNumber"));
+        assertEquals(expected, row.get("0000"));
     }
 
 

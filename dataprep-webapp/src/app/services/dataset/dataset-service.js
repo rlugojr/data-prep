@@ -209,7 +209,7 @@ export default function DatasetService($q, state, StateService, DatasetListServi
      */
     function setDatasetSheet(metadata, sheetName) {
         metadata.sheetName = sheetName;
-        return DatasetRestService.updateMetadata(metadata);
+        return DatasetRestService.setMetadata(metadata);
     }
 
     //--------------------------------------------------------------------------------------------------------------
@@ -217,7 +217,8 @@ export default function DatasetService($q, state, StateService, DatasetListServi
     //--------------------------------------------------------------------------------------------------------------
     function extractOriginalParameters(metadata) {
         return {
-            //TODO remove this and review the datasets model to NOT change the original object. This is done here to avoid cyclic ref
+            //TODO remove this and review the datasets model to NOT change the original object. This is done here to
+            // avoid cyclic ref
             defaultPreparation: metadata.defaultPreparation,
             preparations: metadata.preparations,
 
@@ -227,7 +228,8 @@ export default function DatasetService($q, state, StateService, DatasetListServi
     }
 
     function setParameters(metadata, parameters) {
-        //TODO remove this and review the datasets model to NOT change the original object. This is done here to avoid cyclic ref
+        //TODO remove this and review the datasets model to NOT change the original object. This is done here to avoid
+        // cyclic ref
         metadata.defaultPreparation = parameters.defaultPreparation;
         metadata.preparations = parameters.preparations;
 
@@ -248,7 +250,7 @@ export default function DatasetService($q, state, StateService, DatasetListServi
         var originalParameters = extractOriginalParameters(metadata);
         setParameters(metadata, parameters);
 
-        return DatasetRestService.updateMetadata(metadata)
+        return DatasetRestService.setMetadata(metadata)
             .then(function () {
                 metadata.defaultPreparation = originalParameters.defaultPreparation;
                 metadata.preparations = originalParameters.preparations;
@@ -275,10 +277,22 @@ export default function DatasetService($q, state, StateService, DatasetListServi
      * @ngdoc method
      * @name getCompatiblePreparations
      * @methodOf data-prep.services.dataset.service:DatasetService
-     * @description fetches the compatible preparations for a given dataset
-     * @returns {Promise} The GET Promise
+     * @description fetches the compatible prepartions for a given dataset
+     * @returns {Promise} The process Promise
      */
     function getCompatiblePreparations(datasetId) {
-        return DatasetRestService.getCompatiblePreparations(datasetId);
+        return DatasetRestService.getCompatiblePreparations(datasetId)
+            .then((compatiblePreparations) => {
+                if (state.playground.preparation) {
+                    compatiblePreparations = _.reject(compatiblePreparations, {id: state.playground.preparation.id});
+                }
+
+                return _.map(compatiblePreparations, (candidatePrepa) => {
+                    return {
+                        preparation: candidatePrepa,
+                        dataset: _.find(state.inventory.datasets, {id: candidatePrepa.dataSetId})
+                    };
+                });
+            });
     }
 }

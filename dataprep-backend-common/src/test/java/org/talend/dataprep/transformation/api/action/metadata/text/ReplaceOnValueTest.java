@@ -120,7 +120,7 @@ public class ReplaceOnValueTest extends AbstractMetadataBaseTest {
     @Test
     public void should_replace_the_value_that_match_on_the_specified_column_entire() {
         // given
-        final String columnId = "firstname";
+        final String columnId = "0000";
 
         final Map<String, String> values = new HashMap<>();
         values.put(columnId, "James Hetfield");
@@ -143,7 +143,7 @@ public class ReplaceOnValueTest extends AbstractMetadataBaseTest {
     @Test
     public void test_TDP_1204() {
         // given
-        final String columnId = "firstname";
+        final String columnId = "0000";
 
         final Map<String, String> values = new HashMap<>();
         values.put(columnId, "");
@@ -169,7 +169,7 @@ public class ReplaceOnValueTest extends AbstractMetadataBaseTest {
     @Test
     public void should_replace_the_value_that_match_on_the_specified_column_entireh() {
         // given
-        final String columnId = "firstname";
+        final String columnId = "0000";
 
         final Map<String, String> values = new HashMap<>();
         values.put(columnId, "James (etfield");
@@ -307,7 +307,7 @@ public class ReplaceOnValueTest extends AbstractMetadataBaseTest {
     @Test
     public void should_replace_the_value_that_match_on_the_specified_cell() {
         // given
-        final String columnId = "firstname";
+        final String columnId = "0000";
 
         final Map<String, String> values = new HashMap<>();
         values.put(columnId, "James");
@@ -395,7 +395,7 @@ public class ReplaceOnValueTest extends AbstractMetadataBaseTest {
     @Test
     public void should_replace_many_values_that_match_on_the_specified_cell() {
         // given
-        final String columnId = "firstname";
+        final String columnId = "0000";
 
         final Map<String, String> values = new HashMap<>();
         values.put(columnId, "James Cleveland James");
@@ -420,7 +420,7 @@ public class ReplaceOnValueTest extends AbstractMetadataBaseTest {
     @Test
     public void should_NOT_replace_the_value_that_DOESNT_match_on_the_specified_cell() {
         // given
-        final String columnId = "firstname";
+        final String columnId = "0000";
 
         final Map<String, String> values = new HashMap<>();
         values.put(columnId, "Toto");

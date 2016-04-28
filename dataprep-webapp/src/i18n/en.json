@@ -40,6 +40,7 @@
 
   "_comment": "Inventory",
   "DATASET_DETAILS": "owned by {{author}}, created {{created | TDPMoment}}, contains {{records}} line(s)",
+  "PREPARATION_DETAILS": "<span class=\"dataset-name\" title=\"{{dataset.name}}\">{{dataset.name}}</span> - {{dataset.records}} row(s),  owned by {{author}}, last change: {{lastModificationDate | TDPMoment}}, contains {{steps.length - 1}} step(s)",
   "SEARCH_DATASET_DETAILS": "Home/{{path}}, owned by {{author}}, created {{created | TDPMoment}}, contains {{records}} line(s)",
   "SEARCH_PREPARATION_DETAILS": "owned by {{author}}, created {{creationDate | TDPMoment}}, contains {{steps.length-1}} step(s)",
   "FOLDER_DETAILS": "created {{creationDate | TDPMoment}}, contains {{nbDatasets}} dataset(s)",
@@ -100,6 +101,7 @@
   "EXPORT_XLS": "Export to XLSX",
   "OK": "OK",
   "CONFIRM": "Confirm",
+  "REMOVE": "Remove",
 
   "_comment": "Add datasets",
   "IMPORT_DATASET": "Add Dataset",
@@ -233,6 +235,10 @@
   "SUM": "Sum",
   "AVERAGE": "Average",
   "GROUP_BY": "group by ",
+  "CURRENT_NO_AGGREGATION": "Current (no aggregation)",
+  "COLUMN": "Column",
+  "AGGREGATION": "Aggregation",
+  "AGGREGATION_DETAILS": "{{aggreg}} <span class=\"highlight\">{{col}}</span> group by <span class=\"highlight\">{{group}}</span>",
   "APPLY_TO_ALL_CELLS": "Apply to all cells with this value",
   "STRING": "TEXT",
   "FLOAT": "DECIMAL",
@@ -263,8 +269,6 @@
 
   "_comment": "playground",
   "CHOOSE_PREPARATION_TO_APPLY": "Choose a preparation to apply to this dataset",
-  "NEW_CANDIDATE_PREPARATION_NAME": "New preparation name",
-  "APPLY_PREPARATION": "Apply",
   "NO_COMPATIBLE_PREPARATIONS": "There are no compatible preparations to dataset: {{name}}",
 
   "_comment": "Confirm Popup",

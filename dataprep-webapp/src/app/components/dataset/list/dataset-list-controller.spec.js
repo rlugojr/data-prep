@@ -35,7 +35,7 @@ describe('Dataset list controller', () => {
         $provide.constant('state', stateMock);
     }));
 
-    beforeEach(inject(($rootScope, $componentController, $state, MessageService) => {
+    beforeEach(inject(($rootScope, $componentController, $state, StateService, MessageService) => {
         scope = $rootScope.$new();
 
         createController = () => $componentController('datasetList', {$scope: scope});
@@ -43,6 +43,7 @@ describe('Dataset list controller', () => {
         spyOn($state, 'go').and.returnValue();
         spyOn(MessageService, 'error').and.returnValue();
         spyOn(MessageService, 'success').and.returnValue();
+        spyOn(StateService, 'setDatasetName').and.returnValue();
     }));
 
     describe('on init', () => {
@@ -233,8 +234,9 @@ describe('Dataset list controller', () => {
         it('should NOT rename when dataset is currently being renamed', inject(($q, DatasetService) => {
             //given
             const ctrl = createController();
-            const dataset = {renaming: true};
+            const dataset = {id: '461465'};
             const name = 'new dataset name';
+            ctrl.renamingList.push(dataset);
 
             spyOn(DatasetService, 'update').and.returnValue($q.when());
 
@@ -264,19 +266,20 @@ describe('Dataset list controller', () => {
             expect(MessageService.error).toHaveBeenCalledWith('DATASET_NAME_ALREADY_USED_TITLE', 'DATASET_NAME_ALREADY_USED');
         }));
 
-        it('should rename dataset', inject(($q, DatasetService) => {
+        it('should rename dataset', inject(($q, DatasetService, StateService) => {
             //given
             const ctrl = createController();
             const dataset = {name: 'my old name'};
             const name = 'new dataset name';
 
             spyOn(DatasetService, 'update').and.returnValue($q.when());
+            expect(StateService.setDatasetName).not.toHaveBeenCalled();
 
             //when
             ctrl.rename(dataset, name);
 
             //then
-            expect(dataset.name).toBe(name);
+            expect(StateService.setDatasetName).toHaveBeenCalledWith(dataset.id, name);
             expect(DatasetService.update).toHaveBeenCalledWith(dataset);
         }));
 
@@ -296,7 +299,7 @@ describe('Dataset list controller', () => {
             expect(MessageService.success).toHaveBeenCalledWith('DATASET_RENAME_SUCCESS_TITLE', 'DATASET_RENAME_SUCCESS');
         }));
 
-        it('should set back the old name when the real rename is rejected', inject(($q, DatasetService) => {
+        it('should set back the old name when the real rename is rejected', inject(($q, StateService, DatasetService) => {
             //given
             const ctrl = createController();
             const oldName = 'my old name';
@@ -307,29 +310,29 @@ describe('Dataset list controller', () => {
 
             //when
             ctrl.rename(dataset, newName);
-            expect(dataset.name).toBe(newName);
+            expect(StateService.setDatasetName).not.toHaveBeenCalledWith(dataset.id, oldName);
             scope.$digest();
 
             //then
-            expect(dataset.name).toBe(oldName);
+            expect(StateService.setDatasetName).toHaveBeenCalledWith(dataset.id, oldName);
         }));
 
-        it('should manage "renaming" flag', inject(($q, DatasetService) => {
+        it('should manage "renaming" list', inject(($q, DatasetService) => {
             //given
             const ctrl = createController();
             const dataset = {name: 'my old name'};
             const name = 'new dataset name';
 
             spyOn(DatasetService, 'update').and.returnValue($q.when());
-            expect(dataset.renaming).toBeFalsy();
+            expect(ctrl.renamingList.indexOf(dataset) > -1).toBe(false);
 
             //when
             ctrl.rename(dataset, name);
-            expect(dataset.renaming).toBeTruthy();
+            expect(ctrl.renamingList.indexOf(dataset) > -1).toBe(true);
             scope.$digest();
 
             //then
-            expect(dataset.renaming).toBeFalsy();
+            expect(ctrl.renamingList.indexOf(dataset) > -1).toBe(false);
         }));
     });
 

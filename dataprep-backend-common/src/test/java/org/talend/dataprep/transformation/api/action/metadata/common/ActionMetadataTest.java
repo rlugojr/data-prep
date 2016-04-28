@@ -157,11 +157,11 @@ public class ActionMetadataTest extends AbstractMetadataBaseTest {
         // given
         final Map<String, String> parameters = new HashMap<>();
         parameters.put("scope", "cell");
-        parameters.put("column_id", "0001");
+        parameters.put("column_id", "0000");
         parameters.put("row_id", "58");
 
         final Map<String, String> rowValues = new HashMap<>();
-        rowValues.put("0001", "toto");
+        rowValues.put("0000", "toto");
         final DataSetRow row = new DataSetRow(rowValues);
         row.setTdpId(58L);
 
@@ -171,7 +171,7 @@ public class ActionMetadataTest extends AbstractMetadataBaseTest {
         ActionTestWorkbench.test(row, action);
 
         // then
-        assertThat(row.get("0001"), is("TOTO"));
+        assertThat(row.get("0000"), is("TOTO"));
     }
 
     @Test

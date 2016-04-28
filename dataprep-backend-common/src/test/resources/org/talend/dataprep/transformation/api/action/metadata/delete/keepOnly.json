@@ -3,12 +3,12 @@
     {
       "action": "keep_only",
       "parameters": {
-        "column_id": "city",
+        "column_id": "0001",
         "column_name": "city name",
         "scope": "column",
         "filter": {
           "eq": {
-            "field": "city",
+            "field": "0001",
             "value": "Berlin"
           }
         }

@@ -14,7 +14,9 @@
 package org.talend.dataprep.api.folder;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Optional;
 
 public class FolderEntry implements Serializable {
 

@@ -1,15 +1,15 @@
-//  ============================================================================
+// ============================================================================
 //
-//  Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
-//  This source code is available under agreement available at
-//  https://github.com/Talend/data-prep/blob/master/LICENSE
+// This source code is available under agreement available at
+// https://github.com/Talend/data-prep/blob/master/LICENSE
 //
-//  You should have received a copy of the agreement
-//  along with this program; if not, write to Talend SA
-//  9 rue Pages 92150 Suresnes, France
+// You should have received a copy of the agreement
+// along with this program; if not, write to Talend SA
+// 9 rue Pages 92150 Suresnes, France
 //
-//  ============================================================================
+// ============================================================================
 
 package org.talend.dataprep.schema.xls;
 
@@ -40,7 +40,7 @@ import org.talend.dataprep.exception.TDPException;
 import org.talend.dataprep.exception.error.CommonErrorCodes;
 import org.talend.dataprep.log.Markers;
 import org.talend.dataprep.schema.SchemaParser;
-import org.talend.dataprep.schema.SchemaParserResult;
+import org.talend.dataprep.schema.Schema;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -48,7 +48,8 @@ import org.xml.sax.XMLReader;
 import com.ctc.wstx.sax.WstxSAXParserFactory;
 
 /**
- * This class is in charge of parsing excel file (note apache poi is used for reading .xls) see https://poi.apache.org/
+ * This class is in charge of parsing excel file (note apache poi is used for reading .xls)
+ * @see <a hrerf="https://poi.apache.org/
  */
 @Service("parser#xls")
 public class XlsSchemaParser implements SchemaParser {
@@ -63,28 +64,28 @@ public class XlsSchemaParser implements SchemaParser {
      * @see SchemaParser#parse(Request)
      */
     @Override
-    public SchemaParserResult parse(Request request) {
+    public Schema parse(Request request) {
 
         final Marker marker = Markers.dataset(request.getMetadata().getId());
 
         LOGGER.debug(marker, "parsing {} ");
 
         try {
-            List<SchemaParserResult.SheetContent> sheetContents = parseAllSheets(request);
+            List<Schema.SheetContent> sheetContents = parseAllSheets(request);
 
-            SchemaParserResult result;
+            Schema result;
 
             if (!sheetContents.isEmpty()) {
                 // only one sheet
                 if (sheetContents.size() == 1) {
-                    result = SchemaParserResult.Builder.parserResult() //
+                    result = Schema.Builder.parserResult() //
                             .sheetContents(sheetContents) //
                             .draft(false) //
                             .build();
                 }
                 // multiple sheet, set draft flag on
                 else {
-                    result = SchemaParserResult.Builder.parserResult() //
+                    result = Schema.Builder.parserResult() //
                             .sheetContents(sheetContents) //
                             .draft(true) //
                             .sheetName(sheetContents.get(0).getName()) //
@@ -93,7 +94,7 @@ public class XlsSchemaParser implements SchemaParser {
             }
             // nothing to parse
             else {
-                result = SchemaParserResult.Builder.parserResult() //
+                result = Schema.Builder.parserResult() //
                         .sheetContents(Collections.emptyList()) //
                         .draft(false) //
                         .build();
@@ -107,7 +108,6 @@ public class XlsSchemaParser implements SchemaParser {
 
     }
 
-
     /**
      * Parse all xls sheets.
      *
@@ -115,7 +115,7 @@ public class XlsSchemaParser implements SchemaParser {
      * @return the list of parsed xls sheet.
      * @throws IOException if an error occurs.
      */
-    protected List<SchemaParserResult.SheetContent> parseAllSheets(Request request) throws IOException {
+    protected List<Schema.SheetContent> parseAllSheets(Request request) throws IOException {
 
         InputStream inputStream = request.getContent();
         if (!inputStream.markSupported()) {
@@ -127,8 +127,7 @@ public class XlsSchemaParser implements SchemaParser {
         // parse the xls input stream using the correct format
         if (newExcelFormat) {
             return parseAllSheetsNew(new Request(inputStream, request.getMetadata()));
-        }
-        else {
+        } else {
             return parseAllSheetsOldFormat(new Request(inputStream, request.getMetadata()));
         }
     }
@@ -139,10 +138,10 @@ public class XlsSchemaParser implements SchemaParser {
      * @param request
      * @return
      */
-    private List<SchemaParserResult.SheetContent> parseAllSheetsNew(Request request) {
+    private List<Schema.SheetContent> parseAllSheetsNew(Request request) {
 
         final Marker marker = Markers.dataset(request.getMetadata().getId());
-        List<SchemaParserResult.SheetContent> schemas = new ArrayList<>();
+        List<Schema.SheetContent> schemas = new ArrayList<>();
 
         try {
             OPCPackage container = OPCPackage.open(request.getContent());
@@ -184,10 +183,10 @@ public class XlsSchemaParser implements SchemaParser {
                         sheetParser.parse(sheetSource);
                     } catch (FastStopParsingException e) {
                         // expected here as we stop after the first row
-                        LOGGER.debug(marker, "FastStopParsingException : "+ e.getMessage());
+                        LOGGER.debug(marker, "FastStopParsingException : " + e.getMessage());
                     }
-                    SchemaParserResult.SheetContent sheetContent = //
-                    new SchemaParserResult.SheetContent(StringUtils.isEmpty(sheetName) ? "sheet-" + i : sheetName, //
+                    Schema.SheetContent sheetContent = //
+                    new Schema.SheetContent(StringUtils.isEmpty(sheetName) ? "sheet-" + i : sheetName, //
                             defaultSheetContentsHandler.columnsMetadata);
 
                     List<ColumnMetadata> columnsMetadata = sheetContent.getColumnMetadatas();
@@ -226,23 +225,30 @@ public class XlsSchemaParser implements SchemaParser {
     }
 
     /**
-     * Class used to read Xls sheet with a SAX parser (low memory footprint).
-     * Throws a {@link FastStopParsingException} when parsing is finished even if the sheet is not finished.
+     * Class used to read Xls sheet with a SAX parser (low memory footprint). Throws a {@link FastStopParsingException}
+     * when parsing is finished even if the sheet is not finished.
      */
     static class DefaultSheetContentsHandler implements XSSFSheetXMLHandler.SheetContentsHandler {
 
         /** This class' logger. */
         private Logger logger = LoggerFactory.getLogger(getClass());
+
         /** The columns metadata. */
         private List<ColumnMetadata> columnsMetadata = new ArrayList<>();
-        /** True if this content handler should throw a {@link FastStopParsingException} when finished to stop the processing. */
+
+        /**
+         * True if this content handler should throw a {@link FastStopParsingException} when finished to stop the
+         * processing.
+         */
         private boolean fastStop;
 
         private int lastColumnNumber = 0;
 
         /**
          * Constructor.
-         * @param fastStop if this content handler should throw a {@link FastStopParsingException} as soon as it's finished.
+         * 
+         * @param fastStop if this content handler should throw a {@link FastStopParsingException} as soon as it's
+         * finished.
          */
         public DefaultSheetContentsHandler(boolean fastStop) {
             this.fastStop = fastStop;
@@ -255,7 +261,7 @@ public class XlsSchemaParser implements SchemaParser {
         public void cell(String cellReference, String formattedValue, XSSFComment comment) {
             logger.debug("cell {}", cellReference);
 
-            int colNumber = XlsUtils.getColumnNumberFromCellRef( cellReference);
+            int colNumber = XlsUtils.getColumnNumberFromCellRef(cellReference);
 
             // here we need to populate empty columns as we need to have same number for columns meta and values
             // so we check the difference with the last column number
@@ -319,7 +325,7 @@ public class XlsSchemaParser implements SchemaParser {
      * @param request the xls request.
      * @return The parsed sheets request.
      */
-    private List<SchemaParserResult.SheetContent> parseAllSheetsOldFormat(Request request) {
+    private List<Schema.SheetContent> parseAllSheetsOldFormat(Request request) {
 
         final Marker marker = Markers.dataset(request.getMetadata().getId());
 
@@ -340,7 +346,7 @@ public class XlsSchemaParser implements SchemaParser {
                 return Collections.emptyList();
             }
 
-            List<SchemaParserResult.SheetContent> schemas = new ArrayList<>();
+            List<Schema.SheetContent> schemas = new ArrayList<>();
             for (int i = 0; i < sheetNumber; i++) {
                 Sheet sheet = hssfWorkbook.getSheetAt(i);
 
@@ -356,7 +362,7 @@ public class XlsSchemaParser implements SchemaParser {
                 String sheetName = sheet.getSheetName();
 
                 // update XlsSerializer if this default sheet naming change!!!
-                schemas.add(new SchemaParserResult.SheetContent(sheetName == null ? "sheet-" + i : sheetName, columnsMetadata));
+                schemas.add(new Schema.SheetContent(sheetName == null ? "sheet-" + i : sheetName, columnsMetadata));
 
             }
 

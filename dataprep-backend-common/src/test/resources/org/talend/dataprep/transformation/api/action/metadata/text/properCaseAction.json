@@ -3,7 +3,7 @@
     {
       "action": "propercase",
       "parameters": {
-        "column_id": "band",
+        "column_id": "0000",
         "scope": "column"
       }
     }

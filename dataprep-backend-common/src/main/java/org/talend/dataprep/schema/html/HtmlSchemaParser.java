@@ -14,10 +14,7 @@
 package org.talend.dataprep.schema.html;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.ParseContext;
@@ -30,7 +27,7 @@ import org.talend.dataprep.api.type.Type;
 import org.talend.dataprep.exception.TDPException;
 import org.talend.dataprep.exception.error.CommonErrorCodes;
 import org.talend.dataprep.schema.SchemaParser;
-import org.talend.dataprep.schema.SchemaParserResult;
+import org.talend.dataprep.schema.Schema;
 
 /**
  * This class is in charge of parsing html file to discover schema.
@@ -42,16 +39,27 @@ public class HtmlSchemaParser implements SchemaParser {
     /** This class' logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(HtmlSchemaParser.class);
 
+    /** HTML header selector parameter key. */
+    public static final String HEADER_SELECTOR_KEY = "html.HEADER_SELECTOR_KEY";
+
+    /** HTML value selector parameter key. */
+    public static final String VALUES_SELECTOR_KEY = "html.VALUES_SELECTOR_KEY";
+
+    /** List of patterns to use to parse datasets out of html. */
+    private Pattern pattern = new Pattern("html body table tr th", "html body table tr td");
+
     /**
      * @see SchemaParser#parse(Request)
      */
     @Override
-    public SchemaParserResult parse(Request request) {
+    public Schema parse(Request request) {
 
         try {
-
-            Map<String, String> parameters = request.getMetadata().getContent().getParameters();
-            final String headerSelector = parameters.get(HtmlFormatGuesser.HEADER_SELECTOR_KEY);
+            Map<String, String> parameters = new HashMap<>(2);
+            parameters.put(HEADER_SELECTOR_KEY, pattern.getHeaderSelector());
+            parameters.put(VALUES_SELECTOR_KEY, pattern.getValuesSelector());
+            request.getMetadata().getContent().setParameters(parameters);
+            final String headerSelector = pattern.getHeaderSelector();
 
             HeadersContentHandler headersContentHandler = new HeadersContentHandler(headerSelector, false);
 
@@ -60,8 +68,7 @@ public class HtmlSchemaParser implements SchemaParser {
 
             Metadata metadata = new Metadata();
 
-            htmlParser.parse( inputStream, headersContentHandler, metadata, new ParseContext() );
-
+            htmlParser.parse(inputStream, headersContentHandler, metadata, new ParseContext());
 
             List<ColumnMetadata> columnMetadatas = new ArrayList<>(headersContentHandler.getHeaderValues().size());
 
@@ -73,10 +80,10 @@ public class HtmlSchemaParser implements SchemaParser {
                         .build());
             }
 
-            SchemaParserResult.SheetContent sheetContent = new SchemaParserResult.SheetContent();
+            Schema.SheetContent sheetContent = new Schema.SheetContent();
             sheetContent.setColumnMetadatas(columnMetadatas);
 
-            return SchemaParserResult.Builder.parserResult() //
+            return Schema.Builder.parserResult() //
                     .sheetContents(Collections.singletonList(sheetContent)) //
                     .draft(false) //
                     .build();
@@ -86,5 +93,50 @@ public class HtmlSchemaParser implements SchemaParser {
             throw new TDPException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e);
         }
 
+    }
+
+    /**
+     * Class used to setup a HeadersContentHandler.
+     */
+    static class Pattern {
+
+        /** CSS like selector to get the header out of the html. */
+        private String headerSelector;
+
+        /** CSS like selector to get the values out of the html. */
+        private String valuesSelector;
+
+        /**
+         * Constructor.
+         *
+         * @param headerSelector selector to get the header out of the html.
+         * @param valuesSelector selector to get the values out of the html.
+         */
+        public Pattern(String headerSelector, String valuesSelector) {
+            this.headerSelector = headerSelector;
+            this.valuesSelector = valuesSelector;
+        }
+
+        /**
+         * @return the css like selector used to get the headers.
+         */
+        public String getHeaderSelector() {
+            return headerSelector;
+        }
+
+        /**
+         * @return the css like selector used to get the values.
+         */
+        public String getValuesSelector() {
+            return valuesSelector;
+        }
+
+        /**
+         * @see Object#toString()
+         */
+        @Override
+        public String toString() {
+            return "Pattern{" + "headerSelector='" + headerSelector + '\'' + ", valuesSelector='" + valuesSelector + '\'' + '}';
+        }
     }
 }

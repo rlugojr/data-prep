@@ -18,8 +18,8 @@
         <li id="dataset-header-details">
             <span class="playground-dataset-name"
                   ng-class="{'preview-mode': $ctrl.preview}"
-                  title="{{::$ctrl.dataset.name}}"
-                  ng-bind="::$ctrl.dataset.name"></span>
+                  title="{{$ctrl.dataset.name}}"
+                  ng-bind="$ctrl.dataset.name"></span>
 
             <span ng-if="$ctrl.displayNbLines"
                   ng-switch="!!$ctrl.dataset.limit">
@@ -47,8 +47,8 @@
             <a id="playground-preparation-picker-icon"
                class="icon"
                data-icon="c"
-               ng-if="$ctrl.activePreparationPickerBtn"
-               ng-click="$ctrl.onOpenPreparationPicker()"></a>
+               ng-if="$ctrl.preparationPicker"
+               ng-click="$ctrl.onPreparationPicker()"></a>
         </li>
         <li id="preview" ng-if="$ctrl.preview">
             <div id="previewBadge">

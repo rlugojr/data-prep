@@ -23,8 +23,8 @@
                        on-onboarding="playgroundCtrl.startOnBoarding('playground')"
                        on-feedback="playgroundCtrl.openFeedbackForm()"
                        on-close="playgroundCtrl.beforeClose()"
-                       on-open-preparation-picker="playgroundCtrl.openPreparationPicker()"
-                       active-preparation-picker-btn="!playgroundCtrl.recipeService.getRecipe().length"
+                       on-preparation-picker="playgroundCtrl.togglePreparationPicker()"
+                       preparation-picker="!playgroundCtrl.recipeService.getRecipe().length"
     ></playground-header>
 
     <div class="playground">
@@ -135,12 +135,10 @@
 <talend-modal
             class="preparation-picker-modal"
             fullscreen="false"
-            state="playgroundCtrl.state.playground.displayPreparationPicker"
+            state="playgroundCtrl.displayPreparationPicker"
             close-button="true"
-            ng-if="playgroundCtrl.state.playground.displayPreparationPicker">
+            ng-if="playgroundCtrl.displayPreparationPicker">
+    <div class="modal-title" translate-once="CHOOSE_PREPARATION_TO_APPLY"></div>
 
-    <preparation-picker
-        dataset-name="{{playgroundCtrl.state.playground.dataset.name}}"
-        dataset-id="{{playgroundCtrl.state.playground.dataset.id}}">
-    </preparation-picker>
+    <preparation-picker></preparation-picker>
 </talend-modal>

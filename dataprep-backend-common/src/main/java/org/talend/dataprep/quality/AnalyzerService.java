@@ -85,7 +85,7 @@ public class AnalyzerService implements DisposableBean {
     @Autowired
     private DateParser dateParser;
 
-    @Value("#{'${luceneIndexStrategy:basic}'}")
+    @Value("#{'${luceneIndexStrategy:singleton}'}")
     private String luceneIndexStrategy;
 
     /**

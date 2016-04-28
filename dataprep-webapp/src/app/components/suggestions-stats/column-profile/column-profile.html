@@ -24,32 +24,12 @@
     </div>
 
     <div id="column-profile-chart" ng-switch-when="false">
-        <div class="column-profile-options">
-            <div class="column-profile-chart-control" insertion-charts-control>
-                <talend-button-dropdown button-text="{{ columnProfileCtrl.getCurrentAggregation() | translate }} {{columnProfileCtrl.state.playground.statistics.histogram.aggregationColumn.name}}">
-                    <ul class="column-profile-aggregation-list">
-                        <li ng-click="columnProfileCtrl.changeAggregation()">
-                            <div translate-once="LINE_COUNT"></div>
-                        </li>
-                        <li ng-repeat="column in columnProfileCtrl.aggregationColumns track by column.id" class="more">
-                            <div class="moreText" title="{{column.name}}">{{column.name}}</div>
-                            <ul class="submenu">
-                                <li ng-repeat="aggregation in columnProfileCtrl.aggregations track by $index" ng-click="columnProfileCtrl.changeAggregation(column, aggregation)" title="{{ ::aggregation | translate }}">
-                                    <div class="moreText" translate-once="{{aggregation}}"></div>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </talend-button-dropdown>
-            </div>
-
-            <div ng-if="columnProfileCtrl.state.playground.statistics.histogram.aggregation" class="column-profile-aggregation-description">
-                <span>{{columnProfileCtrl.state.playground.statistics.histogram.aggregation | translate}}</span>
-                <span class="highlight">{{columnProfileCtrl.state.playground.statistics.histogram.aggregationColumn.name}}</span>
-                <span translate-once="GROUP_BY"></span>
-                <span class="highlight">{{columnProfileCtrl.state.playground.statistics.histogram.column.name}}</span>
-            </div>
-        </div>
+        <column-profile-options
+                numeric-columns="columnProfileCtrl.state.playground.grid.numericColumns"
+                aggregation="columnProfileCtrl.state.playground.statistics.histogram.aggregation"
+                column="columnProfileCtrl.state.playground.statistics.histogram.aggregationColumn"
+                group="columnProfileCtrl.state.playground.statistics.histogram.column"
+                on-aggregation-change="columnProfileCtrl.changeAggregation(column, aggregation)"></column-profile-options>
 
         <div id="column-profile-chart-container" style="min-height: 160px;" insertion-charts>
             <horizontal-barchart id="hBarChart"

@@ -3,7 +3,7 @@
     {
       "action": "lowercase",
       "parameters": {
-        "column_id": "entity",
+        "column_id": "0001",
         "scope": "column"
       }
     }

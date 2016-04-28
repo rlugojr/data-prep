@@ -3,7 +3,7 @@
     {
       "action": "delete_negative_values",
       "parameters": {
-        "column_id": "age",
+        "column_id": "0001",
         "scope": "column"
       }
     }

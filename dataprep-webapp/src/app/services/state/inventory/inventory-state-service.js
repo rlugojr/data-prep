@@ -45,6 +45,7 @@ export function InventoryStateService() {
 
         setDatasets: setDatasets,
         removeDataset: removeDataset,
+        setDatasetName: setDatasetName,
 
         setCurrentFolder: setCurrentFolder,
         setCurrentFolderContent: setCurrentFolderContent,
@@ -147,6 +148,28 @@ export function InventoryStateService() {
      */
     function removeDataset(dataset) {
         inventoryState.datasets = _.reject(inventoryState.datasets, {id: dataset.id});
+    }
+
+    /**
+     * @ngdoc method
+     * @name setDatasetName
+     * @methodOf data-prep.services.state.service:InventoryStateService
+     * @param {string} datasetId The dataset id
+     * @param {string} name The dataset name
+     * @description Change the dataset name in folder and datasets list
+     */
+    function setDatasetName(datasetId, name) {
+        if(inventoryState.datasets) {
+            const dataset = _.find(inventoryState.datasets, {id: datasetId});
+            dataset.name = name;
+        }
+
+        if(inventoryState.currentFolderContent && inventoryState.currentFolderContent.datasets) {
+            const dataset = _.find(inventoryState.currentFolderContent.datasets, {id: datasetId});
+            if(dataset) {
+                dataset.name = name;
+            }
+        }
     }
 
     /**

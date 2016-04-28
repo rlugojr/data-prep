@@ -20,6 +20,7 @@ import static org.talend.dataprep.transformation.api.action.metadata.ActionMetad
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.junit.Before;
@@ -67,15 +68,15 @@ public class LowerCaseTest extends AbstractMetadataBaseTest {
     public void should_lowercase() {
         // given
         final Map<String, String> values = new HashMap<>();
-        values.put("name", "Vincent");
-        values.put("entity", "R&D");
-        values.put("joined", "May 20th 2015");
+        values.put("0000", "Vincent");
+        values.put("0001", "R&D");
+        values.put("0002", "May 20th 2015");
         final DataSetRow row = new DataSetRow(values);
 
-        final Map<String, Object> expectedValues = new HashMap<>();
-        expectedValues.put("name", "Vincent");
-        expectedValues.put("entity", "r&d"); // R&D --> r&d
-        expectedValues.put("joined", "May 20th 2015");
+        final Map<String, Object> expectedValues = new LinkedHashMap<>();
+        expectedValues.put("0000", "Vincent");
+        expectedValues.put("0001", "r&d"); // R&D --> r&d
+        expectedValues.put("0002", "May 20th 2015");
 
         //when
         ActionTestWorkbench.test(row, factory.create(action, parameters));
@@ -88,13 +89,13 @@ public class LowerCaseTest extends AbstractMetadataBaseTest {
     public void should_do_nothing_since_column_does_not_exist() {
         // given
         final Map<String, String> values = new HashMap<>();
-        values.put("name", "Vincent");
-        values.put("joined", "May 20th 2015");
+        values.put("0000", "Vincent");
+        values.put("0002", "May 20th 2015");
         final DataSetRow row = new DataSetRow(values);
 
-        final Map<String, Object> expectedValues = new HashMap<>();
-        expectedValues.put("name", "Vincent");
-        expectedValues.put("joined", "May 20th 2015");
+        final Map<String, Object> expectedValues = new LinkedHashMap<>();
+        expectedValues.put("0000", "Vincent");
+        expectedValues.put("0002", "May 20th 2015");
 
         //when
         ActionTestWorkbench.test(row, factory.create(action, parameters));

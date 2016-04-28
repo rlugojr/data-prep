@@ -4,7 +4,7 @@
       "action": "ceil",
       "parameters": {
         "precision": "0",
-        "column_id": "aNumber",
+        "column_id": "0000",
         "scope": "column"
       }
     }

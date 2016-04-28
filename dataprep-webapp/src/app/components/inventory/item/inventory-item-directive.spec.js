@@ -26,7 +26,8 @@ describe('InventoryItem directive', () => {
         'created': '1437020219741',
         'type': 'text/csv',
         'certificationStep': 'NONE',
-        'preparations': [{name:'US States prepa'}, {name:'US States prepa 2'}]
+        'preparations': [{name:'US States prepa'}, {name:'US States prepa 2'}],
+        'favorite' : true
     };
 
     const preparation = {
@@ -292,14 +293,23 @@ describe('InventoryItem directive', () => {
                 //when
                 createElement();
 
-            //then
-            const icon = element.find('a').eq(3).attr('data-icon');
-            expect(icon).toBe('f');
-        });
+                //then
+                const icon = element.find('a').eq(3).attr('data-icon');
+                expect(icon).toBe('f');
+             });
 
-        it('should display favorite icon tooltip', () => {
-            //when
-            createElement();
+            it('should NOT display favorite icon', () => {
+                //when
+                scope.toggleFavorite = null;
+                createElement();
+
+                //then
+                expect(element.find('.favorite').length).toBe(0);
+            });
+
+            it('should display favorite icon tooltip', () => {
+                //when
+                createElement();
 
                 //then
                 const title = element.find('a').eq(3).attr('title');

@@ -35,6 +35,8 @@ import org.talend.dataprep.api.dataset.statistics.number.NumberHistogram;
 import org.talend.dataprep.api.dataset.statistics.number.StreamNumberHistogramStatistics;
 import org.talend.dataprep.api.type.Type;
 import org.talend.dataprep.api.type.TypeUtils;
+import org.talend.dataprep.exception.TDPException;
+import org.talend.dataprep.exception.error.CommonErrorCodes;
 import org.talend.dataquality.semantic.classifier.SemanticCategoryEnum;
 import org.talend.dataquality.semantic.recognizer.CategoryFrequency;
 import org.talend.dataquality.semantic.statistics.SemanticType;
@@ -157,7 +159,7 @@ public class StatisticsAdapter {
 
             // the suggested type can be modified by #injectValueQuality
             column.setType(suggestedColumnType.getName());
-            injectValueQuality(column, result, dataType);
+            injectValueQuality(column, result);
             // Try to use the most frequent sub type of the suggested type when possible
             if (mostFrequentSubType != null && suggestedColumnType != mostFrequentSubType) {
                 column.getQuality().setMostFrequentSubType(mostFrequentSubType.getName());
@@ -166,7 +168,7 @@ public class StatisticsAdapter {
         }
     }
 
-    private void injectValueQuality(final ColumnMetadata column, final Analyzers.Result result, DataTypeOccurences dataType) {
+    private void injectValueQuality(final ColumnMetadata column, final Analyzers.Result result) {
         if (result.exist(ValueQualityStatistics.class)) {
             final Statistics statistics = column.getStatistics();
             final Quality quality = column.getQuality();
@@ -188,13 +190,8 @@ public class StatisticsAdapter {
             if (invalidDetectionType != null && !columnType.equals(invalidDetectionType)) {
                 if (invalidDetectionType.equals(TypeUtils.subTypeOfOther(invalidDetectionType, columnType))) {
                     // some values have been filtered then type used to compute invalids is not the good one
-
-                    final Long suggestedEnumTypeFrequency = dataType.getTypeFrequencies().get(dataType.getSuggestedType());
-                    final long dataTypeOccurrenceCount = suggestedEnumTypeFrequency != null ? suggestedEnumTypeFrequency : 0;
-
-                    validCount = valueQualityStatistics.getValidCount() + valueQualityStatistics.getUnknownCount()
-                            + dataTypeOccurrenceCount;
                     invalidValues = filterInvalids(columnType, rawInvalids);
+                    validCount = allCount - emptyCount - invalidValues.size();
                 } else {
                     // fallback to string because invalidDetection type is not the subtype of the actual detectedType
                     validCount = allCount - emptyCount;
@@ -384,21 +381,23 @@ public class StatisticsAdapter {
      * @return the set of invalid values that do not contains values of specified type
      */
     private Set<String> filterInvalids(Type type, Set<String> invalids) {
-
         if (invalids == null || invalids.isEmpty() || Type.STRING.equals(type)) {
             return Collections.emptySet();
         }
-        DataTypeQualityAnalyzer analyzer = new DataTypeQualityAnalyzer(DataTypeEnum.get(type.getName()));
-        analyzer.init();
-        final Set<String> result;
-        invalids.stream().forEach(analyzer::analyze);
-        List<ValueQualityStatistics> analyzerResult = analyzer.getResult();
-        result = analyzerResult.get(0).getInvalidValues();
-        // defensive programming
-        if (result == null || result.isEmpty()) {
-            return Collections.emptySet();
+        try (DataTypeQualityAnalyzer analyzer = new DataTypeQualityAnalyzer(DataTypeEnum.get(type.getName()))) {
+            analyzer.init();
+            final Set<String> result;
+            invalids.stream().forEach(analyzer::analyze);
+            List<ValueQualityStatistics> analyzerResult = analyzer.getResult();
+            result = analyzerResult.get(0).getInvalidValues();
+            // defensive programming
+            if (result == null || result.isEmpty()) {
+                return Collections.emptySet();
+            }
+            return result;
+        } catch (Exception e) {
+            throw new TDPException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e);
         }
-        return result;
     }
 
     /**

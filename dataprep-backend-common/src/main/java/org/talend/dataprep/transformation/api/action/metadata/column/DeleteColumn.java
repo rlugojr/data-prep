@@ -84,6 +84,7 @@ public class DeleteColumn extends ActionMetadata implements ColumnAction {
         final String columnId = context.getColumnId();
         LOGGER.debug("DeleteColumn for columnId {}", columnId);
         context.getRowMetadata().deleteColumnById(columnId);
+        row.deleteColumnById(columnId);
     }
 
     @Override

@@ -25,12 +25,13 @@
      <div class="dropdown-container">
          <div class="dropdown-action">
             <div class="dropdown-button">{{ column.id }}</div>
-         <div>{{ column.type }}</div>
+            <div>{{ column.type }}</div>
+         </div>
      </div>
      <ul class="dropdown-menu">
          <li><a href="#">Hide Column {{ column.id | uppercase }}</a></li>
          <li class="divider"></li>
-         <li<a href="#">Split first Space</a></li>
+         <li><a href="#">Split first Space</a></li>
          <li><a href="#">Uppercase</a></li>
      </ul>
  </talend-dropdown>
@@ -165,13 +166,19 @@ export default function TalendDropdown($window, $timeout) {
                     }
                 }
 
+                iElement.on('click', (e) => {
+                    if(e.target.classList.contains('dropdown-close')) {
+                        hideMenu();
+                    }
+                });
+
                 //Click : hide/show menu on left click
                 action.click(toggleMenu);
 
                 //Click : hide menu on item select if 'closeOnSelect' is not false
                 menu.click(function (event) {
-                    event.stopPropagation();
                     if (ctrl.closeOnSelect !== false) {
+                        event.stopPropagation();
                         hideMenu();
                     }
                 });

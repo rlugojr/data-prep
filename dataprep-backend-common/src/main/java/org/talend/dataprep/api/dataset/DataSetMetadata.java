@@ -17,7 +17,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import org.springframework.data.annotation.Id;
-import org.talend.dataprep.schema.SchemaParserResult;
+import org.talend.dataprep.schema.Schema;
 import org.talend.dataprep.schema.csv.CSVSerializer;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -98,7 +98,7 @@ public class DataSetMetadata implements Serializable {
      * available only when draft is <code>true</code> i.e until some information has been confirmed by the user
      */
     @JsonProperty("schemaParserResult")
-    private SchemaParserResult schemaParserResult;
+    private Schema schemaParserResult;
 
     /**
      * flag to tell the dataset is one of the favorites for the current user this value is sent back to front but not
@@ -274,14 +274,14 @@ public class DataSetMetadata implements Serializable {
     /**
      * @return the schema parser result.
      */
-    public SchemaParserResult getSchemaParserResult() {
+    public Schema getSchemaParserResult() {
         return schemaParserResult;
     }
 
     /**
      * @param schemaParserResult the schema parser result to set.
      */
-    public void setSchemaParserResult(SchemaParserResult schemaParserResult) {
+    public void setSchemaParserResult(Schema schemaParserResult) {
         this.schemaParserResult = schemaParserResult;
     }
 

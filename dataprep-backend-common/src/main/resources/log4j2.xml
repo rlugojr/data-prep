@@ -16,6 +16,7 @@
 
 <configuration> <!-- status="debug"> -->
     <appenders>
+
         <Console name="console" target="SYSTEM_OUT" ignoreExceptions="false">
             <PatternLayout pattern="%highlight{%d{DEFAULT} [%t] [%marker] %-5level %logger{36} - %msg%n}"/>
         </Console>
@@ -52,6 +53,7 @@
         <!-- disable raw content logging which is verbose for binary upload -->
         <!--logger name="org.apache.http.wire" level="debug"/-->
         <logger name="org.springframework" level="info"/>
+        <logger name="org.talend.dataprep.dataset.service.analysis.synchronous.FormatAnalysis" level="info"/>
         <root level="info" includeLocation="true">
             <appender-ref ref="console"/>
         </root>

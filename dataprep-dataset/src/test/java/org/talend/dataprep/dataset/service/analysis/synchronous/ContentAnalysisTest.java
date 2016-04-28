@@ -24,7 +24,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.talend.dataprep.api.dataset.DataSetMetadata;
 import org.talend.dataprep.api.dataset.location.LocalStoreLocation;
 import org.talend.dataprep.dataset.DataSetBaseTest;
-import org.talend.dataprep.schema.csv.CSVFormatGuess;
+import org.talend.dataprep.schema.csv.CSVFormatFamily;
 
 public class ContentAnalysisTest extends DataSetBaseTest {
 
@@ -59,7 +59,7 @@ public class ContentAnalysisTest extends DataSetBaseTest {
     public void testAnalysisWithHeaderParameter() {
         final DataSetMetadata metadata = metadataBuilder.metadata() //
                 .id("1234") //
-                .parameter(CSVFormatGuess.HEADER_NB_LINES_PARAMETER, "56").build();
+                .parameter(CSVFormatFamily.HEADER_NB_LINES_PARAMETER, "56").build();
         createCsvDataSet(metadata, "5_lines.csv");
 
         contentAnalysis.analyze(metadata.getId());
@@ -107,8 +107,8 @@ public class ContentAnalysisTest extends DataSetBaseTest {
      */
     private void createCsvDataSet(DataSetMetadata metadata, String source) {
         metadata.setLocation(new LocalStoreLocation());
-        metadata.getContent().setFormatGuessId(CSVFormatGuess.BEAN_ID);
-        metadata.getContent().addParameter(CSVFormatGuess.SEPARATOR_PARAMETER, ",");
+        metadata.getContent().setFormatGuessId(CSVFormatFamily.BEAN_ID);
+        metadata.getContent().addParameter(CSVFormatFamily.SEPARATOR_PARAMETER, ",");
         dataSetMetadataRepository.add(metadata);
         contentStore.storeAsRaw(metadata, this.getClass().getResourceAsStream(source));
     }

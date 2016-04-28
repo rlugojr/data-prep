@@ -23,7 +23,7 @@ import org.talend.dataprep.api.dataset.DataSetMetadata;
 import org.talend.dataprep.api.dataset.DataSetMetadataBuilder;
 import org.talend.dataprep.api.dataset.RowMetadata;
 import org.talend.dataprep.api.type.Type;
-import org.talend.dataprep.schema.csv.CSVFormatGuess;
+import org.talend.dataprep.schema.csv.CSVFormatFamily;
 
 /**
  * Utility class for the io unit tests.
@@ -46,7 +46,7 @@ public class IoTestUtils {
      */
     public DataSetMetadata getDataSetMetadata() {
         DataSetMetadata datasetMetadata = metadataBuilder.metadata().id("123456789").build();
-        datasetMetadata.getContent().addParameter(CSVFormatGuess.SEPARATOR_PARAMETER, ";");
+        datasetMetadata.getContent().addParameter(CSVFormatFamily.SEPARATOR_PARAMETER, ";");
         return datasetMetadata;
     }
 
