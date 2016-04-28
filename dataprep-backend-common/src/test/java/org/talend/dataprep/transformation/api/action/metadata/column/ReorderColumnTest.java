@@ -39,15 +39,15 @@ import org.talend.dataprep.transformation.api.action.metadata.common.ImplicitPar
 import org.talend.dataprep.transformation.api.action.metadata.common.OtherColumnParameters;
 
 /**
- * Test class for Reorder action.
+ * Test class for ReorderColumn action.
  *
- * @see Reorder
+ * @see ReorderColumn
  */
 public class ReorderColumnTest extends AbstractMetadataBaseTest {
 
     /** The action to test. */
     @Autowired
-    private Reorder action;
+    private ReorderColumn action;
 
     private Map<String, String> parameters;
 
@@ -67,29 +67,28 @@ public class ReorderColumnTest extends AbstractMetadataBaseTest {
     public void should_reorder_meta_only_2_columns() {
 
         // given
-        DataSetRow row = createDataSetRow( 2 );
+        DataSetRow row = createDataSetRow(2);
 
         // when
         ActionTestWorkbench.test(row, factory.create(action, parameters));
 
         // then
         Assertions.assertThat(row.getRowMetadata().getColumns()).isNotEmpty().hasSize(2);
-        Assertions.assertThat(row.getRowMetadata().getColumns().get(0).getName()).isEqualTo( "1 col" );
+        Assertions.assertThat(row.getRowMetadata().getColumns().get(0).getName()).isEqualTo("1 col");
         Assertions.assertThat(row.getRowMetadata().getColumns().get(0).getId()).isEqualTo("0001");
-        Assertions.assertThat(row.getRowMetadata().getColumns().get(1).getName()).isEqualTo( "0 col" );
+        Assertions.assertThat(row.getRowMetadata().getColumns().get(1).getName()).isEqualTo("0 col");
         Assertions.assertThat(row.getRowMetadata().getColumns().get(1).getId()).isEqualTo("0000");
-        assertValuesNotTouched( 2, row );
+        assertValuesNotTouched(2, row);
     }
-
 
     @Test
     public void should_reorder_meta_with_4_columns_and_0000_to_0003() {
 
         // given
-        DataSetRow row = createDataSetRow( 4 );
+        DataSetRow row = createDataSetRow(4);
 
-        parameters.put( ImplicitParameters.COLUMN_ID.getKey(), "0000" );
-        parameters.put( OtherColumnParameters.SELECTED_COLUMN_PARAMETER, "0003" );
+        parameters.put(ImplicitParameters.COLUMN_ID.getKey(), "0000");
+        parameters.put(OtherColumnParameters.SELECTED_COLUMN_PARAMETER, "0003");
 
         // when
         ActionTestWorkbench.test(row, factory.create(action, parameters));
@@ -100,18 +99,17 @@ public class ReorderColumnTest extends AbstractMetadataBaseTest {
         Assertions.assertThat(row.getRowMetadata().getColumns().get(1).getId()).isEqualTo("0002");
         Assertions.assertThat(row.getRowMetadata().getColumns().get(2).getId()).isEqualTo("0003");
         Assertions.assertThat(row.getRowMetadata().getColumns().get(3).getId()).isEqualTo("0000");
-        assertValuesNotTouched( 4, row );
+        assertValuesNotTouched(4, row);
     }
-
 
     @Test
     public void should_reorder_meta_with_4_columns_and_0003_to_0000() {
 
         // given
-        DataSetRow row = createDataSetRow( 4 );
+        DataSetRow row = createDataSetRow(4);
 
-        parameters.put( ImplicitParameters.COLUMN_ID.getKey(), "0003" );
-        parameters.put( OtherColumnParameters.SELECTED_COLUMN_PARAMETER, "0000" );
+        parameters.put(ImplicitParameters.COLUMN_ID.getKey(), "0003");
+        parameters.put(OtherColumnParameters.SELECTED_COLUMN_PARAMETER, "0000");
 
         // when
         ActionTestWorkbench.test(row, factory.create(action, parameters));
@@ -122,19 +120,17 @@ public class ReorderColumnTest extends AbstractMetadataBaseTest {
         Assertions.assertThat(row.getRowMetadata().getColumns().get(1).getId()).isEqualTo("0000");
         Assertions.assertThat(row.getRowMetadata().getColumns().get(2).getId()).isEqualTo("0001");
         Assertions.assertThat(row.getRowMetadata().getColumns().get(3).getId()).isEqualTo("0002");
-        assertValuesNotTouched( 4, row );
+        assertValuesNotTouched(4, row);
     }
-
-
 
     @Test
     public void should_reorder_meta_with_5_columns_and_0004_to_0002() {
 
         // given
-        DataSetRow row = createDataSetRow( 5 );
+        DataSetRow row = createDataSetRow(5);
 
-        parameters.put( ImplicitParameters.COLUMN_ID.getKey(), "0004" );
-        parameters.put( OtherColumnParameters.SELECTED_COLUMN_PARAMETER, "0002" );
+        parameters.put(ImplicitParameters.COLUMN_ID.getKey(), "0004");
+        parameters.put(OtherColumnParameters.SELECTED_COLUMN_PARAMETER, "0002");
 
         // when
         ActionTestWorkbench.test(row, factory.create(action, parameters));
@@ -147,15 +143,15 @@ public class ReorderColumnTest extends AbstractMetadataBaseTest {
         Assertions.assertThat(row.getRowMetadata().getColumns().get(3).getId()).isEqualTo("0002");
         Assertions.assertThat(row.getRowMetadata().getColumns().get(4).getId()).isEqualTo("0003");
 
-        assertValuesNotTouched( 5, row );
+        assertValuesNotTouched(5, row);
     }
 
     protected DataSetRow createDataSetRow(int columnNumber) {
         List<ColumnMetadata> input = new ArrayList<>(columnNumber);
         Map<String, String> values = new HashMap<>();
-        for (int i = 0; i < columnNumber;i++) {
+        for (int i = 0; i < columnNumber; i++) {
             input.add(createMetadata("000" + i, i + " col"));
-            values.put("000" + i, "000" + i +  " value");
+            values.put("000" + i, "000" + i + " value");
         }
         RowMetadata rowMetadata = new RowMetadata(input);
         DataSetRow row = new DataSetRow(values);
@@ -163,9 +159,9 @@ public class ReorderColumnTest extends AbstractMetadataBaseTest {
         return row;
     }
 
-    protected void assertValuesNotTouched(int columnNumber, DataSetRow row){
-        for (int i = 0; i < columnNumber;i++) {
-            Assertions.assertThat(row.get("000"+i)).isEqualTo("000" + i + " value");
+    protected void assertValuesNotTouched(int columnNumber, DataSetRow row) {
+        for (int i = 0; i < columnNumber; i++) {
+            Assertions.assertThat(row.get("000" + i)).isEqualTo("000" + i + " value");
         }
     }
 
