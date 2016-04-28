@@ -136,19 +136,12 @@ public class ReorderColumn extends ActionMetadata implements DataSetAction {
 
         try {
             if (forwardMove) {
-                index = 0;
-                for (int size = rowMetadata.getColumns().size(); index < size; index++) {
-                    if (index >= originIndex && index < targetIndex) {
-                        swapColumnMetadata(rowMetadata.getColumns().get(index), rowMetadata.getColumns().get(index + 1));
-                    }
-
+                for (index = originIndex; index < targetIndex; index++) {
+                    swapColumnMetadata(rowMetadata.getColumns().get(index), rowMetadata.getColumns().get(index + 1));
                 }
             } else {
-                index = rowMetadata.getColumns().size() - 1;
-                for (; index > 0; index--) {
-                    if (index > targetIndex && index <= originIndex) {
-                        swapColumnMetadata(rowMetadata.getColumns().get(index), rowMetadata.getColumns().get(index - 1));
-                    }
+                for (index = originIndex; index > targetIndex; index--) {
+                    swapColumnMetadata(rowMetadata.getColumns().get(index), rowMetadata.getColumns().get(index - 1));
                 }
             }
         } catch (Exception e) {
