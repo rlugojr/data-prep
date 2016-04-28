@@ -12,12 +12,11 @@
   ============================================================================*/
 
 .history-control {
+  @include display(flex);
   @include filter(drop-shadow(0px 1px 1px #1f2024));
 
   > a {
     color: $white;
-    float: left;
-    position: relative;
     font-size: 0.9em;
 
     &.inactive {
@@ -29,6 +28,7 @@
     &.redo {
       margin-left: 5px;
     }
+
     &.undo {
       margin-right: 5px;
     }
