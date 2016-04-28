@@ -65,25 +65,36 @@
             </a>
         </li>
         <li><export></export></li>
-        <li class="nav-link" translate-once-title="ONBOARDING">
-            <a id="playground-onboarding-icon"
-               class="icon"
-               data-icon="y"
-               ng-click="$ctrl.onOnboarding()"></a>
-        </li>
-        <li class="nav-link" translate-once-title="FEEDBACK_TOOLTIP">
-            <a id="playground-feedback-icon"
-               class="icon"
-               data-icon="H"
-               ng-click="$ctrl.onFeedback()"></a>
-        </li>
-        <li class="nav-link" translate-once-title="ONLINE_HELP_TOOLTIP">
-            <a id="playground-online-help-icon"
-               class="icon"
-               data-icon="l"
-               href="https://help.talend.com/pages/viewpage.action?pageId=266307043&utm_medium=dpdesktop&utm_source=header"
-               target="_blank">
-            </a>
+        <li>
+            <talend-dropdown id="playground-help-nav">
+                <div class="dropdown-container">
+                    <div class="dropdown-action">
+                        HELP
+                    </div>
+                    <ul class="dropdown-menu">
+                        <li class="nav-link" translate-once-title="ONBOARDING">
+                            <a id="playground-onboarding-icon"
+                               class="icon"
+                               data-icon="y"
+                               ng-click="$ctrl.onOnboarding()"></a>
+                        </li>
+                        <li class="nav-link" translate-once-title="FEEDBACK_TOOLTIP">
+                            <a id="playground-feedback-icon"
+                               class="icon"
+                               data-icon="H"
+                               ng-click="$ctrl.onFeedback()"></a>
+                        </li>
+                        <li class="nav-link" translate-once-title="ONLINE_HELP_TOOLTIP">
+                            <a id="playground-online-help-icon"
+                               class="icon"
+                               data-icon="l"
+                               href="https://help.talend.com/pages/viewpage.action?pageId=266307043&utm_medium=dpdesktop&utm_source=header"
+                               target="_blank">
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </talend-dropdown>
         </li>
         <li><documentation-search></documentation-search></li>
         <li id="help-history"><history-control></history-control></li>
