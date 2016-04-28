@@ -406,6 +406,50 @@ public class PreparationAPI extends APIService {
     }
 
 
+    @RequestMapping(value = "/api/preparations/{preparationId}/lock/{userId}", method = PUT, produces = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Mark a preparation as locked by a user.", notes = "Does not return any value, client may expect successful operation based on HTTP status code.")
+    @Timed
+    public void lockPreparation(@PathVariable(value = "preparationId")
+                                   @ApiParam(name = "preparationId", value = "Preparation id.")
+                                   final String preparationId, @PathVariable(value = "userId")
+                                   @ApiParam(name = "userId", value = "Id of user who is asking for lock")
+                                   final String userId) {
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Locking preparation #{} for user '{}'...", preparationId, userId);
+        }
+
+        final HystrixCommand<Void> command = getCommand(PreparationLock.class, preparationId, userId);
+        command.execute();
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Locked preparation #{} for user '{}'...", preparationId, userId);
+        }
+    }
+
+    @RequestMapping(value = "/api/preparations/{preparationId}/unlock/{userId}", method = PUT, produces = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Mark a preparation as unlocked by a user.", notes = "Does not return any value, client may expect successful operation based on HTTP status code.")
+    @Timed
+    public void unlockPreparation(@PathVariable(value = "preparationId")
+                                @ApiParam(name = "preparationId", value = "Preparation id.")
+                                final String preparationId, @PathVariable(value = "userId")
+                                @ApiParam(name = "userId", value = "Id of user who is asking for lock")
+                                final String userId) {
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Locking preparation #{} for user '{}'...", preparationId, userId);
+        }
+
+        final HystrixCommand<Void> command = getCommand(PreparationUnlock.class, preparationId, userId);
+        command.execute();
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Locked preparation #{} for user '{}'...", preparationId, userId);
+        }
+    }
+
+
+
     /**
      * Copy the steps from the another preparation to this one.
      *

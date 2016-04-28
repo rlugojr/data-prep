@@ -47,7 +47,9 @@ public enum CommonErrorCodes implements ErrorCode {
 
     ILLEGAL_ORDER_FOR_LIST(400, "order"),
     ILLEGAL_SORT_FOR_LIST(400, "sort"),
-    UNABLE_TO_PARSE_FILTER(400);
+    UNABLE_TO_PARSE_FILTER(400),
+    CONFLICT_TO_LOCK_RESOURCE(409, "id"),
+    CONFLICT_TO_UNLOCK_RESOURCE(409, "id");
 
 
 

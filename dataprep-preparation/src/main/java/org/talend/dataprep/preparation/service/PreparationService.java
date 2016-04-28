@@ -49,10 +49,12 @@ import org.talend.dataprep.api.folder.FolderEntry;
 import org.talend.dataprep.api.preparation.*;
 import org.talend.dataprep.api.service.info.VersionService;
 import org.talend.dataprep.exception.TDPException;
+import org.talend.dataprep.exception.error.CommonErrorCodes;
 import org.talend.dataprep.exception.error.PreparationErrorCodes;
 import org.talend.dataprep.exception.json.JsonErrorCodeDescription;
 import org.talend.dataprep.folder.store.FolderRepository;
 import org.talend.dataprep.http.HttpResponseContext;
+import org.talend.dataprep.lock.store.LockedResourceRepository;
 import org.talend.dataprep.metrics.Timed;
 import org.talend.dataprep.preparation.store.PreparationRepository;
 import org.talend.dataprep.security.Security;
@@ -63,7 +65,6 @@ import org.talend.dataprep.transformation.pipeline.ActionRegistry;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-
 
 @RestController
 @Api(value = "preparations", basePath = "/preparations", description = "Operations on preparations")
@@ -76,7 +77,7 @@ public class PreparationService {
     @Autowired
     private PreparationRepository preparationRepository;
 
-    /** Where the folders are stored.*/
+    /** Where the folders are stored. */
     @Autowired
     private FolderRepository folderRepository;
 
@@ -104,6 +105,8 @@ public class PreparationService {
     @Autowired
     private ActionRegistry actionRegistry;
 
+    @Autowired
+    private LockedResourceRepository lockedResourceRepository;
 
     /**
      * Create a preparation from the http request body.
@@ -140,7 +143,6 @@ public class PreparationService {
         return id;
     }
 
-
     /**
      * List all the preparations id.
      *
@@ -157,14 +159,14 @@ public class PreparationService {
 
         LOGGER.debug("Get list of preparations (summary).");
 
-        final List<String> preparations = preparationRepository.listAll(Preparation.class).stream().collect(Collectors.toList()).stream() //
+        final List<String> preparations = preparationRepository.listAll(Preparation.class).stream().collect(Collectors.toList())
+                .stream() //
                 .sorted(getPreparationComparator(sort, order)) //
                 .map(Preparation::id).collect(toList());
 
         LOGGER.info("found {} preparation(s) ID in total", preparations.size());
         return preparations;
     }
-
 
     /**
      * List all preparation details.
@@ -190,14 +192,17 @@ public class PreparationService {
     }
 
     /**
-     * <p>Search preparation entry point.</p>
+     * <p>
+     * Search preparation entry point.
+     * </p>
      *
-     * <p>So far at least one search criteria can be processed at a time among the following ones :
-     *  <ul>
-     *      <li>dataset id</li>
-     *      <li>preparation name & exact match</li>
-     *      <li>folder path</li>
-     *  </ul>
+     * <p>
+     * So far at least one search criteria can be processed at a time among the following ones :
+     * <ul>
+     * <li>dataset id</li>
+     * <li>preparation name & exact match</li>
+     * <li>folder path</li>
+     * </ul>
      * </p>
      *
      * @param dataSetId to search all preparations based on this dataset id.
@@ -220,17 +225,15 @@ public class PreparationService {
             @RequestParam(defaultValue = "DESC") @ApiParam(value = "Order for sort key (desc or asc).") String order) {
     //@formatter:on
 
-        //TODO should stream the response à la DataSetRowIterator & DataSetRowStreamSerializer
+        // TODO should stream the response à la DataSetRowIterator & DataSetRowStreamSerializer
 
         final Collection<Preparation> result;
 
         if (dataSetId != null) {
             result = searchByDataSet(dataSetId);
-        }
-        else if (folder != null ){
+        } else if (folder != null) {
             result = searchByFolder(folder);
-        }
-        else {
+        } else {
             result = searchByName(name, exactMatch);
         }
 
@@ -241,9 +244,9 @@ public class PreparationService {
                 .collect(Collectors.toList());
     }
 
-
     /**
      * Return the preparations that are based on the given dataset.
+     * 
      * @param dataSetId the dataset id.
      * @return the preparations that are based on the given dataset.
      */
@@ -289,13 +292,14 @@ public class PreparationService {
      * @param exactMatch true if the name must match exactly.
      * @return all the preparations that matches the given name.
      */
-    private Collection<Preparation> searchByName(String name,boolean exactMatch) {
+    private Collection<Preparation> searchByName(String name, boolean exactMatch) {
 
         LOGGER.debug("looking for preparations with the name '{}' exact match is ", name, exactMatch);
 
         Collection<Preparation> preparations = preparationRepository.getByMatchingName(name, exactMatch);
 
-        String message = exactMatch ? "{} preparation(s) having name that match {}.": "{} preparation(s) having name containing {}.";
+        String message = exactMatch ? "{} preparation(s) having name that match {}."
+                : "{} preparation(s) having name containing {}.";
         LOGGER.info(message, preparations.size(), name);
 
         return preparations;
@@ -334,15 +338,14 @@ public class PreparationService {
         final String newName;
         if (StringUtils.isBlank(name)) {
             newName = original.getName() + " Copy";
-        }
-        else {
+        } else {
             newName = name;
         }
         checkIfPreparationNameIsAvailable(destination, newName);
 
-
         // copy the Preparation
-        Preparation copy = new Preparation(UUID.randomUUID().toString(), original.getDataSetId(), original.getHeadId(), original.getAppVersion());
+        Preparation copy = new Preparation(UUID.randomUUID().toString(), original.getDataSetId(), original.getHeadId(),
+                original.getAppVersion());
         copy.setName(newName);
         final long now = System.currentTimeMillis();
         copy.setCreationDate(now);
@@ -358,13 +361,13 @@ public class PreparationService {
         return newId;
     }
 
-
     /**
      * Check if the name is available in the given folder.
      *
      * @param folder where to look for the name.
      * @param name the wanted preparation name.
-     * @throws TDPException Preparation name already used (409) if there's already a preparation with this name in the folder.
+     * @throws TDPException Preparation name already used (409) if there's already a preparation with this name in the
+     * folder.
      */
     private void checkIfPreparationNameIsAvailable(String folder, String name) {
 
@@ -433,6 +436,7 @@ public class PreparationService {
 
     /**
      * Delete the preparation that match the given id.
+     * 
      * @param id the preparation id to delete.
      */
     @RequestMapping(value = "/preparations/{id}", method = RequestMethod.DELETE, consumes = MediaType.ALL_VALUE, produces = TEXT_PLAIN_VALUE)
@@ -447,7 +451,8 @@ public class PreparationService {
 
         // delete the associated folder entries
         // TODO make this async?
-        folderRepository.findFolderEntries(id, PREPARATION).forEach(e -> folderRepository.removeFolderEntry(e.getFolderId(), id, PREPARATION));
+        folderRepository.findFolderEntries(id, PREPARATION)
+                .forEach(e -> folderRepository.removeFolderEntry(e.getFolderId(), id, PREPARATION));
 
         LOGGER.info("Deletion of preparation #{} done.", id);
     }
@@ -526,7 +531,6 @@ public class PreparationService {
         LOGGER.info("copy steps from {} to {} done --> {}", from, id, preparation);
     }
 
-
     /**
      * Return a preparation details.
      *
@@ -553,7 +557,7 @@ public class PreparationService {
     @RequestMapping(value = "/preparations/{id}/folder", method = GET, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get preparation details", notes = "Return the details of the preparation with provided id.")
     @Timed
-    public Folder searchLocation(@ApiParam(value="the preparation id") @PathVariable("id") String id) {
+    public Folder searchLocation(@ApiParam(value = "the preparation id") @PathVariable("id") String id) {
 
         LOGGER.debug("looking the folder for {}", id);
 
@@ -566,7 +570,6 @@ public class PreparationService {
 
         return folder;
     }
-
 
     @RequestMapping(value = "/preparations/{id}/steps", method = GET, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get all preparation steps id", notes = "Return the steps of the preparation with provided id.")
@@ -613,14 +616,15 @@ public class PreparationService {
      * <li>4. Append each action (one step is created by action) after the new preparation head</li>
      * </ul>
      */
-    //formatter:off
+    // formatter:off
     @RequestMapping(value = "/preparations/{id}/actions/{stepId}", method = PUT, consumes = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Updates an action in a preparation", notes = "Modifies an action in preparation's steps.")
     @Timed
-    public void updateAction(@PathVariable("id") final String preparationId,
-                             @PathVariable("stepId") final String stepToModifyId,
-                             @RequestBody final AppendStep newStep) {
-    //@formatter:on
+    public void updateAction(@PathVariable("id")
+    final String preparationId, @PathVariable("stepId")
+    final String stepToModifyId, @RequestBody
+    final AppendStep newStep) {
+        //@formatter:on
 
         checkActionStepConsistency(newStep);
 
@@ -641,7 +645,8 @@ public class PreparationService {
                                                                             // not anymore
                 .filter(id -> !updatedCreatedColumns.contains(id)).collect(toList());
         final int columnsDiffNumber = updatedCreatedColumns.size() - originalCreatedColumns.size();
-        final int maxCreatedColumnIdBeforeUpdate = !originalCreatedColumns.isEmpty() ? originalCreatedColumns.stream().mapToInt(Integer::parseInt).max().getAsInt() : MAX_VALUE;
+        final int maxCreatedColumnIdBeforeUpdate = !originalCreatedColumns.isEmpty()
+                ? originalCreatedColumns.stream().mapToInt(Integer::parseInt).max().getAsInt() : MAX_VALUE;
 
         // Build list of actions from modified one to the head
         final List<AppendStep> actionsSteps = getStepsWithShiftedColumnIds(steps, stepToModifyId, deletedColumns,
@@ -713,14 +718,12 @@ public class PreparationService {
 
         final Step head = getStep(headId);
         if (head == null) {
-            throw new TDPException(PREPARATION_STEP_DOES_NOT_EXIST,
-                    build().put("id", preparationId).put("stepId", headId));
+            throw new TDPException(PREPARATION_STEP_DOES_NOT_EXIST, build().put("id", preparationId).put("stepId", headId));
         }
 
         final Preparation preparation = getPreparation(preparationId);
         setPreparationHead(preparation, head);
     }
-
 
     /**
      * Get all the actions of a preparation at given version.
@@ -763,6 +766,46 @@ public class PreparationService {
             errors.add(new JsonErrorCodeDescription(code));
         }
         return errors;
+    }
+
+    //@formatter:off
+    @RequestMapping(value = "/preparations/{preparationId}/lock/{userId}", method = PUT, produces = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Lock the specified preparation.", notes = "Returns a locked resource.")
+    @Timed
+    public void lockPreparation(@ApiParam("preparationId") @PathVariable("preparationId") final String preparationId,
+                                @ApiParam("userId") @PathVariable("userId") final String userId) {
+        //@formatter:on
+
+        LOGGER.debug("Trying to lock preparation {} for user {}.", preparationId, userId);
+        Preparation preparation = preparationRepository.get(preparationId, Preparation.class);
+        try {
+            LOGGER.debug("Preparation {} locked for user {}.", preparationId, userId);
+            lockedResourceRepository.retrieveLock(preparation, userId);
+        } catch (Exception e) {
+            LOGGER.debug("Unable to lock Preparation {} for user {}.", preparationId, userId);
+            throw new TDPException(CommonErrorCodes.CONFLICT_TO_LOCK_RESOURCE,
+                    ExceptionContext.build().put("Locker", e.getMessage()));
+        }
+    }
+
+    //@formatter:off
+    @RequestMapping(value = "/preparations/{preparationId}/unlock/{userId}", method = PUT, produces = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Unlock the specified preparation.", notes = "Returns a locked resource.")
+    @Timed
+    public void unlockPreparation(@ApiParam("preparationId") @PathVariable("preparationId") final String preparationId,
+                                  @ApiParam("userId") @PathVariable("userId") final String userId) {
+        //@formatter:on
+
+        LOGGER.debug("Trying to unlock preparation {} for user {}.", preparationId, userId);
+        Preparation preparation = preparationRepository.get(preparationId, Preparation.class);
+        try {
+            lockedResourceRepository.retrieveUnLock(preparation, userId);
+            LOGGER.debug("Preparation {} unlocked by user {}.", preparationId, userId);
+        } catch (Exception e) {
+            LOGGER.debug("Unable to unlock Preparation {} for user {}.", preparationId, userId);
+            throw new TDPException(CommonErrorCodes.CONFLICT_TO_UNLOCK_RESOURCE,
+                    ExceptionContext.build().put("Locker", e.getMessage()));
+        }
     }
 
     // ------------------------------------------------------------------------------------------------------------------
@@ -836,8 +879,7 @@ public class PreparationService {
 
         final List<Step> steps;
         try (IntStream range = IntStream.range(stepIndex, stepsIds.size())) {
-            steps = range.mapToObj(index -> getStep(stepsIds.get(index)))
-                    .collect(toList());
+            steps = range.mapToObj(index -> getStep(stepsIds.get(index))).collect(toList());
         }
 
         final List<List<Action>> stepActions = steps.stream().map(this::getActions).collect(toList());
