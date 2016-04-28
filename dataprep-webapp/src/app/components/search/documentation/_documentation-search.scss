@@ -11,7 +11,9 @@
 
   ============================================================================*/
 .documentation-search {
-  input[type=search] {
-    width: 350px;
+  [type=search],
+  .no-results,
+  .searching {
+    width: 180px;
   }
 }
