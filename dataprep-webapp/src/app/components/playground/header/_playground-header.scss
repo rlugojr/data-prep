@@ -10,31 +10,38 @@ $navigation-color: white;
 $navigation-height: 50px;
 $navigation-item-space: 10px;
 
+%flex-center {
+  @include display(flex);
+  @include align-items(center);
+  @include justify-content(center);
+}
+
 #playground-header {
   @include display(flex);
   @include justify-content(space-between);
   height: $navigation-height;
-  min-height: $navigation-height;
   width: 100vw;
 
   @include background(linear-gradient($navigation-background-top, $navigation-background-bottom) left repeat);
   border-bottom: 1px solid darken($navigation-border, 10);
   color: $navigation-color;
 
+  > ul {
+    @extend %flex-center;
+    > li {
+      @extend %flex-center;
+      height: $navigation-height;
+    }
+  }
+
   > ul,
   #playground-help-nav .dropdown-menu {
     > li {
-      display: table-cell;
-      line-height: $navigation-height - $navigation-border-height;
+      @extend %flex-center;
+      height: $navigation-height;
       padding-left: $navigation-item-space;
       padding-right: $navigation-item-space;
-      vertical-align: middle;
       border-right: 1px solid grey;
-
-      input {
-        display: inline-block;
-        margin: 0;
-      }
     }
   }
 
@@ -47,10 +54,14 @@ $navigation-item-space: 10px;
 
     @media (max-width: ($responsive-sm-screen-width - 1)) {
       .dropdown-menu {
-        > li {
+        &.show-menu {
+          @include display(flex);
+        }
 
+        > li {
           .icon {
             color: $navigation-background-bottom;
+            @include filter(none);
 
             &:hover {
               color: lighten($navigation-background-bottom, 10%);
@@ -61,16 +72,14 @@ $navigation-item-space: 10px;
     }
 
     @media (min-width: $responsive-sm-screen-width) {
-      > ul > li {
-        ul > li {
+      ul > li {
 
-          &:first-child {
-            padding-left: 0;
-          }
+        &:first-child {
+          padding-left: 0;
+        }
 
-          &:last-child {
-            padding-right: 0;
-          }
+        &:last-child {
+          padding-right: 0;
         }
       }
 
@@ -81,7 +90,7 @@ $navigation-item-space: 10px;
         }
 
         &-menu {
-          display: block;
+          @include display(inline-flex);
           position: relative;
           background: none;
           border: none;
@@ -107,14 +116,6 @@ $navigation-item-space: 10px;
   }
 
   #playground-left-header {
-
-    li {
-      @include display(flex);
-    }
-
-    .icon {
-      padding: 0 10px;
-    }
 
     .file-lines-count {
       color: $dark-green;
