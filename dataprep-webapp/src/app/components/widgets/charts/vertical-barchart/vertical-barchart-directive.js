@@ -70,7 +70,6 @@ export default function VerticalBarchart($timeout) {
             var BAR_MIN_HEIGHT = 3;
             var oldVisuData;
             var labelTooltip = scope.keyLabel;
-            var activeLimits = scope.activeLimits;
             var renderPrimaryTimeout, renderSecondaryTimeout, updateLimitsTimeout;
             var containerId = '#' + attrs.id;
 
@@ -330,23 +329,6 @@ export default function VerticalBarchart($timeout) {
                 }
             }
 
-            function updateBarsLookFeel() {
-                if (activeLimits) {
-                    scope.buckets.transition()
-                        .delay(function (d, i) {
-                            return i * 10;
-                        })
-                        .style('opacity', function (d) {
-                            var range = getRangeInfos(d);
-                            var rangeMin = range.min;
-                            var rangeMax = range.max;
-                            var minLimit = activeLimits[0];
-                            var maxLimit = activeLimits[1];
-                            return rangeMin === minLimit || (rangeMin < maxLimit && rangeMax > minLimit) ? '1' : '.4';
-                        });
-                }
-            }
-
             //------------------------------------------------------------------------------------------------------
             //---------------------------------------------- Watchers ----------------------------------------------
             //------------------------------------------------------------------------------------------------------
@@ -373,17 +355,6 @@ export default function VerticalBarchart($timeout) {
                 }
             );
 
-            scope.$watch('activeLimits',
-                function (newLimits) {
-                    if (newLimits) {
-                        $timeout.cancel(updateLimitsTimeout);
-                        updateLimitsTimeout = $timeout(function () {
-                            activeLimits = newLimits;
-                            updateBarsLookFeel();
-                        }, 500, false);
-                    }
-                }
-            );
 
             scope.$on('$destroy', function () {
                 d3.selectAll('.vertical-barchart-cls.d3-tip').remove();
