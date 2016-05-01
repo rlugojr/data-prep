@@ -31,14 +31,8 @@ export default function TransformFormCtrl() {
     function getParamIteration(paramsAccu, parameters) {
         if (parameters) {
             _.forEach(parameters, function (paramItem) {
-                console.log('paramItem:'+paramItem.name+','+paramItem.value+','+paramItem.default+','+paramItem.type);
-                if (paramItem.type == 'date' && paramItem.default == 'now'){
-                    paramsAccu[paramItem.name] = 'now';
-                } else {
-                    paramsAccu[paramItem.name] =
-                        typeof (paramItem.value) !== 'undefined' ? paramItem.value : paramItem.default;
-                }
-
+                paramsAccu[paramItem.name] = typeof (paramItem.value) !== 'undefined' ? paramItem.value : paramItem.default;
+                
                 // deal with select inline parameters
                 if (paramItem.type === 'select') {
                     var selectedValue = _.find(paramItem.configuration.values, {value: paramItem.value});

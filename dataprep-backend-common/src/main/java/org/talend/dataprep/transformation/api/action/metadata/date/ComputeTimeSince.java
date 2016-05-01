@@ -101,8 +101,15 @@ public class ComputeTimeSince extends AbstractDate implements ColumnAction {
 
         Parameter constantParameter = //
             new Parameter( SINCE_WHEN_PARAMETER, //
-                           ParameterType.DATE, //
+                           ParameterType.STRING, //
                            "now", //DEFAULT_FORMATTER.format(LocalDateTime.now()), //
+                           false, //
+                           false, //
+                           getMessagesBundle());
+        Parameter dateParameter = //
+            new Parameter( SINCE_WHEN_PARAMETER, //
+                           ParameterType.DATE, //
+                           StringUtils.EMPTY, //
                            false, //
                            false, //
                            getMessagesBundle());
@@ -113,6 +120,7 @@ public class ComputeTimeSince extends AbstractDate implements ColumnAction {
                 .item(OTHER_COLUMN_MODE,
                         new Parameter(SELECTED_COLUMN_PARAMETER, ParameterType.COLUMN, //
                                 StringUtils.EMPTY, false, false, getMessagesBundle())) //
+                .item( "date", dateParameter ) //
                 .defaultValue(CONSTANT_MODE) //
                 .build());
         

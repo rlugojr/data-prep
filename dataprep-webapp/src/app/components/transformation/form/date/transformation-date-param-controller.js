@@ -16,7 +16,7 @@
  * @name data-prep.transformation-form.controller:TransformDateParamCtrl
  * @description Transformation date parameter controller.
  */
-export default function TransformDateParamCtrl($scope) {
+export default function TransformDateParamCtrl() {
     var vm = this;
 
     /**
@@ -30,20 +30,10 @@ export default function TransformDateParamCtrl($scope) {
         if (!param.value) {
             param.value = param.default;
         }
-        if (param.value == 'now'){
+        if (!param.value){
             param.value = moment(new Date()).format('DD/MM/YYYY HH:mm:ss');
         }
-        console.log('init done');
     };
-
-    $scope.$watch(
-        function () {
-            return vm.parameter.value;
-        },
-        function (newValue) {
-            console.log('newValue:'+newValue);
-        }
-    );
 
     initParamValue();
 }
