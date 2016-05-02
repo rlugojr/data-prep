@@ -401,6 +401,7 @@ describe('Playground Service', function () {
         beforeEach(inject(function (StateService, StatisticsService) {
             spyOn(StatisticsService, 'updateStatistics').and.returnValue();
             spyOn(StateService, 'updateDatasetStatistics').and.returnValue();
+            spyOn(StateService, 'updateDatasetQuality').and.returnValue();
             spyOn(StateService, 'updateDatasetRecord').and.returnValue();
         }));
 
@@ -417,6 +418,7 @@ describe('Playground Service', function () {
             //then
             expect(DatasetService.getMetadata).toHaveBeenCalledWith('1324d56456b84ef154');
             expect(StateService.updateDatasetStatistics).toHaveBeenCalledWith(datasetMetadata);
+            expect(StateService.updateDatasetQuality).toHaveBeenCalledWith(datasetMetadata);
             expect(StateService.updateDatasetRecord).toHaveBeenCalledWith(19);
         }));
 

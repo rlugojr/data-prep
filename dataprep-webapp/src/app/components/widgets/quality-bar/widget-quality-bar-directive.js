@@ -20,10 +20,12 @@
  <quality-bar
      quality="quality"
      enterAnimation="enableEnterAnimation"
+     isTrusted="true"
      hasMenu="true">
  </talend-tooltip>
  * @param {object} quality {empty: number, invalid: number, valid: number} The quality values
  * @param {string} enterAnimation Do not animate on enter if this flag === 'false'
+ * @param {string} isTrusted Show empty quality bar if column has no statistics frequency table yet
  * @param {string} hasMenu Do not show the menu if hasMenu === 'false'
  */
 export default function QualityBar($timeout) {
@@ -35,6 +37,7 @@ export default function QualityBar($timeout) {
         scope: {
             enterAnimation: '@',
             quality: '=',
+            isTrusted: '=',
             hasMenu: '='
         },
         transclude: {

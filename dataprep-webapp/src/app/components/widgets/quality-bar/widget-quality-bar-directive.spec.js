@@ -25,7 +25,7 @@ describe('Quality bar directive', function() {
 
     beforeEach(inject(function($compile) {
         createElement = function () {
-            var html = '<quality-bar quality="quality" has-menu="hasMenu" enter-animation="enterAnimation"></quality-bar>';
+            var html = '<quality-bar quality="quality" has-menu="hasMenu" is-trusted="isTrusted" enter-animation="enterAnimation"></quality-bar>';
             element = $compile(html)(scope);
             scope.$digest();
 
@@ -146,7 +146,7 @@ describe('Quality bar directive', function() {
     describe('without menu', function(){
         beforeEach(inject(function($compile) {
             createElement = function () {
-                var html = '<quality-bar quality="quality" has-menu="hasMenu" enter-animation="false"></quality-bar>';
+                var html = '<quality-bar quality="quality" has-menu="hasMenu" is-trusted="true" enter-animation="false"></quality-bar>';
                 element = $compile(html)(scope);
                 scope.$digest();
 
@@ -175,7 +175,7 @@ describe('Quality bar directive', function() {
     describe('with valid menu', function(){
         beforeEach(inject(function($compile) {
             createElement = function () {
-                var html = '<quality-bar quality="quality" has-menu="hasMenu" enter-animation="false">' +
+                var html = '<quality-bar quality="quality" has-menu="hasMenu" is-trusted="true" enter-animation="false">' +
                     '<valid-menu-items><li class="column-action">valid</li></valid-menu-items>' +
                     '<empty-menu-items><li class="column-action">empty</li></empty-menu-items>' +
                     '<invalid-menu-items><li class="column-action">invalid</li></invalid-menu-items>' +
@@ -208,6 +208,26 @@ describe('Quality bar directive', function() {
 
             expect(element.find('.invalid-partition').eq(0)[0].hasAttribute('talend-dropdown')).toBe(true);
             expect(element.find('.invalid-partition .dropdown-container .dropdown-menu .column-action').text()).toBe('invalid');
+        }));
+    });
+
+    describe('with no trusted statistics', function(){
+
+        it('should not render its content', inject(function ($rootScope) {
+            //given
+            scope.quality = {
+                valid: 10,
+                invalid: 20,
+                empty: 70
+            };
+            scope.isTrusted = false;
+            createElement();
+
+            //when
+            $rootScope.$digest();
+
+            //then
+            expect(element.find('.quality-bar').children().length).toBe(0);
         }));
     });
 });

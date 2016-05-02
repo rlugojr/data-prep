@@ -207,11 +207,17 @@ export default function PlaygroundCtrl($timeout, $state, $stateParams, state, St
      * @methodOf data-prep.playground.controller:PlaygroundCtrl
      * @description Fetch the statistics. If the update fails (no statistics yet) a retry is triggered after 1s
      */
+    let timer;
     function fetchStatistics() {
         StateService.setIsFetchingStats(true);
         PlaygroundService.updateStatistics()
+            .then(() => {
+                if (timer) {
+                    $timeout.cancel(timer);
+                }
+            })
             .then(() => StateService.setIsFetchingStats(false))
-            .catch(() => $timeout(fetchStatistics, 1500, false));
+            .catch(() => timer = $timeout(fetchStatistics, 1500, false));
     }
 
     //--------------------------------------------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-                                                                                                                                                                                           /*  ============================================================================
+/*  ============================================================================
 
  Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 
@@ -45,6 +45,7 @@ export function PlaygroundStateService(RecipeStateService, recipeState,
         setNameEditionMode: setNameEditionMode,
         setData: setData,
         updateDatasetRecord: updateDatasetRecord,
+        updateDatasetQuality: updateDatasetQuality,
         updateDatasetStatistics: updateDatasetStatistics,
 
         //parameters
@@ -139,6 +140,15 @@ export function PlaygroundStateService(RecipeStateService, recipeState,
 
     function updateDatasetRecord(records) {
         playgroundState.dataset.records = records;
+    }
+
+    function updateDatasetQuality(metadata) {
+        if (metadata) {
+            _.forEach(playgroundState.data.metadata.columns, function (col) {
+                var correspondingColumn = _.find(metadata.columns, {id: col.id});
+                col.quality = correspondingColumn.quality;
+            });
+        }
     }
 
     function setIsFetchingStats(value) {
