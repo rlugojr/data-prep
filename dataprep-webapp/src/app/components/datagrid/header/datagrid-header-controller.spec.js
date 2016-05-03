@@ -131,12 +131,14 @@ describe('Datagrid header controller', function () {
         scope = $rootScope.$new();
 
         createController = function () {
-            var ctrlFn = $controller('DatagridHeaderCtrl', {
+            let ctrlFn = $controller('DatagridHeaderCtrl', {
                 $scope: scope
             }, true);
 
             ctrlFn.instance.column = column;
-            return ctrlFn();
+            const ctrl = ctrlFn();
+            scope.$digest();
+            return ctrl;
         };
     }));
 
@@ -162,7 +164,7 @@ describe('Datagrid header controller', function () {
 
         it('should not get transformations if transformations are already initiated', inject(function ($rootScope, TransformationCacheService) {
             //given
-            var ctrl = createController();
+            let ctrl = createController();
             ctrl.initTransformations();
             $rootScope.$digest();
 
@@ -172,6 +174,26 @@ describe('Datagrid header controller', function () {
 
             //then
             expect(TransformationCacheService.getColumnTransformations.calls.count()).toBe(1);
+        }));
+
+        it('should retrieve transformation list when a column changes', inject(function ($rootScope, TransformationCacheService) {
+            //given
+            let ctrl = createController();
+            ctrl.initTransformations();
+            $rootScope.$digest();
+
+            //when
+            ctrl.column = {
+                id: '0001',
+                name: 'New name',
+                type: 'string'
+            };
+            $rootScope.$digest();
+
+            ctrl.initTransformations();
+
+            //then
+            expect(TransformationCacheService.getColumnTransformations.calls.count()).toBe(2);
         }));
     });
 

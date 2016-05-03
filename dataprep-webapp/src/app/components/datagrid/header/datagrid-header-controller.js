@@ -23,7 +23,7 @@
  * @requires data-prep.services.transformation.service:TransformationApplicationService
  * @requires data-prep.services.transformation.service:ColumnSuggestionService
  */
-export default function DatagridHeaderCtrl(state, TransformationCacheService, ConverterService, PlaygroundService,
+export default function DatagridHeaderCtrl($scope, state, TransformationCacheService, ConverterService, PlaygroundService,
                             FilterService, TransformationApplicationService, ColumnSuggestionService) {
     'ngInject';
 
@@ -37,6 +37,13 @@ export default function DatagridHeaderCtrl(state, TransformationCacheService, Co
     vm.transformationApplicationService = TransformationApplicationService;
     vm.columnSuggestionService = ColumnSuggestionService;
     vm.state = state;
+
+    /**
+     * @name transformationsMustBeRetrieved
+     * @description flag to force transformation list to be retrieved
+     * @type {boolean}
+     */
+    let transformationsMustBeRetrieved;
 
     /**
      * @ngdoc property
@@ -63,7 +70,7 @@ export default function DatagridHeaderCtrl(state, TransformationCacheService, Co
      * @description Get transformations from REST call
      */
     vm.initTransformations = function initTransformations() {
-        if (!vm.transformations && !vm.initTransformationsInProgress) {
+        if (transformationsMustBeRetrieved || (!vm.transformations && !vm.initTransformationsInProgress)) {
             vm.transformationsRetrieveError = false;
             vm.initTransformationsInProgress = true;
 
@@ -77,6 +84,7 @@ export default function DatagridHeaderCtrl(state, TransformationCacheService, Co
                     vm.transformationsRetrieveError = true;
                 })
                 .finally(function() {
+                    transformationsMustBeRetrieved = false;
                     vm.initTransformationsInProgress = false;
                 });
         }
@@ -139,4 +147,15 @@ export default function DatagridHeaderCtrl(state, TransformationCacheService, Co
     vm.resetColumnName = function resetColumnName() {
         vm.newName = originalName;
     };
+
+    /**
+     * Invalidate transformations if a column has been modified
+     * e.g. its name
+     */
+    $scope.$watch(
+        () => {
+            return vm.column;
+        },
+        () => transformationsMustBeRetrieved = true
+    );
 }
