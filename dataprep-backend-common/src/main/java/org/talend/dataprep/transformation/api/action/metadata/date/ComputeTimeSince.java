@@ -19,6 +19,7 @@ import static org.talend.dataprep.transformation.api.action.metadata.common.Othe
 import java.time.DateTimeException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalUnit;
@@ -33,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.talend.dataprep.api.dataset.ColumnMetadata;
 import org.talend.dataprep.api.dataset.DataSetRow;
+import org.talend.dataprep.api.dataset.RowMetadata;
 import org.talend.dataprep.api.dataset.statistics.Statistics;
 import org.talend.dataprep.transformation.api.action.context.ActionContext;
 import org.talend.dataprep.transformation.api.action.metadata.common.ActionMetadata;
@@ -66,9 +68,18 @@ public class ComputeTimeSince extends AbstractDate implements ColumnAction {
     public static final String SUFFIX = "_in_"; //$NON-NLS-1$
 
     /**
+     * The now on server side constant
+     */
+    public static final String NOW_SERVER_SIDE = "action.compute_time_since.now_server_side";
+
+    private static final String SINCE_WHEN_ITEM = "since_when";
+
+    /**
      * The unit in which show the period.
      */
     public static final String TIME_UNIT_PARAMETER = "time_unit"; //$NON-NLS-1$
+
+    public static final String DATE_PARAMETER = "Date";
 
     /**
      * This class' logger.
@@ -99,31 +110,26 @@ public class ComputeTimeSince extends AbstractDate implements ColumnAction {
                 .defaultValue(ChronoUnit.HOURS.name()) //
                 .build());
 
-        Parameter constantParameter = //
-            new Parameter( SINCE_WHEN_PARAMETER, //
-                           ParameterType.STRING, //
-                           "now", //DEFAULT_FORMATTER.format(LocalDateTime.now()), //
-                           false, //
-                           false, //
-                           getMessagesBundle());
-        Parameter dateParameter = //
-            new Parameter( SINCE_WHEN_PARAMETER, //
-                           ParameterType.DATE, //
-                           StringUtils.EMPTY, //
-                           false, //
-                           false, //
-                           getMessagesBundle());
-
         parameters.add(SelectParameter.Builder.builder() //
-                .name(MODE_PARAMETER) //
-                .item(CONSTANT_MODE, constantParameter) //
-                .item(OTHER_COLUMN_MODE,
-                        new Parameter(SELECTED_COLUMN_PARAMETER, ParameterType.COLUMN, //
-                                StringUtils.EMPTY, false, false, getMessagesBundle())) //
-                .item( "date", dateParameter ) //
-                .defaultValue(CONSTANT_MODE) //
-                .build());
-        
+                           .name(SINCE_WHEN_ITEM) //
+                           .canBeBlank(false) //
+                           .item( getMessagesBundle().getString( NOW_SERVER_SIDE ) ) //
+                           .item(DATE_PARAMETER, new Parameter( SINCE_WHEN_PARAMETER, //
+                                                        ParameterType.DATE, //
+                                                        StringUtils.EMPTY, //
+                                                        false, //
+                                                        false, //
+                                                        getMessagesBundle())) //
+                           .item( OTHER_COLUMN_MODE, new Parameter(SELECTED_COLUMN_PARAMETER, //
+                                                                ParameterType.COLUMN, //
+                                                                StringUtils.EMPTY, //
+                                                                false, //
+                                                                false, //
+                                                                getMessagesBundle()) ) //
+                           .defaultValue(getMessagesBundle().getString( NOW_SERVER_SIDE )) //
+                           .build()
+        );
+
         return parameters;
     }
 
@@ -132,11 +138,11 @@ public class ComputeTimeSince extends AbstractDate implements ColumnAction {
         super.compile(context);
         if (context.getActionStatus() == ActionContext.ActionStatus.OK) {
             // Create new column
-            final Map<String, String> parameters = context.getParameters();
-            final String columnId = context.getColumnId();
-            final TemporalUnit unit = ChronoUnit.valueOf(parameters.get(TIME_UNIT_PARAMETER).toUpperCase());
-            final ColumnMetadata column = context.getRowMetadata().getById(columnId);
-            context.column(PREFIX + column.getName() + SUFFIX + unit.toString().toLowerCase(),
+            Map<String, String> parameters = context.getParameters();
+            String columnId = context.getColumnId();
+            TemporalUnit unit = ChronoUnit.valueOf(parameters.get(TIME_UNIT_PARAMETER).toUpperCase());
+            ColumnMetadata column = context.getRowMetadata().getById(columnId);
+            context.column("result",
                     (r) -> {
                         final ColumnMetadata c = ColumnMetadata.Builder //
                                 .column() //
@@ -159,31 +165,53 @@ public class ComputeTimeSince extends AbstractDate implements ColumnAction {
      */
     @Override
     public void applyOnColumn(DataSetRow row, ActionContext context) {
-        final Map<String, String> parameters = context.getParameters();
-        final String columnId = context.getColumnId();
+        RowMetadata rowMetadata = context.getRowMetadata();
+        Map<String, String> parameters = context.getParameters();
+        String columnId = context.getColumnId();
+
+        final String newColumnId = context.column("result");
 
         TemporalUnit unit = ChronoUnit.valueOf(parameters.get(TIME_UNIT_PARAMETER).toUpperCase());
 
-        String dateToCompare = parameters.get( SINCE_WHEN_PARAMETER );
-        // FIXME column to compare with
-        LocalDateTime since = StringUtils.isBlank( dateToCompare) ? LocalDateTime.now() : LocalDateTime.parse( dateToCompare, DEFAULT_FORMATTER );
-
-        final ColumnMetadata column = context.getRowMetadata().getById(columnId);
-
-        // create the new column and add the new column after the current one
-        String computeTimeSinceColumn = context.column(PREFIX + column.getName() + SUFFIX + unit.toString().toLowerCase());
+        LocalDateTime since;
+        if (StringUtils.equals(parameters.get(MODE_PARAMETER), OTHER_COLUMN_MODE)) {
+            ColumnMetadata selectedColumn = rowMetadata.getById(parameters.get(SELECTED_COLUMN_PARAMETER));
+            String dateToCompare = row.get(selectedColumn.getId());
+            if (StringUtils.isBlank( dateToCompare )){
+                row.set(newColumnId, StringUtils.EMPTY);
+                return;
+            }
+            try {
+                since = dateParser.parse(dateToCompare, selectedColumn);
+            } catch (DateTimeException e) {
+                LOGGER.debug("Unable to parse date {} for {} @ {}", dateToCompare, selectedColumn.getId(), row.getTdpId(), e);
+                row.set(newColumnId, StringUtils.EMPTY);
+                return;
+            }
+        } else {
+            String dateToCompare = parameters.get(SINCE_WHEN_PARAMETER);
+            try {
+                since = StringUtils.isBlank(dateToCompare) //
+                        || StringUtils.equalsIgnoreCase(dateToCompare, getMessagesBundle().getString(NOW_SERVER_SIDE)) ? //
+                                LocalDateTime.now() : LocalDateTime.parse(dateToCompare, DEFAULT_FORMATTER);
+            } catch (DateTimeParseException e) {
+                LOGGER.debug("Unable to parse date {} with format {} @ {}", dateToCompare, DATE_PATTERN, row.getTdpId(), e);
+                row.set(newColumnId, StringUtils.EMPTY);
+                return;
+            }
+        }
 
         // parse the date
-        final String value = row.get(columnId);
+        String value = row.get(columnId);
         try {
-            final LocalDateTime temporalAccessor = dateParser.parse(value, context.getRowMetadata().getById(columnId));
-            final Temporal valueAsDate = LocalDateTime.from(temporalAccessor);
-            final long newValue = unit.between(valueAsDate, since);
-            row.set(computeTimeSinceColumn, String.valueOf(newValue));
+            LocalDateTime temporalAccessor = dateParser.parse(value, context.getRowMetadata().getById(columnId));
+            Temporal valueAsDate = LocalDateTime.from(temporalAccessor);
+            long newValue = unit.between(valueAsDate, since);
+            row.set(newColumnId, String.valueOf(newValue));
         } catch (DateTimeException e) {
             // Nothing to do: in this case, temporalAccessor is left null
             LOGGER.debug("Unable to parse date {} for {} @ {}", value, columnId, row.getTdpId(), e);
-            row.set(computeTimeSinceColumn, StringUtils.EMPTY);
+            row.set(newColumnId, StringUtils.EMPTY);
         }
     }
 

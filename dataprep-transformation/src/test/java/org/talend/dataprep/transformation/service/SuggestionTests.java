@@ -223,28 +223,6 @@ public class SuggestionTests extends TransformationServiceBaseTests {
                 .post("/suggest/column?limit=10") //
                 .asString();
 
-
-        // well we need to know what is value for now as it is generated as an action parameter
-        // then replace it in the json (so we even validate the json structure first :-)
-
-        ObjectMapper mapper = builder.build();
-        JsonNode jsonNode = mapper.readTree( response );
-        List<ComputeTimeSince> actionMetadatas = mapper.readValue( response, new TypeReference<List<ComputeTimeSince>>(){});
-
-        Map<String,String> values = Maps.newHashMap();
-        for (ActionMetadata actionMetadata : actionMetadatas){
-            if( StringUtils.equals( actionMetadata.getName(), "compute_time_since" )){
-                /*for ( Parameter parameter : actionMetadata.getParameters()){
-                    if (StringUtils.equals( parameter.getName(), "mode" )){
-                        values.put( "now.value", (String) parameter.getConfiguration().get( "default" ) );
-                        break;
-                    }
-                }*/
-            }
-        }
-
-        expectedSuggestions = StrSubstitutor.replace( expectedSuggestions, values);
-
         // then
         assertEquals(expectedSuggestions, response, false);
     }
