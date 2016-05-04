@@ -19,25 +19,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Maps;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang3.text.StrSubstitutor;
 import org.junit.Test;
-import org.talend.dataprep.api.preparation.Action;
 import org.talend.dataprep.transformation.Application;
 
 import com.jayway.restassured.path.json.JsonPath;
-import org.talend.dataprep.transformation.api.action.metadata.common.ActionMetadata;
-import org.talend.dataprep.transformation.api.action.metadata.date.ComputeTimeSince;
-import org.talend.dataprep.transformation.api.action.parameters.Parameter;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Integration tests on suggestions.
