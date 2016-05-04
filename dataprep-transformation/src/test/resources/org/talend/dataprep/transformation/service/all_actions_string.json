@@ -3646,5 +3646,8 @@
     "label": "Swap columns",
     "docUrl": "",
     "dynamic": false
+  },
+  {
+    "name": "format_phone_number"
   }
 ]
