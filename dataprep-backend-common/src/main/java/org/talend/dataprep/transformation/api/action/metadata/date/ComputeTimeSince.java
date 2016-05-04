@@ -51,35 +51,35 @@ public class ComputeTimeSince extends AbstractDate implements ColumnAction {
      */
     public static final String TIME_SINCE_ACTION_NAME = "compute_time_since"; //$NON-NLS-1$
 
-    public static final String SINCE_WHEN_PARAMETER = "since_when_value"; //$NON-NLS-1$
+    private static final String DATE_PATTERN = "dd/MM/yyyy HH:mm:ss";
 
-    public static final String DATE_PATTERN = "dd/MM/yyyy HH:mm:ss";
-
-    public static final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ofPattern( DATE_PATTERN);
+    private static final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ofPattern( DATE_PATTERN);
 
     /**
-     * The column prefix.
+     * The new column prefix.
      */
-    public static final String PREFIX = "since_"; //$NON-NLS-1$
+    private static final String PREFIX = "since_"; //$NON-NLS-1$
 
     /**
-     * The column suffix.
+     * The new column suffix.
      */
-    public static final String SUFFIX = "_in_"; //$NON-NLS-1$
+    private static final String SUFFIX = "_in_"; //$NON-NLS-1$
 
     /**
-     * The now on server side constant
+     * Parameter to set which date to compare to. 3 modes: 'now at runtime', specific date defined by user, took from another column.
      */
-    public static final String NOW_SERVER_SIDE = "action.compute_time_since.now_server_side";
+    private static final String SINCE_WHEN_PARAMETER = "since_when";
 
-    private static final String SINCE_WHEN_ITEM = "since_when";
+    private static final String NOW_SERVER_SIDE_MODE = "now_server_side";
+
+    protected static final String SPECIFIC_DATE_MODE = "specific_date";
 
     /**
      * The unit in which show the period.
      */
-    public static final String TIME_UNIT_PARAMETER = "time_unit"; //$NON-NLS-1$
+    protected static final String TIME_UNIT_PARAMETER = "time_unit"; //$NON-NLS-1$
 
-    public static final String DATE_PARAMETER = "Date";
+    protected static final String SPECIFIC_DATE_PARAMETER = "specific_date"; //$NON-NLS-1$
 
     /**
      * This class' logger.
@@ -111,24 +111,21 @@ public class ComputeTimeSince extends AbstractDate implements ColumnAction {
                 .build());
 
         parameters.add(SelectParameter.Builder.builder() //
-                           .name(SINCE_WHEN_ITEM) //
-                           .canBeBlank(false) //
-                           .item( getMessagesBundle().getString( NOW_SERVER_SIDE ) ) //
-                           .item(DATE_PARAMETER, new Parameter( SINCE_WHEN_PARAMETER, //
-                                                        ParameterType.DATE, //
-                                                        StringUtils.EMPTY, //
-                                                        false, //
-                                                        false, //
-                                                        getMessagesBundle())) //
-                           .item( OTHER_COLUMN_MODE, new Parameter(SELECTED_COLUMN_PARAMETER, //
-                                                                ParameterType.COLUMN, //
-                                                                StringUtils.EMPTY, //
-                                                                false, //
-                                                                false, //
-                                                                getMessagesBundle()) ) //
-                           .defaultValue(getMessagesBundle().getString( NOW_SERVER_SIDE )) //
-                           .build()
-        );
+                .name(SINCE_WHEN_PARAMETER) //
+                .canBeBlank(false) //
+                .item(NOW_SERVER_SIDE_MODE) //
+                .item(SPECIFIC_DATE_MODE, new Parameter(SPECIFIC_DATE_PARAMETER, //
+                        ParameterType.DATE, //
+                        StringUtils.EMPTY, //
+                        false, //
+                        false)) //
+                .item(OTHER_COLUMN_MODE, new Parameter(SELECTED_COLUMN_PARAMETER, //
+                        ParameterType.COLUMN, //
+                        StringUtils.EMPTY, //
+                        false, //
+                        false)) //
+                .defaultValue(NOW_SERVER_SIDE_MODE) //
+                .build());
 
         return parameters;
     }
@@ -189,10 +186,10 @@ public class ComputeTimeSince extends AbstractDate implements ColumnAction {
                 return;
             }
         } else {
-            String dateToCompare = parameters.get(SINCE_WHEN_PARAMETER);
+            String dateToCompare = parameters.get(SPECIFIC_DATE_PARAMETER);
             try {
                 since = StringUtils.isBlank(dateToCompare) //
-                        || StringUtils.equalsIgnoreCase(dateToCompare, getMessagesBundle().getString(NOW_SERVER_SIDE)) ? //
+                        || StringUtils.equalsIgnoreCase(dateToCompare, getMessagesBundle().getString(NOW_SERVER_SIDE_MODE)) ? //
                                 LocalDateTime.now() : LocalDateTime.parse(dateToCompare, DEFAULT_FORMATTER);
             } catch (DateTimeParseException e) {
                 LOGGER.debug("Unable to parse date {} with format {} @ {}", dateToCompare, DATE_PATTERN, row.getTdpId(), e);

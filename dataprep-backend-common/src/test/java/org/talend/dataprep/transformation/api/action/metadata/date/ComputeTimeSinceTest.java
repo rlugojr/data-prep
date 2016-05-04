@@ -20,8 +20,8 @@ import static org.talend.dataprep.transformation.api.action.metadata.ActionMetad
 import static org.talend.dataprep.transformation.api.action.metadata.common.OtherColumnParameters.MODE_PARAMETER;
 import static org.talend.dataprep.transformation.api.action.metadata.common.OtherColumnParameters.OTHER_COLUMN_MODE;
 import static org.talend.dataprep.transformation.api.action.metadata.common.OtherColumnParameters.SELECTED_COLUMN_PARAMETER;
-import static org.talend.dataprep.transformation.api.action.metadata.date.ComputeTimeSince.DATE_PARAMETER;
-import static org.talend.dataprep.transformation.api.action.metadata.date.ComputeTimeSince.SINCE_WHEN_PARAMETER;
+import static org.talend.dataprep.transformation.api.action.metadata.date.ComputeTimeSince.SPECIFIC_DATE_MODE;
+import static org.talend.dataprep.transformation.api.action.metadata.date.ComputeTimeSince.SPECIFIC_DATE_PARAMETER;
 import static org.talend.dataprep.transformation.api.action.metadata.date.ComputeTimeSince.TIME_UNIT_PARAMETER;
 
 import java.io.IOException;
@@ -433,8 +433,8 @@ public class ComputeTimeSinceTest extends BaseDateTests {
         row.set("0001", date);
 
         parameters.put(TIME_UNIT_PARAMETER, DAYS.name());
-        parameters.put( MODE_PARAMETER, DATE_PARAMETER );
-        parameters.put( SINCE_WHEN_PARAMETER, compare );
+        parameters.put( MODE_PARAMETER, SPECIFIC_DATE_MODE);
+        parameters.put(SPECIFIC_DATE_PARAMETER, compare );
 
         //when
         ActionTestWorkbench.test(row, factory.create(action, parameters));
@@ -458,8 +458,8 @@ public class ComputeTimeSinceTest extends BaseDateTests {
         row.set("0001", date);
 
         parameters.put(TIME_UNIT_PARAMETER, DAYS.name());
-        parameters.put( MODE_PARAMETER, DATE_PARAMETER );
-        parameters.put( SINCE_WHEN_PARAMETER, compare );
+        parameters.put( MODE_PARAMETER, SPECIFIC_DATE_MODE);
+        parameters.put(SPECIFIC_DATE_PARAMETER, compare );
 
         //when
         ActionTestWorkbench.test(row, factory.create(action, parameters));

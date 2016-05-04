@@ -641,21 +641,20 @@
         "configuration": {
           "values": [
             {
-              "value": "Now on Server side",
-              "label": "Now on Server side"
+              "value": "now_server_side",
+              "label": "Now"
             },
             {
-              "value": "Date",
-              "label": "Date",
+              "value": "specific_date",
+              "label": "Specific date",
               "parameters": [
                 {
-                  "name": "since_when_value",
+                  "name": "specific_date",
                   "type": "date",
                   "implicit": false,
                   "canBeBlank": false,
                   "default": "",
-                  "description": "Since when",
-                  "label": "Since when"
+                  "label": "This date"
                 }
               ]
             },
@@ -677,9 +676,8 @@
           ],
           "multiple": false
         },
-        "default": "Now on Server side",
-        "description": "parameter.since_when.desc",
-        "label": "Since when"
+        "default": "now_server_side",
+        "label": "Since"
       }
     ],
     "category": "dates",
