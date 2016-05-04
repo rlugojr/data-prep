@@ -68,7 +68,7 @@ public class ComputeTimeSince extends AbstractDate implements ColumnAction {
     /**
      * Parameter to set which date to compare to. 3 modes: 'now at runtime', specific date defined by user, took from another column.
      */
-    private static final String SINCE_WHEN_PARAMETER = "since_when";
+    protected static final String SINCE_WHEN_PARAMETER = "since_when";
 
     private static final String NOW_SERVER_SIDE_MODE = "now_server_side";
 
@@ -170,44 +170,36 @@ public class ComputeTimeSince extends AbstractDate implements ColumnAction {
 
         TemporalUnit unit = ChronoUnit.valueOf(parameters.get(TIME_UNIT_PARAMETER).toUpperCase());
 
-        LocalDateTime since;
-        if (StringUtils.equals(parameters.get(MODE_PARAMETER), OTHER_COLUMN_MODE)) {
-            ColumnMetadata selectedColumn = rowMetadata.getById(parameters.get(SELECTED_COLUMN_PARAMETER));
-            String dateToCompare = row.get(selectedColumn.getId());
-            if (StringUtils.isBlank( dateToCompare )){
-                row.set(newColumnId, StringUtils.EMPTY);
-                return;
-            }
-            try {
-                since = dateParser.parse(dateToCompare, selectedColumn);
-            } catch (DateTimeException e) {
-                LOGGER.debug("Unable to parse date {} for {} @ {}", dateToCompare, selectedColumn.getId(), row.getTdpId(), e);
-                row.set(newColumnId, StringUtils.EMPTY);
-                return;
-            }
-        } else {
-            String dateToCompare = parameters.get(SPECIFIC_DATE_PARAMETER);
-            try {
-                since = StringUtils.isBlank(dateToCompare) //
-                        || StringUtils.equalsIgnoreCase(dateToCompare, getMessagesBundle().getString(NOW_SERVER_SIDE_MODE)) ? //
-                                LocalDateTime.now() : LocalDateTime.parse(dateToCompare, DEFAULT_FORMATTER);
-            } catch (DateTimeParseException e) {
-                LOGGER.debug("Unable to parse date {} with format {} @ {}", dateToCompare, DATE_PATTERN, row.getTdpId(), e);
-                row.set(newColumnId, StringUtils.EMPTY);
-                return;
-            }
-        }
-
-        // parse the date
-        String value = row.get(columnId);
         try {
+            LocalDateTime since = null;
+
+            String mode = parameters.containsKey(SINCE_WHEN_PARAMETER) ? parameters.get(SINCE_WHEN_PARAMETER)
+                    : NOW_SERVER_SIDE_MODE;
+
+            switch (mode) {
+            case SPECIFIC_DATE_MODE:
+                since = LocalDateTime.parse(parameters.get(SPECIFIC_DATE_PARAMETER), DEFAULT_FORMATTER);
+                break;
+            case OTHER_COLUMN_MODE:
+                ColumnMetadata selectedColumn = rowMetadata.getById(parameters.get(SELECTED_COLUMN_PARAMETER));
+                String dateToCompare = row.get(selectedColumn.getId());
+
+                since = dateParser.parse(dateToCompare, selectedColumn);
+                break;
+            case NOW_SERVER_SIDE_MODE:
+            default:
+                since = LocalDateTime.now();
+                break;
+            }
+
+            // parse the date
+            String value = row.get(columnId);
             LocalDateTime temporalAccessor = dateParser.parse(value, context.getRowMetadata().getById(columnId));
             Temporal valueAsDate = LocalDateTime.from(temporalAccessor);
             long newValue = unit.between(valueAsDate, since);
             row.set(newColumnId, String.valueOf(newValue));
         } catch (DateTimeException e) {
             // Nothing to do: in this case, temporalAccessor is left null
-            LOGGER.debug("Unable to parse date {} for {} @ {}", value, columnId, row.getTdpId(), e);
             row.set(newColumnId, StringUtils.EMPTY);
         }
     }
