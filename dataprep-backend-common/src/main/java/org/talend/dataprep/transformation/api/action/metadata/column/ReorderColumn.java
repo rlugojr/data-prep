@@ -34,14 +34,14 @@ import org.talend.dataprep.api.dataset.RowMetadata;
 import org.talend.dataprep.api.dataset.statistics.Statistics;
 import org.talend.dataprep.exception.TDPException;
 import org.talend.dataprep.exception.error.CommonErrorCodes;
+import org.talend.dataprep.parameters.Parameter;
+import org.talend.dataprep.parameters.ParameterType;
 import org.talend.dataprep.transformation.api.action.context.ActionContext;
 import org.talend.dataprep.transformation.api.action.metadata.category.ActionCategory;
 import org.talend.dataprep.transformation.api.action.metadata.common.ActionMetadata;
 import org.talend.dataprep.transformation.api.action.metadata.common.DataSetAction;
 import org.talend.dataprep.transformation.api.action.metadata.common.ImplicitParameters;
 import org.talend.dataprep.transformation.api.action.metadata.common.OtherColumnParameters;
-import org.talend.dataprep.transformation.api.action.parameters.Parameter;
-import org.talend.dataprep.transformation.api.action.parameters.ParameterType;
 
 /**
  * This action reorder columns. The column will be move to the selected column. All other columns will be moved as well.
@@ -80,7 +80,6 @@ public class ReorderColumn extends ActionMetadata implements DataSetAction {
         List<Parameter> parameters = super.getParameters();
         parameters.add(new Parameter(OtherColumnParameters.SELECTED_COLUMN_PARAMETER, ParameterType.COLUMN, StringUtils.EMPTY,
                 false, false));
-        parameters.add(new Parameter(DISPLAY_TYPE_PARAMETER, ParameterType.HIDDEN, "column", true, true, getMessagesBundle()));
         return parameters;
     }
 
