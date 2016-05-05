@@ -1,15 +1,15 @@
-//  ============================================================================
+// ============================================================================
 //
-//  Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
-//  This source code is available under agreement available at
-//  https://github.com/Talend/data-prep/blob/master/LICENSE
+// This source code is available under agreement available at
+// https://github.com/Talend/data-prep/blob/master/LICENSE
 //
-//  You should have received a copy of the agreement
-//  along with this program; if not, write to Talend SA
-//  9 rue Pages 92150 Suresnes, France
+// You should have received a copy of the agreement
+// along with this program; if not, write to Talend SA
+// 9 rue Pages 92150 Suresnes, France
 //
-//  ============================================================================
+// ============================================================================
 
 package org.talend.dataprep.schema.csv;
 
@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 import org.talend.dataprep.util.ShannonEntropy;
 
 /**
- * This class performs header and scoring analysis on a separator. It uses the <tt>CSVFastHeaderAndTypeAnalyzer</tt> to
+ * This class performs header and scoring analysis on a separator. It uses {@link CSVFastHeaderAndTypeAnalyzer} to
  * determine the header. It also associates a score to a separator using a heuristic based upon the
  * <a href="https://en.wikipedia.org/wiki/Entropy_(information_theory)">Shanon entropy</a>. The entropy of the separator
  * is computed according to the specified number of lines used as the sample size.
@@ -169,7 +169,7 @@ public class SeparatorAnalyzer implements Consumer<Separator> {
             // other than score
             if (Double.compare(0.0, s1Score) == 0 && Double.compare(0.0, s2Score) == 0
                     || (Double.compare(0.0, s1Score) != 0 && Double.compare(0.0, s2Score) != 0
-                    && Math.abs(s1Score - s2Score) < (ShannonEntropy.maxEntropy(numberOfLines) / 2))) {
+                            && Math.abs(s1Score - s2Score) < (ShannonEntropy.maxEntropy(numberOfLines) / 2))) {
                 // choose according to consistency
                 result = Integer.compare(consistencyLevel(s1), consistencyLevel(s2));
                 if (result == 0) {

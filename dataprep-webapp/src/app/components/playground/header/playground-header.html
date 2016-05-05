@@ -38,6 +38,7 @@
                class="icon"
                data-icon="L"
                ng-click="$ctrl.onParameters()"
+               ng-class="{pressed: $ctrl.parametersVisible}"
                translate-once-title="DATAGRID_PARAMETERS_GEAR"></a>
         </li>
     </ul>
@@ -60,7 +61,7 @@
             <a id="playground-lookup-icon"
                class="icon"
                ng-click="$ctrl.onLookup()"
-               ng-class="{pressed: $ctrl.lookup}">
+               ng-class="{pressed: $ctrl.lookupVisible}">
                 <img src="assets/images/lookup/lookup-button.png">
             </a>
         </li>

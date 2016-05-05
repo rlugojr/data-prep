@@ -19,13 +19,10 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.talend.dataprep.api.dataset.ColumnMetadata.Builder.column;
 import static org.talend.dataprep.api.dataset.DataSetGovernance.Certification.CERTIFIED;
 import static org.talend.dataprep.api.type.Type.INTEGER;
 import static org.talend.dataprep.api.type.Type.STRING;
 
-import org.apache.poi.ss.formula.functions.Match;
-import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,15 +33,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.talend.dataprep.api.dataset.location.HttpLocation;
 import org.talend.dataprep.api.dataset.location.LocalStoreLocation;
-import org.talend.dataprep.api.type.Type;
-import org.talend.dataprep.schema.FormatGuess;
-import org.talend.dataprep.schema.SchemaParserResult;
+import org.talend.dataprep.schema.Schema;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = DataSetMetadataBuilderTest.class)
@@ -218,7 +212,7 @@ public class DataSetMetadataBuilderTest {
     @Test
     public void testSchemaParserResult() throws Exception {
         final DataSetMetadata metadata = builder.metadata().id("1234")
-                .schemaParserResult(SchemaParserResult.Builder.parserResult().sheetName("sheetName").build()).build();
+                .schemaParserResult(Schema.Builder.parserResult().sheetName("sheetName").build()).build();
         assertEquals("sheetName", metadata.getSchemaParserResult().getSheetName());
     }
 
@@ -242,7 +236,7 @@ public class DataSetMetadataBuilderTest {
         content.setMediaType("text/csv");
         content.setParameters(parameters);
 
-        final SchemaParserResult schemaParserResult = new SchemaParserResult.Builder()
+        final Schema schemaParserResult = new Schema.Builder()
                 .draft(true)
                 .build();
 

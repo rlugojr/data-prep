@@ -24,7 +24,7 @@ import org.talend.dataprep.api.dataset.DataSetContent;
 import org.talend.dataprep.api.dataset.DataSetMetadata;
 import org.talend.dataprep.api.dataset.DataSetRow;
 import org.talend.dataprep.api.dataset.json.DataSetRowIterator;
-import org.talend.dataprep.schema.FormatGuess;
+import org.talend.dataprep.schema.FormatFamily;
 import org.talend.dataprep.schema.Serializer;
 
 /**
@@ -34,7 +34,7 @@ public abstract class DataSetContentStore {
 
     /** Format guesser factory. */
     @Autowired
-    protected FormatGuess.Factory factory;
+    protected FormatFamily.Factory factory;
 
     /** DataPrep ready jackson builder. */
     @Autowired
@@ -67,7 +67,7 @@ public abstract class DataSetContentStore {
      */
     protected InputStream get(DataSetMetadata dataSetMetadata) {
         DataSetContent content = dataSetMetadata.getContent();
-        Serializer serializer = factory.getFormatGuess(content.getFormatGuessId()).getSerializer();
+        Serializer serializer = factory.getFormatFamily(content.getFormatGuessId()).getSerializer();
         return serializer.serialize(getAsRaw(dataSetMetadata), dataSetMetadata);
 
     }

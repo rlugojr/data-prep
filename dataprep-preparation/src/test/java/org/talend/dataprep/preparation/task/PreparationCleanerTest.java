@@ -16,46 +16,27 @@ package org.talend.dataprep.preparation.task;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import javax.annotation.Resource;
-
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.SpringApplicationConfiguration;
-import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.context.WebApplicationContext;
 import org.talend.dataprep.api.preparation.Preparation;
 import org.talend.dataprep.api.preparation.Step;
-import org.talend.dataprep.api.service.info.VersionService;
-import org.talend.dataprep.preparation.Application;
-import org.talend.dataprep.preparation.store.PreparationRepository;
+import org.talend.dataprep.preparation.BasePreparationTest;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = Application.class)
-@WebIntegrationTest
+
 @TestPropertySource(properties={"dataset.metadata.store: in-memory", "preparation.store.remove.hours: 2"})
-public class PreparationCleanerTest {
+public class PreparationCleanerTest extends BasePreparationTest {
+
     @Autowired
     private PreparationCleaner cleaner;
-
-    @Autowired
-    private PreparationRepository repository;
 
     @Autowired
     ConfigurableEnvironment environment;
 
     @Autowired
     private WebApplicationContext context;
-
-    @Autowired
-    private VersionService versionService;
-
-    /** The root step. */
-    @Resource(name = "rootStep")
-    private Step rootStep;
 
     @Test
     public void removeOrphanSteps_should_remove_orphan_step_after_at_least_X_hours() {
@@ -64,7 +45,7 @@ public class PreparationCleanerTest {
         final Step firstStep = new Step(rootStep.getId(), "first", version);
         final Step secondStep = new Step(firstStep.getId(), "second", version);
         final Step orphanStep = new Step(secondStep.getId(), "orphan", version);
-        final Preparation preparation = new Preparation("1", secondStep.id(), version);
+        final Preparation preparation = new Preparation("#123", "1", secondStep.id(), version);
 
         repository.add(firstStep);
         repository.add(secondStep);
@@ -100,8 +81,8 @@ public class PreparationCleanerTest {
         final Step secondStep = new Step(firstStep.getId(), "second", version);
         final Step thirdStep = new Step(secondStep.getId(), "third", version);
 
-        final Preparation firstPreparation = new Preparation("1", firstStep.id(), version);
-        final Preparation secondPreparation = new Preparation("2", thirdStep.id(), version);
+        final Preparation firstPreparation = new Preparation("#458", "1", firstStep.id(), version);
+        final Preparation secondPreparation = new Preparation("#5428", "2", thirdStep.id(), version);
 
         repository.add(firstStep);
         repository.add(secondStep);

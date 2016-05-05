@@ -64,7 +64,7 @@ public class HtmlSerializer implements Serializer {
             try {
 
                 Map<String, String> parameters = dataSetMetadata.getContent().getParameters();
-                String valuesSelector = parameters.get(HtmlFormatGuesser.VALUES_SELECTOR_KEY);
+                String valuesSelector = parameters.get(HtmlSchemaParser.VALUES_SELECTOR_KEY);
                 ValuesContentHandler valuesContentHandler = new ValuesContentHandler(valuesSelector);
 
                 HtmlParser htmlParser = new HtmlParser();

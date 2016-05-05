@@ -47,7 +47,7 @@ import org.talend.dataprep.test.ServerConfiguration;
 import org.talend.dataprep.transformation.api.action.ActionTestWorkbench;
 import org.talend.dataprep.transformation.api.action.metadata.ActionMetadataTestUtils;
 import org.talend.dataprep.transformation.api.action.metadata.common.ActionFactory;
-import org.talend.dataprep.transformation.api.action.parameters.Parameter;
+import org.talend.dataprep.parameters.Parameter;
 
 /**
  * Unit test for the Lookup action.

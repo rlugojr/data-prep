@@ -125,6 +125,7 @@ class PipelineDiffTransformer implements Transformer {
                 .withInitialMetadata(rowMetadata) //
                 .withOutput(() -> output) //
                 .withContext(transformationContext) //
+                .withInlineAnalysis(analyzerService::schemaAnalysis) //
                 .withStatisticsAdapter(adapter) //
                 .build();
     }

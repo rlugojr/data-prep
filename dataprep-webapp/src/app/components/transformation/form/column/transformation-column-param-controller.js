@@ -21,20 +21,7 @@ export default function TransformColumnParamCtrl(state) {
     'ngInject';
 
     var vm = this;
-    vm.columns = [];
-
-    /**
-     * @ngdoc method
-     * @name initColumns
-     * @methodOf data-prep.transformation-form.controller:TransformColumnParamCtrl
-     * @description [PRIVATE] Init column param values
-     */
-    var initColumns = function () {
-        var currentColumn = state.playground.grid.selectedColumn;
-        vm.columns = _.filter(state.playground.data.metadata.columns, function (column) {
-            return currentColumn !== column;
-        });
-    };
+    vm.columns = state.playground.data.metadata.columns;
 
     /**
      * @ngdoc method
@@ -50,6 +37,5 @@ export default function TransformColumnParamCtrl(state) {
         }
     };
 
-    initColumns();
     initDefaultValue();
 }

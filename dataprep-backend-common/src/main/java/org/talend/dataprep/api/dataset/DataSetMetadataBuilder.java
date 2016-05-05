@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.talend.dataprep.api.dataset.location.LocalStoreLocation;
 import org.talend.dataprep.api.service.info.VersionService;
-import org.talend.dataprep.schema.SchemaParserResult;
+import org.talend.dataprep.schema.Schema;
 
 /**
  * <p>
@@ -156,7 +156,7 @@ public class DataSetMetadataBuilder {
     /**
      * @see DataSetMetadata#schemaParserResult
      */
-    private SchemaParserResult schemaParserResult;
+    private Schema schemaParserResult;
 
     /** Dataset builder. */
     private ColumnMetadata.Builder[] columnBuilders;
@@ -305,7 +305,7 @@ public class DataSetMetadataBuilder {
         return this;
     }
 
-    public DataSetMetadataBuilder schemaParserResult(SchemaParserResult schemaParserResult) {
+    public DataSetMetadataBuilder schemaParserResult(Schema schemaParserResult) {
         this.schemaParserResult = schemaParserResult;
         return this;
     }

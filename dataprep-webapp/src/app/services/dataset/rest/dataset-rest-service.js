@@ -22,12 +22,10 @@ export default function DatasetRestService($rootScope, $upload, $http, RestURLs)
     'ngInject';
 
     return {
-        import: importRemoteDataset,
         create: create,
         update: update,
         delete: deleteDataset,
         clone: cloneDataset,
-        move: moveDataset,
 
         updateColumn: updateColumn,
 
@@ -51,40 +49,21 @@ export default function DatasetRestService($rootScope, $upload, $http, RestURLs)
      * @ngdoc method
      * @name create
      * @methodOf data-prep.services.dataset.service:DatasetRestService
-     * @description Create the dataset
-     * @param {dataset} dataset - the dataset infos to create
-     * @param {object} folder - the dataset folder
-     * @returns {Promise} the $upload promise
-     */
-    function create(dataset, folder) {
-        var folderPath = folder && folder.path ? folder.path : '/';
-        return $upload.http({
-            url: RestURLs.datasetUrl + '?name=' + encodeURIComponent(dataset.name) + '&folderPath=' + encodeURIComponent(folderPath),
-            headers: {'Content-Type': 'text/plain'},
-            data: dataset.file
-        });
-    }
-
-    /**
-     * @ngdoc method
-     * @name importRemoteDataset
-     * @methodOf data-prep.services.dataset.service:DatasetRestService
      * @description Import the remote dataset
      * @param {parameters} parameters The import parameters
-     * @param {object} folder The dataset folder
+     * @param {object} file The file imported from local
+     * @param {string} contentType The request Content-Type
      * @returns {Promise} The POST promise
      */
-    function importRemoteDataset(parameters, folder) {
-        var folderPath = folder && folder.path ? folder.path : '/';
+    function create(parameters, contentType, file) {
         var req = {
-            method: 'POST',
-            url: RestURLs.datasetUrl + '?name=' + encodeURIComponent(parameters.name) + '&folderPath=' + encodeURIComponent(folderPath),
+            url: RestURLs.datasetUrl + '?name=' + encodeURIComponent(parameters.name),
             headers: {
-                'Content-Type': 'application/vnd.remote-ds.' + parameters.type
+                'Content-Type': contentType
             },
-            data: parameters
+            data: file? file: parameters
         };
-        return $http(req);
+        return $upload.http(req);
     }
 
     /**
@@ -92,15 +71,15 @@ export default function DatasetRestService($rootScope, $upload, $http, RestURLs)
      * @name update
      * @methodOf data-prep.services.dataset.service:DatasetRestService
      * @description Update the dataset
-     * @param {dataset} dataset - the dataset infos to update
+     * @param {dataset} dataset The dataset infos to update
      * @returns {Promise} the $upload promise
      */
     function update(dataset) {
         return $upload.http({
-            url: RestURLs.datasetUrl + '/' + dataset.id + '/metadata',
+            url: RestURLs.datasetUrl + '/' + dataset.id + '?name=' + encodeURIComponent(dataset.name),
             method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            data: dataset
+            headers: {'Content-Type': 'text/plain'},
+            data: dataset.file
         });
     }
 
@@ -109,7 +88,7 @@ export default function DatasetRestService($rootScope, $upload, $http, RestURLs)
      * @name delete
      * @methodOf data-prep.services.dataset.service:DatasetRestService
      * @description Delete the dataset
-     * @param {dataset} dataset the dataset infos to delete
+     * @param {object} dataset the dataset infos to delete
      * @returns {Promise} The DELETE promise
      */
     function deleteDataset(dataset) {
@@ -121,50 +100,12 @@ export default function DatasetRestService($rootScope, $upload, $http, RestURLs)
      * @name cloneDataset
      * @methodOf data-prep.services.dataset.service:DatasetRestService
      * @description Clone the dataset
-     * @param {Object} dataset the dataset infos to clone
-     * @param {Object} folder the folder to clone the dataset
-     * @param {string} cloneName the name for the cloned dataset
-     * @returns {HttpPromise} The GET promise
+     * @param {Object} dataset the dataset metadata
+     * @returns {Promise} The GET promise
      */
-    function cloneDataset(dataset, folder, cloneName) {
-        var url = RestURLs.datasetUrl + '/clone/' + dataset.id;
-        if (folder) {
-            url += '?folderPath=' + encodeURIComponent(folder.path);
-            if (cloneName) {
-                url += '&cloneName=' + encodeURIComponent(cloneName);
-            }
-        } else {
-            if (cloneName) {
-                url += '?cloneName=' + encodeURIComponent(cloneName);
-            }
-        }
-        return $http.put(url);
+    function cloneDataset(dataset) {
+        return $http.post(RestURLs.datasetUrl + '/' + dataset.id +'/copy');
     }
-
-
-    /**
-     * @ngdoc method
-     * @name moveDataset
-     * @methodOf data-prep.services.dataset.service:DatasetRestService
-     * @description Move the dataset to an other Folder
-     * @param {Object} dataset the dataset infos to move
-     * @param {Object} folder the original folder of the dataset
-     * @param {Object} newFolder the folder to move the dataset
-     * @param {String} newName the name for the moved dataset (optional)
-     * @returns {HttpPromise} The PUT promise
-     */
-    function moveDataset(dataset, folder, newFolder, newName) {
-        var url = RestURLs.datasetUrl + '/move/' + dataset.id;
-
-        return $http.put(url,
-            {
-                folderPath: folder.path,
-                newFolderPath: newFolder.path,
-                newName: newName
-            }
-        );
-    }
-
 
     //--------------------------------------------------------------------------------------------------------------
     //---------------------------------------------------Metadata---------------------------------------------------
@@ -180,7 +121,7 @@ export default function DatasetRestService($rootScope, $upload, $http, RestURLs)
      * @returns {Promise} The GET call promise
      */
     function getDatasets(sortType, sortOrder, deferredAbort) {
-        var url = RestURLs.datasetUrl;
+        let url = RestURLs.datasetUrl;
 
         if (sortType) {
             url += '?sort=' + sortType;
@@ -202,10 +143,10 @@ export default function DatasetRestService($rootScope, $upload, $http, RestURLs)
      * @methodOf data-prep.services.dataset.service:DatasetRestService
      * @description Update the dataset metadata
      * @param {dataset} metadata The dataset infos to update
-     * @returns {Promise} The POST promise
+     * @returns {Promise} The PUT promise
      */
     function updateMetadata(metadata) {
-        return $http.post(RestURLs.datasetUrl + '/' + metadata.id, metadata);
+        return $http.put(RestURLs.datasetUrl + '/' + metadata.id + '/metadata', metadata);
     }
 
     /**
@@ -231,7 +172,7 @@ export default function DatasetRestService($rootScope, $upload, $http, RestURLs)
      * @returns {Promise} The POST promise
      */
     function updateColumn(datasetId, columnId, params) {
-        var url = RestURLs.datasetUrl + '/' + datasetId + '/column/' + columnId;
+        const url = RestURLs.datasetUrl + '/' + datasetId + '/column/' + columnId;
         return $http.post(url, params);
     }
 
@@ -248,11 +189,8 @@ export default function DatasetRestService($rootScope, $upload, $http, RestURLs)
      * @returns {Promise} The GET promise
      */
     function getContent(datasetId, metadata) {
-        var url = RestURLs.datasetUrl + '/' + datasetId + '?metadata=' + metadata;
-        return $http.get(url)
-            .then(function (res) {
-                return res.data;
-            });
+        const url = RestURLs.datasetUrl + '/' + datasetId + '?metadata=' + metadata;
+        return $http.get(url).then((response) => response.data);
     }
 
     /**
@@ -264,11 +202,8 @@ export default function DatasetRestService($rootScope, $upload, $http, RestURLs)
      * @returns {Promise} The GET promise
      */
     function getMetadata(datasetId) {
-        var url = RestURLs.datasetUrl + '/' + datasetId + '/metadata';
-        return $http.get(url)
-            .then(function (res) {
-                return res.data;
-            });
+        const url = RestURLs.datasetUrl + '/' + datasetId + '/metadata';
+        return $http.get(url).then((response) => response.data);
     }
 
     //--------------------------------------------------------------------------------------------------------------
@@ -286,12 +221,8 @@ export default function DatasetRestService($rootScope, $upload, $http, RestURLs)
     function getSheetPreview(datasetId, sheetName) {
         $rootScope.$emit('talend.loading.start');
         return $http.get(RestURLs.datasetUrl + '/preview/' + datasetId + '?metadata=true' + (sheetName ? '&sheetName=' + encodeURIComponent(sheetName) : ''))
-            .then(function (res) {
-                return res.data;
-            })
-            .finally(function () {
-                $rootScope.$emit('talend.loading.stop');
-            });
+            .then((response) => response.data)
+            .finally(() => { $rootScope.$emit('talend.loading.stop') });
     }
 
     //--------------------------------------------------------------------------------------------------------------
@@ -321,9 +252,7 @@ export default function DatasetRestService($rootScope, $upload, $http, RestURLs)
      */
     function getEncodings() {
         return $http.get(RestURLs.datasetUrl + '/encodings')
-            .then(function (response) {
-                return response.data;
-            });
+            .then((response) => response.data);
     }
 
     /**
@@ -335,8 +264,6 @@ export default function DatasetRestService($rootScope, $upload, $http, RestURLs)
      */
     function getCompatiblePreparations(datasetId) {
         return $http.get(RestURLs.datasetUrl+ '/' + datasetId  + '/compatiblepreparations')
-            .then(function (response) {
-                return response.data;
-            });
+            .then((response) => response.data);
     }
 }

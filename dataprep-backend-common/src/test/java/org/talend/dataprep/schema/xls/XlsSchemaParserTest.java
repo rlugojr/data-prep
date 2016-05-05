@@ -15,19 +15,21 @@ package org.talend.dataprep.schema.xls;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.assertj.core.api.Assertions;
-import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.talend.dataprep.api.dataset.ColumnMetadata;
 import org.talend.dataprep.api.dataset.DataSetMetadata;
+import org.talend.dataprep.schema.FormatFamily;
 import org.talend.dataprep.schema.AbstractSchemaTestUtils;
 import org.talend.dataprep.schema.SchemaParser;
-import org.talend.dataprep.schema.SchemaParserResult;
+import org.talend.dataprep.schema.Schema;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Unit test for the XLSSchemaParser class.
@@ -64,6 +66,8 @@ public class XlsSchemaParserTest extends AbstractSchemaTestUtils {
                          "Product to send"); //
     }
 
+
+
     /**
      * Load the excel file and check the parsed columns name against the given ones.
      *
@@ -76,12 +80,44 @@ public class XlsSchemaParserTest extends AbstractSchemaTestUtils {
 
             DataSetMetadata datasetMetadata = ioTestUtils.getSimpleDataSetMetadata();
 
-            SchemaParserResult result = parser.parse(new SchemaParser.Request(inputStream, datasetMetadata));
+            Schema result = parser.parse(new SchemaParser.Request(inputStream, datasetMetadata));
             List<ColumnMetadata> columns = result.getSheetContents().get(0).getColumnMetadatas();
             final List<String> actual = columns.stream().map(ColumnMetadata::getName).collect(Collectors.toList());
 
             Assertions.assertThat( actual ).containsExactly( expectedColsName );
-
         }
+    }
+
+    @Test
+    public void read_xls_TDP_143() throws Exception {
+
+        String fileName = "state_table.xls";
+
+        FormatFamily format;
+
+        try (InputStream inputStream = this.getClass().getResourceAsStream(fileName)) {
+            List<ColumnMetadata> columnMetadatas = parser.parse(getRequest(inputStream, "#852"))
+                    .getSheetContents().get(0).getColumnMetadatas();
+            Assertions.assertThat(columnMetadatas).isNotNull().isNotEmpty().hasSize(17);
+        }
+
+    }
+
+    @Test
+    public void should_not_accept_csv_update() throws Exception {
+        final DataSetMetadata metadata = metadataBuilder.metadata().id("toto").formatGuessId("formatGuess#csv").build();
+        assertFalse(parser.accept(metadata));
+    }
+
+    @Test
+    public void should_not_accept_xls_update() throws Exception {
+        final DataSetMetadata metadata = metadataBuilder.metadata().id("tata").formatGuessId("formatGuess#xls").build();
+        assertFalse(parser.accept(metadata));
+    }
+
+    @Test
+    public void should_not_accept_html_update() throws Exception {
+        final DataSetMetadata metadata = metadataBuilder.metadata().id("tata").formatGuessId("formatGuess#html").build();
+        assertFalse(parser.accept(metadata));
     }
 }

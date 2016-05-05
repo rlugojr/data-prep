@@ -79,6 +79,12 @@ public class InlineAnalysisNode extends AnalysisNode implements Monitored {
             LOGGER.trace("{}/{} value(s) filtered out during analysis (in #{})", filteredOutValues, rowColumns.size(),
                     analysisRow.getTdpId());
             inlineAnalyzer.analyze(array);
+            try {
+                adapter.adapt(previousColumns, inlineAnalyzer.getResult(), filter);
+            } catch (Exception e) {
+                // Ignore
+                LOGGER.debug("Unable to adapt inline analysis.", e);
+            }
         } catch (Exception e) {
             LOGGER.warn("Unexpected exception during on the fly analysis.", e);
         } finally {

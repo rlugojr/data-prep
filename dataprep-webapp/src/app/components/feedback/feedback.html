@@ -27,7 +27,7 @@
           ng-submit="feedbackCtrl.feedbackForm.$valid && feedbackCtrl.sendFeedback()">
         <div class="feedback-form-line">
             <span class="feedback-form-label" translate-once="FEEDBACK_MAIL"></span>
-            <input type="text"
+            <input type="email"
                    ng-model="feedbackCtrl.feedback.mail"
                    ng-model-options="{debounce: { default: 300, blur: 0 }}"/>
         </div>

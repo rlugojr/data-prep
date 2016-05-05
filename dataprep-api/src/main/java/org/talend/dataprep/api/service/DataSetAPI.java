@@ -27,13 +27,10 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.apache.commons.io.IOUtils;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.talend.dataprep.api.dataset.DataSetMetadata;
-import org.talend.dataprep.api.dataset.DataSetMoveRequest;
 import org.talend.dataprep.api.preparation.Preparation;
-import org.talend.dataprep.api.service.command.common.HttpResponse;
 import org.talend.dataprep.api.service.command.dataset.*;
 import org.talend.dataprep.api.service.command.preparation.PreparationList;
 import org.talend.dataprep.api.service.command.transformation.SuggestDataSetActions;
@@ -68,12 +65,11 @@ public class DataSetAPI extends APIService {
     @ApiOperation(value = "Create a data set", consumes = TEXT_PLAIN_VALUE, produces = TEXT_PLAIN_VALUE, notes = "Create a new data set based on content provided in POST body. For documentation purposes, body is typed as 'text/plain' but operation accepts binary content too. Returns the id of the newly created data set.")
     public String create(
             @ApiParam(value = "User readable name of the data set (e.g. 'Finance Report 2015', 'Test Data Set').") @RequestParam(defaultValue = "", required = false) String name,
-            @ApiParam(value = "The folder path to create the entry.") @RequestParam(defaultValue = "/", required = false) String folderPath,
             @RequestHeader("Content-Type") String contentType, @ApiParam(value = "content") InputStream dataSetContent) {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Creating dataset (pool: {} )...", getConnectionStats());
         }
-        HystrixCommand<String> creation = getCommand(CreateDataSet.class, name, contentType, dataSetContent, folderPath);
+        HystrixCommand<String> creation = getCommand(CreateDataSet.class, name, contentType, dataSetContent);
         String result = creation.execute();
         LOG.debug("Dataset creation done.");
         return result;
@@ -92,6 +88,23 @@ public class DataSetAPI extends APIService {
         HystrixCommand<String> creation = getCommand(CreateOrUpdateDataSet.class, id, name, dataSetContent);
         String result = creation.execute();
         LOG.debug("Dataset creation or update for #{} done.", id);
+        return result;
+    }
+
+    @RequestMapping(value = "/api/datasets/{id}/copy", method = POST, produces = TEXT_PLAIN_VALUE)
+    @ApiOperation(value = "Copy the dataset.", consumes = TEXT_PLAIN_VALUE, produces = TEXT_PLAIN_VALUE,
+            notes = "Copy the dataset, returns the id of the copied created data set.")
+    public String copy(
+            @ApiParam(value = "Name of the copy") @RequestParam(required = false) String name,
+            @ApiParam(value = "Id of the data set to update / create") @PathVariable(value = "id") String id) {
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Copying {} (pool: {})...", id, getConnectionStats());
+        }
+
+        HystrixCommand<String> creation = getCommand(CopyDataSet.class, id, name);
+        String result = creation.execute();
+        LOG.info("Dataset {} copied --> {} named '{}'", id, result, name);
         return result;
     }
 
@@ -196,72 +209,6 @@ public class DataSetAPI extends APIService {
         return metadata;
     }
 
-    /**
-     * Clone a dataset from the given id
-     *
-     * @param id the dataset id to clone
-     * @param folderPath the folder path to clone the dataset
-     * @param cloneName the name of the dataset clone
-     * @return The dataset id.
-     */
-    @RequestMapping(value = "/api/datasets/clone/{id}", method = PUT, produces = TEXT_PLAIN_VALUE)
-    @ApiOperation(value = "Create a data set", produces = TEXT_PLAIN_VALUE, notes = "Clone a data set based the id provided.")
-    public void cloneDataset(
-        @ApiParam(value = "Id of the data set to get") @PathVariable(value = "id") String id,
-        @ApiParam(value = "The name of the cloned dataset.") @RequestParam(defaultValue = "", required = false) String cloneName,
-        @ApiParam(value = "The folder path to create the entry.") @RequestParam(defaultValue = "", required = false) String folderPath,
-        final OutputStream output) {
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Cloning dataset (pool: {} )...", getConnectionStats());
-        }
-        HystrixCommand<HttpResponse> creation = getCommand(CloneDataSet.class, id, folderPath, cloneName);
-        HttpResponse result = creation.execute();
-        LOG.debug("Dataset clone done.");
-        try {
-            HttpResponseContext.status(HttpStatus.valueOf(result.getStatusCode()));
-            HttpResponseContext.header("Content-Type", result.getContentType());
-            IOUtils.write(result.getHttpContent(), output);
-            output.flush();
-        } catch (IOException e) {
-            throw new TDPException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e);
-        }
-    }
-
-    /**
-     * Move a data set to an other folder.
-     *
-     * @param dataSetId the dataset id to move.
-     * @param dataSetMoveRequest the move request.
-     */
-    @RequestMapping(value = "/api/datasets/move/{id}", method = PUT, consumes = MediaType.ALL_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
-    @ApiOperation(value = "Clone a data set", produces = MediaType.TEXT_PLAIN_VALUE, consumes = MediaType.ALL_VALUE, notes = "Move a data set to an other folder.")
-    @Timed
-    public void move(@PathVariable(value = "id") @ApiParam(name = "id", value = "Id of the data set to clone") String dataSetId,
-            @ApiParam(value = "the parameters to move the dataset.") @RequestBody(required = true) DataSetMoveRequest dataSetMoveRequest,
-            final OutputStream output) throws IOException {
-
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Moving dataset (pool: {} )...", getConnectionStats());
-        }
-        HystrixCommand<HttpResponse> creation = getCommand(MoveDataSet.class, //
-                dataSetId, //
-                dataSetMoveRequest.getFolderPath(), //
-                dataSetMoveRequest.getNewFolderPath(), //
-                dataSetMoveRequest.getNewName());
-        HttpResponse result = creation.execute();
-        LOG.debug("Dataset move done.");
-
-        HttpResponseContext.header("Content-Type", result.getContentType());
-        HttpResponseContext.status(HttpStatus.valueOf(result.getStatusCode()));
-        if (result.getStatusCode() != HttpStatus.OK.value()) {
-            try {
-                IOUtils.write(result.getHttpContent(), output);
-                output.flush();
-            } catch (IOException e) {
-                throw new TDPException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e);
-            }
-        }
-    }
 
     @RequestMapping(value = "/api/datasets/preview/{id}", method = GET, consumes = ALL_VALUE, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get a data set by id.", produces = APPLICATION_JSON_VALUE, notes = "Get a data set based on given id.")
@@ -469,8 +416,7 @@ public class DataSetAPI extends APIService {
         final String json;
         try {
             json = new String(byteArray.toByteArray());
-            final T object = mapper.readerFor(type).readValue(json);
-            return object;
+            return mapper.readerFor(type).readValue(json);
         } catch (IOException e) {
             throw new TDPException(CommonErrorCodes.UNABLE_TO_PARSE_JSON, e);
         } finally {
@@ -478,6 +424,7 @@ public class DataSetAPI extends APIService {
         }
 
     }
+
     @RequestMapping(value = "/api/datasets/encodings", method = GET, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "List supported dataset encodings.", notes = "Returns the supported dataset encodings.")
     @Timed
@@ -497,4 +444,25 @@ public class DataSetAPI extends APIService {
             throw new TDPException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e);
         }
     }
+
+    @RequestMapping(value = "/api/datasets/imports", method = GET, produces = APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "List supported imports for a dataset.", notes = "Returns the supported import types.")
+    @Timed
+    @PublicAPI
+    public void listImports(final OutputStream output) {
+
+        // Get dataset metadata
+        HystrixCommand<InputStream> retrieveImports = getCommand(DataSetGetImports.class);
+
+        try (InputStream content = retrieveImports.execute()) {
+            IOUtils.copyLarge(content, output);
+            output.flush();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Listing datasets (pool: {}) done.", getConnectionStats());
+            }
+        } catch (IOException e) {
+            throw new TDPException(CommonErrorCodes.UNEXPECTED_EXCEPTION, e);
+        }
+    }
+
 }

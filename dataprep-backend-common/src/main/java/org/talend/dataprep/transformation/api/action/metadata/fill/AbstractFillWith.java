@@ -38,9 +38,9 @@ import org.talend.dataprep.transformation.api.action.metadata.common.ActionMetad
 import org.talend.dataprep.transformation.api.action.metadata.common.OtherColumnParameters;
 import org.talend.dataprep.transformation.api.action.metadata.date.DateParser;
 import org.talend.dataprep.transformation.api.action.metadata.date.DatePattern;
-import org.talend.dataprep.transformation.api.action.parameters.Parameter;
-import org.talend.dataprep.transformation.api.action.parameters.ParameterType;
-import org.talend.dataprep.transformation.api.action.parameters.SelectParameter;
+import org.talend.dataprep.parameters.Parameter;
+import org.talend.dataprep.parameters.ParameterType;
+import org.talend.dataprep.parameters.SelectParameter;
 
 public abstract class AbstractFillWith extends ActionMetadata implements OtherColumnParameters {
 
@@ -51,7 +51,8 @@ public abstract class AbstractFillWith extends ActionMetadata implements OtherCo
     private static final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ofPattern(DATE_PATTERN);
 
     private static final String DEFAULT_DATE_VALUE = DEFAULT_FORMATTER.format(LocalDateTime.of(1970, Month.JANUARY, 1, 10, 0));
-    public static final Logger LOGGER = LoggerFactory.getLogger(AbstractFillWith.class);
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractFillWith.class);
 
     /**
      * Component that parses dates.
@@ -143,6 +144,7 @@ public abstract class AbstractFillWith extends ActionMetadata implements OtherCo
                         DEFAULT_DATE_VALUE, //
                         false, //
                         false, //
+                        StringUtils.EMPTY, //
                         getMessagesBundle());
                 break;
             case ANY:
@@ -155,7 +157,7 @@ public abstract class AbstractFillWith extends ActionMetadata implements OtherCo
                         .name(MODE_PARAMETER)
                         .item(CONSTANT_MODE, constantParameter)
                         .item(OTHER_COLUMN_MODE, new Parameter(SELECTED_COLUMN_PARAMETER, ParameterType.COLUMN, //
-                                                               StringUtils.EMPTY, false, false, getMessagesBundle()))
+                                                               StringUtils.EMPTY, false, false, StringUtils.EMPTY, getMessagesBundle()))
                         .defaultValue(CONSTANT_MODE)
                         .build()
         );

@@ -11,8 +11,7 @@
 
  ============================================================================*/
 
-import Home from './home-directive';
-import HomeCtrl from './home-controller';
+import HomeComponent from './home-component';
 
 (() => {
     'use strict';
@@ -26,13 +25,14 @@ import HomeCtrl from './home-controller';
      * @requires data-prep.dataset-header
      * @requires data-prep.dataset-list
      * @requires data-prep.playground
+     * @requires data-prep.preparation-header
      * @requires data-prep.preparation-list
      * @requires data-prep.services.dataset
      * @requires data-prep.services.utils
      * @requires data-prep.services.datasetWorkflowService
      * @requires data-prep.services.state
-     * @requires data-prep.folder
      * @requires data-prep.services.folder
+     * @requires data-prep.import
      */
     angular.module('data-prep.home',
         [
@@ -42,13 +42,12 @@ import HomeCtrl from './home-controller';
             'data-prep.dataset-list',
             'data-prep.folder',
             'data-prep.playground',
+            'data-prep.preparation-header',
             'data-prep.preparation-list',
             'data-prep.services.dataset',
             'data-prep.services.datasetWorkflowService',
-            'data-prep.services.folder',
             'data-prep.services.state',
-            'data-prep.services.utils',
+            'data-prep.import',
         ])
-        .controller('HomeCtrl', HomeCtrl)
-        .directive('home', Home);
+        .component('home', HomeComponent);
 })();

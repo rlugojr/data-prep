@@ -1,15 +1,15 @@
-//  ============================================================================
+// ============================================================================
 //
-//  Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
-//  This source code is available under agreement available at
-//  https://github.com/Talend/data-prep/blob/master/LICENSE
+// This source code is available under agreement available at
+// https://github.com/Talend/data-prep/blob/master/LICENSE
 //
-//  You should have received a copy of the agreement
-//  along with this program; if not, write to Talend SA
-//  9 rue Pages 92150 Suresnes, France
+// You should have received a copy of the agreement
+// along with this program; if not, write to Talend SA
+// 9 rue Pages 92150 Suresnes, France
 //
-//  ============================================================================
+// ============================================================================
 
 package org.talend.dataprep.schema.csv;
 
@@ -51,11 +51,12 @@ public class CSVSerializer implements Serializer {
             // Serialize asynchronously for better performance (especially if caller doesn't consume all, see sampling).
             Runnable r = () -> {
                 final Map<String, String> parameters = metadata.getContent().getParameters();
-                final String separator = parameters.get(CSVFormatGuess.SEPARATOR_PARAMETER);
-                try (CSVReader reader = new CSVReader(new InputStreamReader(rawContent, metadata.getEncoding()), separator.charAt(0),  '\"', '\0')) {
+                final String separator = parameters.get(CSVFormatFamily.SEPARATOR_PARAMETER);
+                try (CSVReader reader = new CSVReader(new InputStreamReader(rawContent, metadata.getEncoding()),
+                        separator.charAt(0),  '\"', '\0')) {
                     JsonGenerator generator = new JsonFactory().createGenerator(jsonOutput);
                     int i = 0;
-                    while (i++ < metadata.getContent().getNbLinesInHeader() ) {
+                    while (i++ < metadata.getContent().getNbLinesInHeader()) {
                         reader.readNext(); // Skip all header lines
                     }
                     generator.writeStartArray();

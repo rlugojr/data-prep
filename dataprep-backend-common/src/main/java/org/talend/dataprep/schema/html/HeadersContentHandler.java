@@ -26,8 +26,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * SAX ContentHandler to get headers values.
- * Sax is used for low memory usage, and a HeadersContentFoundException is thrown when the header is found.
+ * SAX ContentHandler to get headers values. Sax is used for low memory usage, and a HeadersContentFoundException is
+ * thrown when the header is found.
  */
 public class HeadersContentHandler extends DefaultHandler {
 
@@ -36,19 +36,25 @@ public class HeadersContentHandler extends DefaultHandler {
 
     /** CSS selector like to follow to get to the headers within the document. */
     private final List<String> headersLocation;
-    /** Current currentLocation while reading the location.  */
+
+    /** Current currentLocation while reading the location. */
     private final ArrayDeque<String> currentLocation = new ArrayDeque<>();
+
     /** True if reading headers (current location matches the headers location). */
     private boolean readingHeaders;
+
     /** The headers values. */
     private List<String> headerValues = new ArrayList<>();
+
     /** flag to manage empty cells (empty String as value). */
     private boolean valueFound;
+
     /** if <code>true</code> will stop the processing when reading the first headers. */
     private boolean fastStop;
 
-     /**
+    /**
      * Constructor.
+     * 
      * @param headerSelector an html element selector corresponding to headers "html body table tr th" <b>attributes not
      * supported</b>.
      */
@@ -116,7 +122,7 @@ public class HeadersContentHandler extends DefaultHandler {
     public void characters(char[] chars, int start, int length) throws SAXException {
         if (readingHeaders) {
             char[] thechars = new char[length];
-            System.arraycopy( chars, start, thechars, 0, length );
+            System.arraycopy(chars, start, thechars, 0, length);
             String headerValue = new String(thechars);
             if (!valueFound) {
                 headerValues.add(headerValue);

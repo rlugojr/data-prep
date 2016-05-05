@@ -13,14 +13,10 @@
 
 package org.talend.dataprep.transformation.api.action.metadata.common;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
@@ -45,7 +41,7 @@ public class ActionMetadataUtils implements ApplicationContextAware {
     private static ApplicationContext applicationContext;
 
     /**
-     * Default empty constructor.
+     * No argument constructor.
      */
     private ActionMetadataUtils() {
         // private constructor for utility class
@@ -67,44 +63,100 @@ public class ActionMetadataUtils implements ApplicationContextAware {
         if (invalidValues.contains(value)) {
             return true;
         }
-        // Find analyzer for column type
+        // Find analyzer for column type or domain type
         final AnalyzerService analyzerService = applicationContext.getBean(AnalyzerService.class);
+        final Set<String> updatedInvalidValues;
+
         final String domain = colMetadata.getDomain();
-        Analyzer<Analyzers.Result> analyzer;
         if (!StringUtils.isEmpty(domain)) {
-            synchronized (analyzerCache) {
-                analyzer = analyzerCache.get(domain);
-                if (analyzer == null) {
-                    analyzer = analyzerService.build(colMetadata, AnalyzerService.Analysis.QUALITY);
-                    analyzerCache.put(domain, analyzer);
-                }
-                analyzer.getResult().clear();
-                analyzer.analyze(value);
-                analyzer.end();
-            }
+            updatedInvalidValues = retrieveInvalidsFromCachedAnalyzer(analyzerService, domain, colMetadata, value);
         } else {
-            // perform a data type only (no domain set).
-            analyzer = analyzerService.build(colMetadata, AnalyzerService.Analysis.QUALITY);
-            analyzer.analyze(value);
-            analyzer.end();
+            final String type = colMetadata.getType();
+            if (!StringUtils.isEmpty(type)) {
+                updatedInvalidValues = retrieveInvalidsFromCachedAnalyzer(analyzerService, type, colMetadata, value);
+            } else {
+                // perform a data type only (no domain set).
+                Analyzer<Analyzers.Result> analyzer = analyzerService.build(colMetadata, AnalyzerService.Analysis.QUALITY);
+                try {
+                    updatedInvalidValues = retrieveInvalids(analyzer, value);
+                } finally {
+                    try {
+                        analyzer.close();
+                    } catch (Exception e) {
+                        LOGGER.warn("Unable to close analyzer.", e);
+                    }
+                }
+            }
         }
-        final List<Analyzers.Result> results = analyzer.getResult();
-        if (results.isEmpty()) {
-            LOGGER.warn("ValueQualityAnalysis of {} returned an empty result, invalid value could not be detected...");
-            return false;
-        }
-        final Set<String> updatedInvalidValues = results.get(0).get(ValueQualityStatistics.class).getInvalidValues();
         // update invalid values of column metadata to prevent unnecessary future analysis
         invalidValues.addAll(updatedInvalidValues);
         return updatedInvalidValues.contains(value);
     }
 
+    /**
+     * Retrieves invalids from cached analyzers
+     * @param analyzerService the analyzer service
+     * @param key the key used to map the analyzer
+     * @param colMetadata the column metadata
+     * @param value the value to check for validity
+     * @return
+     */
+    private static Set<String> retrieveInvalidsFromCachedAnalyzer(AnalyzerService analyzerService, String key, ColumnMetadata colMetadata,
+                                                                  String value) {
+        final Set<String> result;
+
+        Analyzer<Analyzers.Result> analyzer;
+        synchronized (analyzerCache) {
+            analyzer = analyzerCache.get(key);
+            if (analyzer == null) {
+                analyzer = analyzerService.build(colMetadata, AnalyzerService.Analysis.QUALITY);
+                analyzerCache.put(key, analyzer);
+            }
+            // do not use analyzer.getResult().clear since it does not reinitialize the analyzers
+            // TODO: change this method when DQ provide us with a new method to call for reinitialization
+            result = retrieveInvalids(analyzer, value);
+        }
+        return result;
+    }
+
+    /**
+     * Returns the set of invalid values
+     * @param analyzer the analyzer used to check the value validity
+     * @param value the value to check for validity
+     * @return
+     */
+    private static Set<String> retrieveInvalids(Analyzer<Analyzers.Result> analyzer, String value) {
+        final Set<String> result;
+        analyzer.init();
+        analyzer.analyze(value);
+        analyzer.end();
+        final List<Analyzers.Result> results = analyzer.getResult();
+        if (results.isEmpty()) {
+            LOGGER.warn("ValueQualityAnalysis of {} returned an empty result, invalid value could not be detected...");
+            result = Collections.emptySet();
+        } else {
+            result = results.get(0).get(ValueQualityStatistics.class).getInvalidValues();
+        }
+        return result;
+    }
+
+    /**
+     *
+     * @return an unmodifiable version of the analyzer cache
+     */
     public static Map<String, Analyzer<Analyzers.Result>> getAnalyzerCache() {
-        return analyzerCache;
+        return Collections.unmodifiableMap(analyzerCache);
+    }
+
+    /**
+     * Re-initializes the analyzer cache
+     */
+    static void reinitializeCache(){
+        analyzerCache.clear();
     }
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(ApplicationContext applicationContext) {
         ActionMetadataUtils.applicationContext = applicationContext;
     }
 }

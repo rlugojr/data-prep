@@ -20,7 +20,8 @@
  <playground-header  dataset="dataset"
                      display-nb-lines="displayNbLines"
                      preview="previewInProgress"
-                     lookup="lookupInProgress"
+                     lookup-visible="lookupInProgress"
+                     parameters-visible="hasParametersVisible"
                      on-parameters="toggleParameters()"
                      on-lookup="toggleLookup()"
                      on-onboarding="startOnBoarding(')"
@@ -29,7 +30,8 @@
  * @param {object} dataset The current dataset
  * @param {boolean} displayNbLines Whether or not the number of lines should be displayed
  * @param {boolean} preview A preview is in progress
- * @param {boolean} lookup A lookup is in progress
+ * @param {boolean} lookupVisible A lookup is in progress
+ * @param {boolean} parametersVisible Dataset parameters window is visible
  * @param {function} onParameters Callback on gear icon click
  * @param {function} onLookup Callback on lookup icon click
  * @param {function} onOnboarding Callback on onboarding icon click
@@ -44,7 +46,8 @@ const PlaygroundHeader = {
         dataset: '<',
         displayNbLines: '<',
         preview: '<',
-        lookup: '<',
+        lookupVisible: '<',
+        parametersVisible: '<',
         onParameters: '&',
         onLookup: '&',
         onOnboarding: '&',

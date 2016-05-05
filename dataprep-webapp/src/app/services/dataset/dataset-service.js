@@ -26,13 +26,13 @@ export default function DatasetService($q, state, StateService, DatasetListServi
     'ngInject';
 
     return {
+        init: init,
+
         //lifecycle
-        import: DatasetListService.importRemoteDataset,
         create: DatasetListService.create,
         update: DatasetListService.update,
         delete: deleteDataset,
         clone: DatasetListService.clone,
-        move: DatasetListService.move,
 
         //dataset actions
         updateColumn: DatasetRestService.updateColumn,
@@ -51,6 +51,7 @@ export default function DatasetService($q, state, StateService, DatasetListServi
         getSheetPreview: getSheetPreview,
 
         //dataset update
+        rename: rename,
         setDatasetSheet: setDatasetSheet,
         updateParameters: updateParameters,
         refreshSupportedEncodings: refreshSupportedEncodings,
@@ -69,16 +70,56 @@ export default function DatasetService($q, state, StateService, DatasetListServi
     //--------------------------------------------------------------------------------------------------------------
     /**
      * @ngdoc method
+     * @methodOf data-prep.services.dataset.service:DatasetService
+     * @name _refreshDatasetsSort
+     * @description Refresh the actual sort parameter
+     * */
+    function _refreshDatasetsSort() {
+        const savedSort = StorageService.getDatasetsSort();
+        if (savedSort) {
+            StateService.setDatasetsSort(_.find(state.inventory.sortList, {id: savedSort}));
+        }
+    }
+
+    /**
+     * @ngdoc method
+     * @methodOf data-prep.services.dataset.service:DatasetService
+     * @name _refreshDatasetsOrder
+     * @description Refresh the actual order parameter
+     */
+    function _refreshDatasetsOrder() {
+        const savedSortOrder = StorageService.getDatasetsOrder();
+        if (savedSortOrder) {
+            StateService.setDatasetsOrder(_.find(state.inventory.orderList, {id: savedSortOrder}));
+        }
+    }
+
+    /**
+     * @ngdoc method
+     * @methodOf data-prep.services.dataset.service:DatasetService
+     * @name _refreshDatasetsOrder
+     * @description Init datasets sort/order and refresh datasets list
+     */
+    function init() {
+        _refreshDatasetsSort();
+        _refreshDatasetsOrder();
+        return DatasetListService.refreshDatasets();
+    }
+
+    //--------------------------------------------------------------------------------------------------------------
+    //---------------------------------------------------Lifecycle--------------------------------------------------
+    //--------------------------------------------------------------------------------------------------------------
+    /**
+     * @ngdoc method
      * @name deleteDataset
      * @methodOf data-prep.services.dataset.service:DatasetService
      * @param {object} dataset The dataset to delete
-     * @description Delete a dataset. It just call {@link data-prep.services.dataset.service:DatasetListService
-         *     DatasetListService} delete function
+     * @description Delete a dataset.
      * @returns {promise} The pending DELETE promise
      */
     function deleteDataset(dataset) {
         return DatasetListService.delete(dataset)
-            .then(function (response) {
+            .then((response) => {
                 StorageService.removeAllAggregations(dataset.id);
                 return response;
             });
@@ -110,12 +151,12 @@ export default function DatasetService($q, state, StateService, DatasetListServi
      * @name getDatasetByName
      * @methodOf data-prep.services.dataset.service:DatasetService
      * @param {string} name The dataset name
-     * @description Get the dataset that has the wanted name in the current folder. The case is not important here.
+     * @description Get the dataset that has the wanted name. The case is not important here.
      * @returns {object} The dataset that has the same name (case insensitive)
      */
     function getDatasetByName(name) {
-        var lowerCaseName = name.toLowerCase();
-        return _.find(state.inventory.currentFolderContent.datasets, function (dataset) {
+        const lowerCaseName = name.toLowerCase();
+        return _.find(state.inventory.datasets, (dataset) => {
             return dataset.name.toLowerCase() === lowerCaseName;
         });
     }
@@ -129,8 +170,8 @@ export default function DatasetService($q, state, StateService, DatasetListServi
      * @returns {promise} The dataset
      */
     function getDatasetById(datasetId) {
-        return DatasetListService.getDatasetsPromise().then(function (datasetList) {
-            return _.find(datasetList, function (dataset) {
+        return DatasetListService.getDatasetsPromise().then((datasetList) => {
+            return _.find(datasetList, (dataset) => {
                 return dataset.id === datasetId;
             });
         });
@@ -170,10 +211,10 @@ export default function DatasetService($q, state, StateService, DatasetListServi
      * @returns {string} - the unique name
      */
     function getUniqueName(name) {
-        var cleanedName = name.replace(/\([0-9]+\)$/, '').trim();
-        var result = cleanedName;
+        const cleanedName = name.replace(/\([0-9]+\)$/, '').trim();
+        let result = cleanedName;
 
-        var index = 1;
+        let index = 1;
         while (getDatasetByName(result)) {
             result = cleanedName + ' (' + index + ')';
             index++;
@@ -215,7 +256,7 @@ export default function DatasetService($q, state, StateService, DatasetListServi
     //--------------------------------------------------------------------------------------------------------------
     //---------------------------------------------Dataset Parameters-----------------------------------------------
     //--------------------------------------------------------------------------------------------------------------
-    function extractOriginalParameters(metadata) {
+    function _extractOriginalParameters(metadata) {
         return {
             //TODO remove this and review the datasets model to NOT change the original object. This is done here to
             // avoid cyclic ref
@@ -227,9 +268,9 @@ export default function DatasetService($q, state, StateService, DatasetListServi
         };
     }
 
-    function setParameters(metadata, parameters) {
+    function _setParameters(metadata, parameters) {
         //TODO remove this and review the datasets model to NOT change the original object. This is done here to avoid
-        // cyclic ref
+        // avoid cyclic ref
         metadata.defaultPreparation = parameters.defaultPreparation;
         metadata.preparations = parameters.preparations;
 
@@ -247,16 +288,16 @@ export default function DatasetService($q, state, StateService, DatasetListServi
      * @returns {Promise} The process Promise
      */
     function updateParameters(metadata, parameters) {
-        var originalParameters = extractOriginalParameters(metadata);
-        setParameters(metadata, parameters);
+        const originalParameters = _extractOriginalParameters(metadata);
+        _setParameters(metadata, parameters);
 
         return DatasetRestService.updateMetadata(metadata)
-            .then(function () {
+            .then(() => {
                 metadata.defaultPreparation = originalParameters.defaultPreparation;
                 metadata.preparations = originalParameters.preparations;
             })
-            .catch(function (error) {
-                setParameters(metadata, originalParameters);
+            .catch((error) => {
+                _setParameters(metadata, originalParameters);
                 return $q.reject(error);
             });
     }
@@ -290,9 +331,55 @@ export default function DatasetService($q, state, StateService, DatasetListServi
                 return _.map(compatiblePreparations, (candidatePrepa) => {
                     return {
                         preparation: candidatePrepa,
-                        dataset: _.find(state.inventory.datasets, {id: candidatePrepa.dataSetId})
+                        dataset: _.find(state.inventory.datasets, {id: candidatePrepa.dataSetId}),
                     };
                 });
             });
+    }
+
+    //--------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------Rename---------------------------------------------------
+    //--------------------------------------------------------------------------------------------------------------
+    //TODO remove this and review the datasets model to NOT change the original object. This is done here to
+    // avoid cyclic ref
+    function _removePreparations(metadata) {
+        const preparations = {
+            defaultPreparation: metadata.defaultPreparation,
+            preparations: metadata.preparations,
+        };
+
+        metadata.defaultPreparation = null;
+        metadata.preparations = null;
+
+        return preparations;
+    }
+
+    //TODO remove this and review the datasets model to NOT change the original object. This is done here to
+    // avoid cyclic ref
+    function _injectPreparations(metadata, preparations) {
+        metadata.defaultPreparation = preparations.defaultPreparation;
+        metadata.preparations = preparations.preparations;
+    }
+
+    /**
+     * @ngdoc method
+     * @name rename
+     * @methodOf data-prep.services.dataset.service:DatasetService
+     * @param {object} metadata The dataset metadata
+     * @param {string} name The new name
+     * @description Set the new name
+     * @returns {Promise} The process Promise
+     */
+    function rename(metadata, name) {
+        const oldName = metadata.name;
+        StateService.setDatasetName(metadata.id, name);
+        const preparations = _removePreparations(metadata);
+
+        return DatasetRestService.updateMetadata(metadata)
+            .catch((error) => {
+                StateService.setDatasetName(metadata.id, oldName);
+                return $q.reject(error);
+            })
+            .finally(() => { _injectPreparations(metadata, preparations) });
     }
 }

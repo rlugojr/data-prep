@@ -207,14 +207,19 @@ public class Pipeline implements Node, RuntimeNode {
         }
 
         public Pipeline build() {
+            final ActionAnalysis analysis = analyzeActions();
             final NodeBuilder current = NodeBuilder.source();
             // Apply actions
             for (Action action : actions) {
                 current.to(new CompileNode(action, context.create(action.getRowAction())));
+                if (action.getParameters().containsKey(ImplicitParameters.FILTER.getKey())) {
+                    // action has a filter, to cover cases where filters are on invalid values
+                    // TODO Perform static analysis of filter to discover if filter holds conditions that needs up-to-date statistics
+                    current.to(new InlineAnalysisNode(inlineAnalyzer, c -> true, adapter));
+                }
                 current.to(new ActionNode(action, context.in(action.getRowAction())));
             }
             // Analyze (delayed)
-            final ActionAnalysis analysis = analyzeActions();
             if (analysis.needDelayedAnalysis) {
                 current.to(new InlineAnalysisNode(inlineAnalyzer, analysis.filter, adapter));
                 current.to(new DelayedAnalysisNode(delayedAnalyzer, analysis.filter, adapter));
