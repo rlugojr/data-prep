@@ -73,7 +73,7 @@ public class FileSystemLockedResourceRepositoryTest {
         Identifiable resource = getFirstResourceType("1");
 
         LockedResource lockedResource = repository.tryLock(resource, userId);
-        final LockedResource mustBeNull = repository.unLock(resource, userId);
+        final LockedResource mustBeNull = repository.tryUnlock(resource, userId);
 
         assertNotNull(lockedResource);
         assertNull(mustBeNull);
@@ -84,7 +84,7 @@ public class FileSystemLockedResourceRepositoryTest {
         String userId = "1";
         Identifiable resource = getFirstResourceType("1");
 
-        final LockedResource mustBeNull = repository.unLock(resource, userId);
+        final LockedResource mustBeNull = repository.tryUnlock(resource, userId);
 
         assertNull(mustBeNull);
     }
@@ -128,7 +128,7 @@ public class FileSystemLockedResourceRepositoryTest {
         LockedResource lockOnResource1 = repository.tryLock(resource, user1);
         LockedResource lockOnResource2 = repository.tryLock(resource2, user2);
         repository.tryLock(resource3, user2);
-        repository.unLock(resource3, user2);
+        repository.tryUnlock(resource3, user2);
 
         Collection<LockedResource> allLockedResources = repository.listAll();
 

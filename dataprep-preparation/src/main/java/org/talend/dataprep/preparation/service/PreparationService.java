@@ -54,6 +54,7 @@ import org.talend.dataprep.exception.error.PreparationErrorCodes;
 import org.talend.dataprep.exception.json.JsonErrorCodeDescription;
 import org.talend.dataprep.folder.store.FolderRepository;
 import org.talend.dataprep.http.HttpResponseContext;
+import org.talend.dataprep.lock.store.LockedResource;
 import org.talend.dataprep.lock.store.LockedResourceRepository;
 import org.talend.dataprep.metrics.Timed;
 import org.talend.dataprep.preparation.store.PreparationRepository;
@@ -775,16 +776,16 @@ public class PreparationService {
     public void lockPreparation(@ApiParam("preparationId") @PathVariable("preparationId") final String preparationId,
                                 @ApiParam("userId") @PathVariable("userId") final String userId) {
         //@formatter:on
-
-        LOGGER.debug("Trying to lock preparation {} for user {}.", preparationId, userId);
         Preparation preparation = preparationRepository.get(preparationId, Preparation.class);
-        try {
+
+        LockedResource lockedResource = lockedResourceRepository.tryLock(preparation, userId);
+        if (lockedResourceRepository.lockOwned(lockedResource, userId)){
             LOGGER.debug("Preparation {} locked for user {}.", preparationId, userId);
-            lockedResourceRepository.retrieveLock(preparation, userId);
-        } catch (Exception e) {
+        }
+        else{
             LOGGER.debug("Unable to lock Preparation {} for user {}.", preparationId, userId);
             throw new TDPException(CommonErrorCodes.CONFLICT_TO_LOCK_RESOURCE,
-                    ExceptionContext.build().put("Locker", e.getMessage()));
+                    ExceptionContext.build().put("Locker", lockedResource.getUserId()));
         }
     }
 
@@ -796,15 +797,14 @@ public class PreparationService {
                                   @ApiParam("userId") @PathVariable("userId") final String userId) {
         //@formatter:on
 
-        LOGGER.debug("Trying to unlock preparation {} for user {}.", preparationId, userId);
         Preparation preparation = preparationRepository.get(preparationId, Preparation.class);
-        try {
-            lockedResourceRepository.retrieveUnLock(preparation, userId);
+        LockedResource lockedResource = lockedResourceRepository.tryUnlock(preparation, userId);
+        if (lockedResourceRepository.lockReleased(lockedResource, userId)){
             LOGGER.debug("Preparation {} unlocked by user {}.", preparationId, userId);
-        } catch (Exception e) {
+        }else{
             LOGGER.debug("Unable to unlock Preparation {} for user {}.", preparationId, userId);
             throw new TDPException(CommonErrorCodes.CONFLICT_TO_UNLOCK_RESOURCE,
-                    ExceptionContext.build().put("Locker", e.getMessage()));
+                    ExceptionContext.build().put("Locker", lockedResource.getUserId()));
         }
     }
 

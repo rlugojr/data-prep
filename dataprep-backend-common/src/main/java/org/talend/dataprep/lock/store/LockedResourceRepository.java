@@ -38,7 +38,7 @@ public interface LockedResourceRepository {
      */
     LockedResource tryLock(Identifiable resource, String userId);
 
-    LockedResource unLock(Identifiable resource, String userId);
+    LockedResource tryUnlock(Identifiable resource, String userId);
 
     /**
      * Returns the {@link Identifiable} with the specified identifier and of the specified class.
@@ -75,7 +75,7 @@ public interface LockedResourceRepository {
      */
     void remove(Identifiable resource);
 
-    boolean retrieveLock(Identifiable object, String userId) throws Exception;
-    boolean retrieveUnLock(Identifiable object, String userId) throws Exception;
+    boolean lockOwned(LockedResource lockedResource, String userId);
+    boolean lockReleased(LockedResource lockedResource, String userId);
 
 }

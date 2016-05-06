@@ -15,7 +15,7 @@ package org.talend.dataprep.lock.store;
 
 import java.time.Instant;
 
-import org.apache.commons.codec.binary.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.talend.dataprep.api.preparation.Identifiable;
@@ -35,20 +35,12 @@ public abstract class AbstractLockedResourceRepository implements LockedResource
     }
 
     @Override
-    public LockedResource unLock(Identifiable resource, String userId) {
-        return unLock(resource, userId, lockFactory);
+    public LockedResource tryUnlock(Identifiable resource, String userId) {
+        return tryUnlock(resource, userId, lockFactory);
     }
 
-    public boolean couldBeLocked(LockedResource lockedResource, String userId) {
-        if (userId != null && (lockedResource == null || StringUtils.equals(lockedResource.getUserId(), userId)
-                || lockedResource.getExpirationTime() < Instant.now().getEpochSecond())) {
-            return true;
-        }
-        return false;
-    }
-
-    public LockedResource tryLock(Identifiable object, String userId, LockFactory lockFactory) {
-        if (object == null) {
+    public LockedResource tryLock(Identifiable resource, String userId, LockFactory lockFactory) {
+        if (resource == null) {
             LOGGER.warn("A null resource cannot be locked...");
             throw new IllegalArgumentException("A null resource cannot be locked");
         }
@@ -57,17 +49,17 @@ public abstract class AbstractLockedResourceRepository implements LockedResource
             throw new IllegalArgumentException("A null user-identifier cannot be locked");
         }
 
-        String resource = object.getId();
-        DistributedLock lock = lockFactory.getLock(resource);
+        String resourceId = resource.getId();
+        DistributedLock lock = lockFactory.getLock(resourceId);
         LockedResource lockedResource;
         lock.lock();
         try {
-            lockedResource = get(object);
+            lockedResource = get(resource);
             if (lockedResource == null) {
-                lockedResource = add(object, userId);
-            } else if (couldBeLocked(lockedResource, userId)) {
-                remove(object);
-                lockedResource = add(object, userId);
+                lockedResource = add(resource, userId);
+            } else if (lockOwned(lockedResource, userId) || lockExpired(lockedResource)) {
+                remove(resource);
+                lockedResource = add(resource, userId);
             } else {
                 return lockedResource;
             }
@@ -78,7 +70,7 @@ public abstract class AbstractLockedResourceRepository implements LockedResource
         return lockedResource;
     }
 
-    public LockedResource unLock(Identifiable resource, String userId, LockFactory lockFactory) {
+    public LockedResource tryUnlock(Identifiable resource, String userId, LockFactory lockFactory) {
         if (resource == null) {
             LOGGER.warn("A null resource cannot be locked...");
             throw new IllegalArgumentException("A null resource cannot be locked");
@@ -96,7 +88,7 @@ public abstract class AbstractLockedResourceRepository implements LockedResource
             LockedResource lockedResource = get(resource);
             if (lockedResource == null) {
                 result = null;
-            } else if (couldBeLocked(lockedResource, userId)) {
+            } else if (lockOwned(lockedResource, userId) || lockExpired(lockedResource)) {
                 remove(resource);
                 result = null;
             } else {
@@ -110,26 +102,30 @@ public abstract class AbstractLockedResourceRepository implements LockedResource
     }
 
     @Override
-    public boolean retrieveLock(Identifiable object, String userId) throws Exception {
-        LockedResource lockedResource = tryLock(object, userId);
-        if (lockedResource != null) {
-            if (StringUtils.equals(userId, lockedResource.getUserId())) {
-                return true;
-            } else {
-                throw new Exception(lockedResource.getUserId());
-            }
+    public boolean lockOwned(LockedResource lockedResource, String userId){
+        final long now = Instant.now().getEpochSecond();
+        if (lockedResource != null && StringUtils.isNotEmpty(userId) && StringUtils.equals(userId, lockedResource.getUserId())
+                && now <= lockedResource.getExpirationTime()) {
+            return true;
         } else {
             return false;
         }
     }
 
-    @Override
-    public boolean retrieveUnLock(Identifiable object, String userId) throws Exception {
-        LockedResource lockedResource = unLock(object, userId);
-        if (lockedResource != null) {
-            throw new Exception(lockedResource.getUserId());
-        } else {
+    private boolean lockExpired(LockedResource lockedResource){
+        final long now = Instant.now().getEpochSecond();
+        if (lockedResource != null && lockedResource.getExpirationTime() < now){
             return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean lockReleased(LockedResource lockedResource, String userId) {
+        if (lockedResource == null) {
+            return true;
+        } else {
+            return false;
         }
     }
 

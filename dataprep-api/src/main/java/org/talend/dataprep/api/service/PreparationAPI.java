@@ -31,6 +31,8 @@ import javax.validation.Valid;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang.StringUtils;
+import org.apache.cxf.security.SecurityContext;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.talend.dataprep.api.preparation.Action;
@@ -54,9 +56,13 @@ import com.netflix.hystrix.HystrixCommand;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.talend.dataprep.security.Security;
 
 @RestController
 public class PreparationAPI extends APIService {
+
+    @Autowired
+    Security security;
 
     @RequestMapping(value = "/api/preparations", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get all preparations.", notes = "Returns the list of preparations the current user is allowed to see.")
@@ -413,11 +419,16 @@ public class PreparationAPI extends APIService {
                                    @ApiParam(name = "preparationId", value = "Preparation id.")
                                    final String preparationId, @PathVariable(value = "userId")
                                    @ApiParam(name = "userId", value = "Id of user who is asking for lock")
-                                   final String userId) {
+                                   String userId) {
+
+        if (!StringUtils.isNumeric(userId)){
+            userId = security.getUserId();
+        }
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("Locking preparation #{} for user '{}'...", preparationId, userId);
         }
+
 
         final HystrixCommand<Void> command = getCommand(PreparationLock.class, preparationId, userId);
         command.execute();
@@ -434,8 +445,11 @@ public class PreparationAPI extends APIService {
                                 @ApiParam(name = "preparationId", value = "Preparation id.")
                                 final String preparationId, @PathVariable(value = "userId")
                                 @ApiParam(name = "userId", value = "Id of user who is asking for lock")
-                                final String userId) {
+                                String userId) {
 
+        if (!StringUtils.isNumeric(userId)){
+            userId = security.getUserId();
+        }
         if (LOG.isDebugEnabled()) {
             LOG.debug("Locking preparation #{} for user '{}'...", preparationId, userId);
         }
