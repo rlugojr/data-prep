@@ -120,8 +120,7 @@ public class LookupTest {
                 "lookup_ds_id", //
                 "lookup_join_on", //
                 "lookup_join_on_name", //
-                "lookup_selected_cols", //
-                "dataset_action_display_type");
+                "lookup_selected_cols");
 
         // when
         final List<Parameter> parameters = action.getParameters();
