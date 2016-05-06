@@ -155,14 +155,28 @@ public class Preparation extends Identifiable implements Serializable {
         this.headId = headId;
     }
 
+    /**
+     * @see Identifiable#id()
+     */
     @Override
     public String id() {
         return getId();
     }
 
+    /**
+     * @see Identifiable#getId()
+     */
     @Override
     public String getId() {
         return id;
+    }
+
+    /**
+     * @see Identifiable#setId(String)
+     */
+    @Override
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**
@@ -179,10 +193,6 @@ public class Preparation extends Identifiable implements Serializable {
         this.appVersion = appVersion;
     }
 
-    @Override
-    public void setId(String id) {
-        // No op
-    }
 
     @Override
     public String toString() {
