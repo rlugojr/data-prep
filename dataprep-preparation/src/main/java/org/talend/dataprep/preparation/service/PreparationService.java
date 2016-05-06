@@ -141,6 +141,8 @@ public class PreparationService {
         folderRepository.addFolderEntry(folderEntry, folder);
 
         LOGGER.info("New preparation {} created and stored in {} ", preparation, folder);
+        // Lock the freshly created preparation
+        lock(id);
         return id;
     }
 
@@ -403,6 +405,8 @@ public class PreparationService {
                      @ApiParam(value = "The new name of the moved dataset.") @RequestParam(defaultValue = "", required = false) String newName)
             throws IOException {
     //@formatter:on
+        // Ensure that the preparation is not locked elsewhere
+        lock(preparationId);
 
         LOGGER.debug("moving {} from {} to {} with the new name '{}'", preparationId, folder, destination, newName);
 
@@ -445,6 +449,8 @@ public class PreparationService {
     @Timed
     public void delete(@PathVariable(value = "id") @ApiParam(name = "id", value = "Id of the preparation to delete") String id) {
 
+        // Ensure that the preparation is not locked elsewhere
+        lock(id);
         LOGGER.debug("Deletion of preparation #{} requested.", id);
 
         Preparation preparationToDelete = preparationRepository.get(id, Preparation.class);
@@ -472,6 +478,8 @@ public class PreparationService {
     public String update(@ApiParam("id") @PathVariable("id") String id,
             @RequestBody @ApiParam("preparation") final Preparation preparation) {
     //@formatter:on
+        // Ensure that the preparation is not locked elsewhere
+        lock(id);
 
         Preparation previousPreparation = preparationRepository.get(id, Preparation.class);
 
@@ -542,6 +550,9 @@ public class PreparationService {
     @ApiOperation(value = "Get preparation details", notes = "Return the details of the preparation with provided id.")
     @Timed
     public PreparationDetails get(@ApiParam("id") @PathVariable("id") String id) {
+        // Ensure that the preparation is not locked elsewhere
+        lock(id);
+
         LOGGER.debug("Get content of preparation details for #{}.", id);
         final Preparation preparation = preparationRepository.get(id, Preparation.class);
         final PreparationDetails details = getDetails(preparation);
@@ -576,6 +587,9 @@ public class PreparationService {
     @ApiOperation(value = "Get all preparation steps id", notes = "Return the steps of the preparation with provided id.")
     @Timed
     public List<String> getSteps(@ApiParam("id") @PathVariable("id") String id) {
+        // Ensure that the preparation is not locked elsewhere
+        lock(id);
+
         LOGGER.debug("Get steps of preparation for #{}.", id);
         final Step step = getStep(id);
         return preparationUtils.listStepsIds(step.id(), preparationRepository);
@@ -590,6 +604,8 @@ public class PreparationService {
     public void appendSteps(@PathVariable("id")
     final String id, @RequestBody
     final AppendStep stepsToAppend) {
+        // Ensure that the preparation is not locked elsewhere
+        lock(id);
         checkActionStepConsistency(stepsToAppend);
 
         LOGGER.debug("Adding actions to preparation #{}", id);
@@ -626,6 +642,8 @@ public class PreparationService {
     final String stepToModifyId, @RequestBody
     final AppendStep newStep) {
         //@formatter:on
+        // Ensure that the preparation is not locked elsewhere
+        lock(preparationId);
 
         checkActionStepConsistency(newStep);
 
@@ -686,6 +704,9 @@ public class PreparationService {
             throw new TDPException(PREPARATION_ROOT_STEP_CANNOT_BE_DELETED);
         }
 
+        // Ensure that the preparation is not locked elsewhere
+        lock(id);
+
         // get steps from 'step to delete' to head
         final Preparation preparation = getPreparation(id);
         final List<String> steps = extractSteps(preparation, stepToDeleteId); // throws an exception if stepId is not in
@@ -716,6 +737,8 @@ public class PreparationService {
     final String preparationId, //
             @PathVariable("headId")
     final String headId) {
+        // Ensure that the preparation is not locked elsewhere
+        lock(preparationId);
 
         final Step head = getStep(headId);
         if (head == null) {
@@ -741,6 +764,8 @@ public class PreparationService {
             @ApiParam("id") @PathVariable("id") final String id,
             @ApiParam("version") @PathVariable("version") final String version) {
     //@formatter:on
+        // Ensure that the preparation is not locked elsewhere
+        lock(id);
 
         LOGGER.debug("Get list of actions of preparations #{} at version {}.", id, version);
 
@@ -770,42 +795,21 @@ public class PreparationService {
     }
 
     //@formatter:off
-    @RequestMapping(value = "/preparations/{preparationId}/lock/{userId}", method = PUT, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/preparations/{preparationId}/lock", method = PUT, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Lock the specified preparation.", notes = "Returns a locked resource.")
     @Timed
-    public void lockPreparation(@ApiParam("preparationId") @PathVariable("preparationId") final String preparationId,
-                                @ApiParam("userId") @PathVariable("userId") final String userId) {
+    public void lockPreparation(@ApiParam("preparationId") @PathVariable("preparationId") final String preparationId) {
         //@formatter:on
-        Preparation preparation = preparationRepository.get(preparationId, Preparation.class);
-
-        LockedResource lockedResource = lockedResourceRepository.tryLock(preparation, userId);
-        if (lockedResourceRepository.lockOwned(lockedResource, userId)){
-            LOGGER.debug("Preparation {} locked for user {}.", preparationId, userId);
-        }
-        else{
-            LOGGER.debug("Unable to lock Preparation {} for user {}.", preparationId, userId);
-            throw new TDPException(CommonErrorCodes.CONFLICT_TO_LOCK_RESOURCE,
-                    ExceptionContext.build().put("Locker", lockedResource.getUserId()));
-        }
+        lock(preparationId);
     }
 
     //@formatter:off
-    @RequestMapping(value = "/preparations/{preparationId}/unlock/{userId}", method = PUT, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/preparations/{preparationId}/unlock", method = PUT, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Unlock the specified preparation.", notes = "Returns a locked resource.")
     @Timed
-    public void unlockPreparation(@ApiParam("preparationId") @PathVariable("preparationId") final String preparationId,
-                                  @ApiParam("userId") @PathVariable("userId") final String userId) {
+    public void unlockPreparation(@ApiParam("preparationId") @PathVariable("preparationId") final String preparationId) {
         //@formatter:on
-
-        Preparation preparation = preparationRepository.get(preparationId, Preparation.class);
-        LockedResource lockedResource = lockedResourceRepository.tryUnlock(preparation, userId);
-        if (lockedResourceRepository.lockReleased(lockedResource, userId)){
-            LOGGER.debug("Preparation {} unlocked by user {}.", preparationId, userId);
-        }else{
-            LOGGER.debug("Unable to unlock Preparation {} for user {}.", preparationId, userId);
-            throw new TDPException(CommonErrorCodes.CONFLICT_TO_UNLOCK_RESOURCE,
-                    ExceptionContext.build().put("Locker", lockedResource.getUserId()));
-        }
+        unlock(preparationId);
     }
 
     // ------------------------------------------------------------------------------------------------------------------
@@ -915,6 +919,52 @@ public class PreparationService {
                     build().put("id", preparation.getId()).put("stepId", fromStepId));
         }
         return steps;
+    }
+
+    /**
+     * Marks the specified preparation (identified by <i>preparationId</i>) as locked by the user identified by the
+     * specified user (identified by <i>userId</i>).
+     * 
+     * @param preparationId the specified preparation identifier
+     * @throws TDPException if the lock is hold by another user
+     */
+
+    private void lock(String preparationId) {
+
+        final String userId = security.getUserId();
+
+        Preparation preparation = preparationRepository.get(preparationId, Preparation.class);
+
+        LockedResource lockedResource = lockedResourceRepository.tryLock(preparation, userId);
+        if (lockedResourceRepository.lockOwned(lockedResource, userId)) {
+            LOGGER.debug("Preparation {} locked for user {}.", preparationId, userId);
+        } else {
+            LOGGER.debug("Unable to lock Preparation {} for user {}. Already locked by {}", preparationId, userId,
+                    lockedResource.getUserId());
+            throw new TDPException(CommonErrorCodes.CONFLICT_TO_LOCK_RESOURCE,
+                    ExceptionContext.build().put("Locker", lockedResource.getUserId()));
+        }
+    }
+
+    /**
+     * Marks the specified preparation (identified by <i>preparationId</i>) as unlocked by the user identified by the
+     * specified user (identified by <i>userId</i>).
+     *
+     * @param preparationId the specified preparation identifier
+     * @throws TDPException if the lock is hold by another user
+     */
+    private void unlock(String preparationId) {
+        final String userId = security.getUserId();
+        Preparation preparation = preparationRepository.get(preparationId, Preparation.class);
+        LockedResource lockedResource = lockedResourceRepository.tryUnlock(preparation, userId);
+        if (lockedResourceRepository.lockReleased(lockedResource, userId)) {
+            LOGGER.debug("Preparation {} unlocked by user {}.", preparationId, userId);
+        } else {
+            LOGGER.debug("Unable to unlock Preparation {} for user {}. Already locked by {}", preparationId, userId,
+                    lockedResource.getUserId());
+            throw new TDPException(CommonErrorCodes.CONFLICT_TO_UNLOCK_RESOURCE,
+                    ExceptionContext.build().put("Locker", lockedResource.getUserId()));
+        }
     }
 
     // ------------------------------------------------------------------------------------------------------------------

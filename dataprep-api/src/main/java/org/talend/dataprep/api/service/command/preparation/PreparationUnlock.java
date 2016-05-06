@@ -25,9 +25,9 @@ import org.talend.dataprep.command.GenericCommand;
 @Scope("request")
 public class PreparationUnlock extends GenericCommand<Void> {
 
-    private PreparationUnlock(final String preparationId, final String userId) {
+    private PreparationUnlock(final String preparationId) {
         super(GenericCommand.PREPARATION_GROUP);
-        execute(() -> new HttpPut(preparationServiceUrl + "/preparations/" + preparationId + "/unlock/" + userId));
+        execute(() -> new HttpPut(preparationServiceUrl + "/preparations/" + preparationId + "/unlock"));
         on(HttpStatus.OK).then(asNull());
     }
 }

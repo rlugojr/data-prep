@@ -61,9 +61,6 @@ import org.talend.dataprep.security.Security;
 @RestController
 public class PreparationAPI extends APIService {
 
-    @Autowired
-    Security security;
-
     @RequestMapping(value = "/api/preparations", method = RequestMethod.GET, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get all preparations.", notes = "Returns the list of preparations the current user is allowed to see.")
     @Timed
@@ -412,53 +409,41 @@ public class PreparationAPI extends APIService {
     }
 
 
-    @RequestMapping(value = "/api/preparations/{preparationId}/lock/{userId}", method = PUT, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/api/preparations/{preparationId}/lock", method = PUT, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Mark a preparation as locked by a user.", notes = "Does not return any value, client may expect successful operation based on HTTP status code.")
     @Timed
     public void lockPreparation(@PathVariable(value = "preparationId")
                                    @ApiParam(name = "preparationId", value = "Preparation id.")
-                                   final String preparationId, @PathVariable(value = "userId")
-                                   @ApiParam(name = "userId", value = "Id of user who is asking for lock")
-                                   String userId) {
-
-        if (!StringUtils.isNumeric(userId)){
-            userId = security.getUserId();
-        }
+                                   final String preparationId) {
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Locking preparation #{} for user '{}'...", preparationId, userId);
+            LOG.debug("Locking preparation #{}...", preparationId);
         }
 
 
-        final HystrixCommand<Void> command = getCommand(PreparationLock.class, preparationId, userId);
+        final HystrixCommand<Void> command = getCommand(PreparationLock.class, preparationId);
         command.execute();
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Locked preparation #{} for user '{}'...", preparationId, userId);
+            LOG.debug("Locked preparation #{}...", preparationId);
         }
     }
 
-    @RequestMapping(value = "/api/preparations/{preparationId}/unlock/{userId}", method = PUT, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/api/preparations/{preparationId}/unlock", method = PUT, produces = APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Mark a preparation as unlocked by a user.", notes = "Does not return any value, client may expect successful operation based on HTTP status code.")
     @Timed
     public void unlockPreparation(@PathVariable(value = "preparationId")
                                 @ApiParam(name = "preparationId", value = "Preparation id.")
-                                final String preparationId, @PathVariable(value = "userId")
-                                @ApiParam(name = "userId", value = "Id of user who is asking for lock")
-                                String userId) {
-
-        if (!StringUtils.isNumeric(userId)){
-            userId = security.getUserId();
-        }
+                                final String preparationId) {
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Locking preparation #{} for user '{}'...", preparationId, userId);
+            LOG.debug("Locking preparation #{}...", preparationId);
         }
 
-        final HystrixCommand<Void> command = getCommand(PreparationUnlock.class, preparationId, userId);
+        final HystrixCommand<Void> command = getCommand(PreparationUnlock.class, preparationId);
         command.execute();
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Locked preparation #{} for user '{}'...", preparationId, userId);
+            LOG.debug("Locked preparation #{}...", preparationId);
         }
     }
 
