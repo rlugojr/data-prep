@@ -18,7 +18,7 @@
     <appenders>
 
         <Console name="console" target="SYSTEM_OUT" ignoreExceptions="false">
-            <PatternLayout pattern="%highlight{%d{DEFAULT} [%t] [%X{user}] %-5level %logger{36} - %msg%n}"/>
+            <PatternLayout pattern="%highlight{%d{DEFAULT} [%t] [%X{user}] [%marker] %-5level %logger{36} - %msg%n}"/>
         </Console>
 
 
