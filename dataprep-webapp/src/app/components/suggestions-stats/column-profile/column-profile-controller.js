@@ -1,15 +1,15 @@
 /*  ============================================================================
 
-  Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+ Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 
-  This source code is available under agreement available at
-  https://github.com/Talend/data-prep/blob/master/LICENSE
+ This source code is available under agreement available at
+ https://github.com/Talend/data-prep/blob/master/LICENSE
 
-  You should have received a copy of the agreement
-  along with this program; if not, write to Talend SA
-  9 rue Pages 92150 Suresnes, France
+ You should have received a copy of the agreement
+ along with this program; if not, write to Talend SA
+ 9 rue Pages 92150 Suresnes, France
 
-  ============================================================================*/
+ ============================================================================*/
 
 /**
  * @ngdoc controller
@@ -20,7 +20,7 @@
  * @requires data-prep.statistics.service:StatisticsTooltipService
  * @requires data-prep.services.filter.service:FilterService
  */
-export default function ColumnProfileCtrl($translate, $timeout, state, StatisticsService, StatisticsTooltipService, FilterService) {
+export default function ColumnProfileCtrl($translate, $timeout, $filter, state, StatisticsService, StatisticsTooltipService, FilterService) {
     'ngInject';
 
     var vm = this;
@@ -61,11 +61,12 @@ export default function ColumnProfileCtrl($translate, $timeout, state, Statistic
      * @param {object} interval The interval [min, max] to filter
      */
     vm.addRangeFilter = function addRangeFilter(interval) {
-        var selectedColumn = state.playground.grid.selectedColumn;
+        const selectedColumn = state.playground.grid.selectedColumn,
+            isDateRange = selectedColumn.type === 'date';
 
         if (!interval.label) {
-            var min = d3.format(',')(interval.min);
-            var max = d3.format(',')(interval.max);
+            const min = isDateRange ? $filter('date')(interval.min, interval.datePattern) : d3.format(',')(interval.min),
+                max = isDateRange ? $filter('date')(interval.max, interval.datePattern) : d3.format(',')(interval.max);
             if(min === max){
                 interval.label = '[' + min + ']';
             }
@@ -73,7 +74,7 @@ export default function ColumnProfileCtrl($translate, $timeout, state, Statistic
                 interval.label = interval.isMaxReached ? '[' + min + ' .. ' + max + ']' : '[' + min + ' .. ' + max + '[';
             }
         }
-        var removeFilterFn = StatisticsService.getRangeFilterRemoveFn();
+        const removeFilterFn = StatisticsService.getRangeFilterRemoveFn();
         FilterService.addFilterAndDigest('inside_range',
             selectedColumn.id,
             selectedColumn.name,

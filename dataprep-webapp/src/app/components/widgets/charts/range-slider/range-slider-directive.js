@@ -31,7 +31,7 @@
  * @param {function} onBrushEnd The callback on slider move
  * */
 
-export default function RangeSlider($timeout) {
+export default function RangeSlider($timeout, $filter, state) {
     'ngInject';
 
     return {
@@ -70,6 +70,16 @@ export default function RangeSlider($timeout) {
              * @description Render the slider and attach the actions listeners
              **/
             function renderRangerSlider() {
+                let datePattern;
+
+                const lastChangeDatePatternAction = _.findLast(state.playground.preparation.actions,
+                    (action) => action.action === 'change_date_pattern'
+                );
+
+                if (lastChangeDatePatternAction) {
+                    datePattern = lastChangeDatePatternAction.parameters.custom_date_pattern || lastChangeDatePatternAction.parameters.new_pattern;
+                }
+
                 var rangeLimits = ctrl.rangeLimits;
                 var minBrush = typeof rangeLimits.minBrush !== 'undefined' ? rangeLimits.minBrush : rangeLimits.min;
                 var maxBrush = typeof rangeLimits.maxBrush !== 'undefined' ? rangeLimits.maxBrush : rangeLimits.max;
@@ -93,6 +103,8 @@ export default function RangeSlider($timeout) {
                 };
 
                 var centerValue = (minBrush + maxBrush) / 2;
+
+                const isDateType = state.playground.grid.selectedColumn.type === 'date';
 
                 //--------------------------------------------------------------------------------------------------
                 //----------------------------------------------CONTAINER-------------------------------------------
@@ -217,7 +229,7 @@ export default function RangeSlider($timeout) {
                         .attr('text-anchor', 'start')
                         .attr('fill', 'grey')
                         .text(function () {
-                            return d3.format(',')(rangeLimits.min);
+                            return isDateType ? $filter('date')(rangeLimits.min, datePattern) : d3.format(',')(rangeLimits.min);
                         });
 
                     svg.append('g').append('text')
@@ -227,7 +239,7 @@ export default function RangeSlider($timeout) {
                         .attr('text-anchor', 'end')
                         .attr('fill', 'grey')
                         .text(function () {
-                            return d3.format(',')(rangeLimits.max);
+                            return isDateType ? $filter('date')(rangeLimits.max, datePattern) : d3.format(',')(rangeLimits.max);
                         });
 
                     ctrl.brush = d3.svg.brush()
@@ -275,12 +287,12 @@ export default function RangeSlider($timeout) {
                             var brushValues = ctrl.brush.extent();
                             if (initialBrushValues[0] !== brushValues[0]) {
                                 $timeout(function () {
-                                    ctrl.minMaxModel.minModel = brushValues[0].toFixed(nbDecimals);
+                                    ctrl.minMaxModel.minModel = isDateType ? $filter('date')(brushValues[0].toFixed(nbDecimals), datePattern): brushValues[0].toFixed(nbDecimals);
                                 });
                             }
                             if (initialBrushValues[1] !== brushValues[1]) {
                                 $timeout(function () {
-                                    ctrl.minMaxModel.maxModel = brushValues[1].toFixed(nbDecimals);
+                                    ctrl.minMaxModel.maxModel = isDateType ? $filter('date')(brushValues[1].toFixed(nbDecimals), datePattern) : brushValues[1].toFixed(nbDecimals);
                                 });
                             }
                         })
@@ -311,8 +323,10 @@ export default function RangeSlider($timeout) {
                 function initInputValues() {
                     hideMsgErr();
                     $timeout(function () {
-                        ctrl.minMaxModel.minModel = '' + lastValues.input.min;
-                        ctrl.minMaxModel.maxModel = '' + lastValues.input.max;
+                        const inputMin = '' + lastValues.input.min,
+                            inputMax = '' + lastValues.input.max;
+                        ctrl.minMaxModel.minModel = isDateType ? $filter('date')(inputMin, datePattern) : inputMin;
+                        ctrl.minMaxModel.maxModel = isDateType ? $filter('date')(inputMax, datePattern) : inputMax;
                     });
 
                     //filterToApply = [lastValues.input.min, lastValues.input.max];
