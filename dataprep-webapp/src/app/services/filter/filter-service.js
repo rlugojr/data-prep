@@ -30,6 +30,7 @@ export default function FilterService($timeout, state, StateService, FilterAdapt
     var service = {
         //utils
         getColumnsContaining: getColumnsContaining,
+        getIntervalLabelFor: getIntervalLabelFor,
 
         //life
         addFilter: addFilter,
@@ -63,6 +64,32 @@ export default function FilterService($timeout, state, StateService, FilterAdapt
         var canBeBoolean = 'true'.match(regexp) || 'false'.match(regexp);
 
         return DatagridService.getColumnsContaining(regexp, canBeNumeric, canBeBoolean);
+    }
+
+    /**
+     * @ngdoc method
+     * @name getIntervalLabelFor
+     * @methodOf data-prep.services.filter.service:FilterService
+     * @description Define an interval label
+     * @param {Array} interval Array with a min and a max value
+     * @param {boolean} isMaxReached to close interval if max value composes the interval
+     */
+    function getIntervalLabelFor(interval, isMaxReached) {
+        if (interval.length !== 2) {
+            throw 'Must be a valid interval with min and max values.';
+        }
+
+        let label;
+        const min = interval[0], max = interval[1];
+
+        if (min === max) {
+            label = '[' + min + ']';
+        }
+        else {
+            label = isMaxReached ? '[' + min + ' .. ' + max + ']' : '[' + min + ' .. ' + max + '[';
+        }
+
+        return label;
     }
 
     //--------------------------------------------------------------------------------------------------------------
@@ -99,8 +126,9 @@ export default function FilterService($timeout, state, StateService, FilterAdapt
         return function () {
             return function (item) {
                 // col could be removed by a step
-                if (item[colId]) {
-                    return item[colId].toLowerCase().match(regexp);
+                let currentItem = item[colId];
+                if (currentItem) {
+                    return currentItem.toLowerCase().match(regexp);
                 }
                 else {
                     return false;
@@ -123,10 +151,9 @@ export default function FilterService($timeout, state, StateService, FilterAdapt
         return function () {
             return function (item) {
                 // col could be removed by a step
-                if (item[colId]) {
-                    return caseSensitive ?
-                    item[colId] === phrase :
-                    (item[colId]).toUpperCase() === phrase.toUpperCase();
+                let currentItem = item[colId];
+                if (currentItem) {
+                    return currentItem.match(new RegExp(phrase), (!caseSensitive ? 'i' : null));
                 }
                 else {
                     return false;
@@ -294,7 +321,7 @@ export default function FilterService($timeout, state, StateService, FilterAdapt
      * @description Add a filter and update datagrid filters
      */
 
-    function addFilter(type, colId, colName, args, removeFilterFn) {
+    function addFilter(type, colId, colName, args, removeFilterFn, keyName) {
         var filterFn;
         var sameColAndTypeFilter = _.find(state.playground.filter.gridFilters, {colId: colId, type: type});
         var createFilter, getFilterValue, filterExists, argsToDisplay;
@@ -409,7 +436,7 @@ export default function FilterService($timeout, state, StateService, FilterAdapt
         }
         else {
             var filterValue = getFilterValue();
-            updateFilter(sameColAndTypeFilter, filterValue);
+            updateFilter(sameColAndTypeFilter, filterValue, keyName);
         }
     }
 
@@ -424,8 +451,8 @@ export default function FilterService($timeout, state, StateService, FilterAdapt
      * @param {function} removeFilterFn An optional remove callback
      * @description Wrapper on addFilter method that trigger a digest at the end (use of $timeout)
      */
-    function addFilterAndDigest(type, colId, colName, args, removeFilterFn) {
-        $timeout(addFilter.bind(service, type, colId, colName, args, removeFilterFn));
+    function addFilterAndDigest(type, colId, colName, args, removeFilterFn, keyName) {
+        $timeout(addFilter.bind(service, type, colId, colName, args, removeFilterFn, keyName));
     }
 
     /**
@@ -436,11 +463,15 @@ export default function FilterService($timeout, state, StateService, FilterAdapt
      * @param {object} newValue The filter update parameters
      * @description Update an existing filter and update datagrid filters
      */
-    function updateFilter(oldFilter, newValue) {
+    function updateFilter(oldFilter, newValue, keyName) {
         var newFilterFn;
         var newFilter;
         var newArgs;
         var editableFilter;
+
+        const addOrCriteria = keyName === 'ctrl',
+            addFromToCriteria = keyName === 'shift';
+
         switch (oldFilter.type) {
             case 'contains':
                 newArgs = {phrase: newValue};
@@ -448,12 +479,38 @@ export default function FilterService($timeout, state, StateService, FilterAdapt
                 editableFilter = true;
                 break;
             case 'exact':
-                newArgs = {phrase: newValue};
-                newFilterFn = createExactFilterFn(oldFilter.colId, getValueToMatch(newValue), oldFilter.args.caseSensitive);
+                let newComputedValue = (function () {
+                    if (addOrCriteria) {
+                        const oldPhrase = oldFilter.args.phrase;
+                        if (oldPhrase.indexOf(newValue) > -1) {
+                            return _.without(oldPhrase.split('|'), newValue).join('|');
+                        }
+                        return [oldPhrase, newValue].join('|')
+                    }
+                    return newValue;
+                }());
+                newArgs = {phrase: newComputedValue};
+                newFilterFn = createExactFilterFn(oldFilter.colId, getValueToMatch(newArgs.phrase), oldFilter.args.caseSensitive);
                 editableFilter = true;
                 break;
             case 'inside_range':
-                newArgs = newValue;
+                let newComputedRange = (function () {
+                    if (addFromToCriteria) {
+                        const oldInterval = oldFilter.args.interval;
+                        let newInterval = newValue.interval;
+                        if (oldInterval[0] < newInterval[0]) {
+                            newInterval[0] = oldInterval[0];
+                        }
+                        if (oldInterval[1] > newInterval[1]) {
+                            newInterval[1] = oldInterval[1];
+                        }
+                        newValue.interval = newInterval;
+                        newValue.label = getIntervalLabelFor(newInterval);
+                        return newValue;
+                    }
+                    return newValue;
+                }());
+                newArgs = newComputedRange;
                 editableFilter = false;
                 newFilterFn = newValue.type === 'date' ?
                     createDateRangeFilterFn(oldFilter.colId, newValue.interval) :

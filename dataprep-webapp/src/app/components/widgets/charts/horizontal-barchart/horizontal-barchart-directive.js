@@ -38,6 +38,8 @@
  * @param {number}      width The chart width
  * @param {number}      height The chart height
  * @param {function}    onClick The callback on chart bar click. The item in argument is the element in primaryData that is selected.
+ * @param {function}    onCtrlClick The callback on chart bar ctrl + click. The item in argument is the element in primaryData that is selected.
+ * @param {function}    onShiftClick The callback on chart bar shift + click. The item in argument is the element in primaryData that is selected.
  * @param {string}      keyField The key property name in primaryData elements
  * @param {string}      keyLabel The label property name in primaryData elements used in tooltip
  * @param {array}       primaryData The primary value array to render
@@ -56,6 +58,8 @@ export default function HorizontalBarchart($timeout) {
         restrict: 'E',
         scope: {
             onClick: '&',
+            onCtrlClick: '&',
+            onShiftClick: '&',
             keyField: '@',
             keyLabel: '@',
             primaryData: '=',
@@ -271,6 +275,14 @@ export default function HorizontalBarchart($timeout) {
                         tooltip.hide(d);
                     })
                     .on('click', function (d) {
+                        if(d3.event.ctrlKey) {
+                            scope.onCtrlClick({item: _.extend({}, d)});
+                            return;
+                        }
+                        else if(d3.event.shiftKey) {
+                            scope.onShiftClick({item: _.extend({}, d)});
+                            return;
+                        }
                         //create a new reference as the data object could be modified outside the component
                         scope.onClick({item: _.extend({}, d)});
                     });

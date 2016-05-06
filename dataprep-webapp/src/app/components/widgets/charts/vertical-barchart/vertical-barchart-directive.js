@@ -39,6 +39,8 @@
  * @param {number}      height The chart height
  * @param {boolean}     showXAxis Determine if the x-axis should be drawn
  * @param {function}    onClick The callback on chart bar click. The interval is an Object {min: minValue, max, maxValue}
+ * @param {function}    onCtrlClick The callback on chart bar ctrl + click. The interval is an Object {min: minValue, max, maxValue}
+ * @param {function}    onShiftClick The callback on chart bar shift + click. The interval is an Object {min: minValue, max, maxValue}
  * @param {string}      keyField The key property name in primaryData elements
  * @param {string}      keyLabel The label property name in primaryData elements
  * @param {array}       primaryData The primary value array to render
@@ -56,6 +58,8 @@ export default function VerticalBarchart($timeout) {
         restrict: 'E',
         scope: {
             onClick: '&',
+            onCtrlClick: '&',
+            onShiftClick: '&',
             activeLimits: '=',
             keyField: '@',
             keyLabel: '@',
@@ -299,6 +303,14 @@ export default function VerticalBarchart($timeout) {
                     .on('click', function (d) {
                         //create a new reference as the data object could be modified outside the component
                         var newDataObj = _.extend({}, getRangeInfos(d));
+                        if(d3.event.ctrlKey) {
+                            scope.onCtrlClick({interval: newDataObj});
+                            return;
+                        }
+                        else if(d3.event.shiftKey) {
+                            scope.onShiftClick({interval: newDataObj});
+                            return;
+                        }
                         scope.onClick({interval: newDataObj});
                     });
             }

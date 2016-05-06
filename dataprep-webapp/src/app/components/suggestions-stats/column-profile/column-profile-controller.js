@@ -20,7 +20,7 @@
  * @requires data-prep.statistics.service:StatisticsTooltipService
  * @requires data-prep.services.filter.service:FilterService
  */
-export default function ColumnProfileCtrl($translate, $timeout, state, StatisticsService, StatisticsTooltipService, FilterService) {
+export default function ColumnProfileCtrl($translate, $timeout, $filter, state, StatisticsService, StatisticsTooltipService, FilterService) {
     'ngInject';
 
     var vm = this;
@@ -32,14 +32,14 @@ export default function ColumnProfileCtrl($translate, $timeout, state, Statistic
     //------------------------------------------------------------------------------------------------------
     //------------------------------------------------FILTER------------------------------------------------
     //------------------------------------------------------------------------------------------------------
-    function addExactFilter(value) {
+    function addExactFilter(value, keyName) {
         var column = state.playground.grid.selectedColumn;
         return value.length ?
             FilterService.addFilterAndDigest('exact', column.id, column.name, {
                 phrase: value,
                 caseSensitive: true
-            }) :
-            FilterService.addFilterAndDigest('empty_records', column.id, column.name);
+            }, null, keyName) :
+            FilterService.addFilterAndDigest('empty_records', column.id, column.name, null, null, keyName);
     }
 
     /**
@@ -49,8 +49,8 @@ export default function ColumnProfileCtrl($translate, $timeout, state, Statistic
      * @description Add an "exact" case sensitive filter if the value is not empty, an "empty_records" filter otherwise
      * @type {array}
      */
-    vm.addBarchartFilter = function addBarchartFilter(item) {
-        return addExactFilter(item.data);
+    vm.addBarchartFilter = function addBarchartFilter(item, keyName) {
+        return addExactFilter(item.data, keyName);
     };
 
     /**
@@ -60,30 +60,24 @@ export default function ColumnProfileCtrl($translate, $timeout, state, Statistic
      * @description Add an "range" filter
      * @param {object} interval The interval [min, max] to filter
      */
-    vm.addRangeFilter = function addRangeFilter(interval) {
+    vm.addRangeFilter = function addRangeFilter(interval, keyName) {
         var selectedColumn = state.playground.grid.selectedColumn;
 
-        if (!interval.label) {
-            var min = d3.format(',')(interval.min);
-            var max = d3.format(',')(interval.max);
-            if(min === max){
-                interval.label = '[' + min + ']';
-            }
-            else {
-                interval.label = interval.isMaxReached ? '[' + min + ' .. ' + max + ']' : '[' + min + ' .. ' + max + '[';
-            }
-        }
+        const min = interval.min,
+            max = interval.max;
+
         var removeFilterFn = StatisticsService.getRangeFilterRemoveFn();
         FilterService.addFilterAndDigest('inside_range',
             selectedColumn.id,
             selectedColumn.name,
             {
-                interval: [interval.min, interval.max],
-                label: interval.label,
+                interval: [min, max],
+                label: FilterService.getIntervalLabelFor([min, max], interval.isMaxReached),
                 type: selectedColumn.type,
                 isMaxReached: interval.isMaxReached
             },
-            removeFilterFn);
+            removeFilterFn,
+            keyName);
     };
 
     vm.changeAggregation = function changeAggregation(column, aggregation) {
