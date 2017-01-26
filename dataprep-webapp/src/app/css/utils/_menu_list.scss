@@ -14,6 +14,7 @@ $item-link-margin-spacing: -5px -20px;
 $item-padding-spacing: 5px 20px;
 
 @mixin menu-shape() {
+  font-family: $sourcesanspro;
   background-color: $white;
   border: 1px solid silver;
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
