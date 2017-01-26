@@ -28,33 +28,6 @@ $iconsfont: "talend-font";
 }
 
 @font-face {
-  font-family: 'Inconsolata';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Inconsolata'),
-    /* from http://fonts.gstatic.com/s/inconsolata/v10/BjAYBlHtW3CJxDcjzrnZCIbN6UDyHWBl620a-IRfuBk.woff */
-  url('./fonts/Inconsolata_400.woff') format('woff'),
-    /* from http://fonts.gstatic.com/s/inconsolata/v10/BjAYBlHtW3CJxDcjzrnZCJ0EAVxt0G0biEntp43Qt6E.ttf */
-  url('./fonts/Inconsolata_400.ttf') format('truetype'),
-    /* from http://fonts.gstatic.com/l/font?kit=BjAYBlHtW3CJxDcjzrnZCHNsigHlcrQGNV8nkUSFQfc#Inconsolata */
-  url('./fonts/Inconsolata_400.svg#Inconsolata') format('svg');
-}
-
-@font-face {
-  font-family: 'Inconsolata';
-  font-style: normal;
-  font-weight: 700;
-  src: local('Inconsolata Bold'),
-  local('Inconsolata-Bold'),
-    /* from http://fonts.gstatic.com/s/inconsolata/v10/AIed271kqQlcIRSOnQH0yTqR_3kx9_hJXbbyU8S6IN0.woff */
-  url('./fonts/Inconsolata_700.woff') format('woff'),
-    /* from http://fonts.gstatic.com/s/inconsolata/v10/AIed271kqQlcIRSOnQH0yZ_TkvowlIOtbR7ePgFOpF4.ttf */
-  url('./fonts/Inconsolata_700.ttf') format('truetype'),
-    /* from http://fonts.gstatic.com/l/font?kit=AIed271kqQlcIRSOnQH0yXtNmQEE9wZ6UZlmiISB1pg#Inconsolata */
-  url('./fonts/Inconsolata_700.svg#Inconsolata') format('svg');
-}
-
-@font-face {
   font-family: "talend-font";
   src: url("./fonts/talend-font.eot");
   src: url("./fonts/talend-font.eot?#iefix") format("embedded-opentype"),
