@@ -56,6 +56,13 @@ $item-padding-spacing: 5px 20px;
       color: #333;
       margin: $item-link-margin-spacing;
       padding: $item-padding-spacing;
+      cursor: pointer; // Needed because of SlickGrid
+
+      &:hover,
+      &:focus,
+      &:active {
+        text-decoration: none;
+      }
     }
 
     .info {
