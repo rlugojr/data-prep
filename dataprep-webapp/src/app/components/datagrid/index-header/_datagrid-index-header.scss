@@ -31,14 +31,15 @@ $datagrid-headercell-font-size: .95em;
 
   .grid-header-menu {
     @include menu-list;
+    padding: 0;
     box-shadow: none;
-    padding: 5px;
   }
 
   .talend-dropdown-div {
     .grid-header-menu-title {
+      display: block;
+      padding: 10px 20px 0;
       color: $dark-blue;
-      padding: 0 20px;
     }
 
     .sc-dropdown-trigger {
