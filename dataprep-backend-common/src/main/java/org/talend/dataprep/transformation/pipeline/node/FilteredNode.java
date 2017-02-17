@@ -23,7 +23,7 @@ public class FilteredNode extends BasicNode {
 
     private final Function<RowMetadata, Predicate<DataSetRow>> filter;
 
-    private Predicate<DataSetRow> instance;
+    private transient Predicate<DataSetRow> instance;
 
     public FilteredNode(Function<RowMetadata, Predicate<DataSetRow>> filter) {
         this.filter = filter;

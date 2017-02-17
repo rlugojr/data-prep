@@ -63,24 +63,16 @@ public class PreparationParser {
         mapper.registerModule(new MixedContentMapModule());
     }
 
-    public static PreparationMessage parseCorePreparation(InputStream preparation) {
+    public static StandalonePreparation parsePreparation(InputStream preparation) {
         assertPreparation(preparation);
         try {
-            final PreparationMessage preparationMessage = mapper.reader(PreparationMessage.class).readValue(preparation);
+            final StandalonePreparation preparationMessage = mapper.reader(StandalonePreparation.class).readValue(preparation);
             if (preparationMessage.getRowMetadata() == null) {
                 preparationMessage.setRowMetadata(new RowMetadata());
             }
             return preparationMessage;
         } catch (IOException e) {
             throw new IllegalArgumentException("Unable to parse preparation", e);
-        }
-    }
-
-    public static StandalonePreparation parseExportableCorePreparation(InputStream inputStream) {
-        try {
-            return mapper.reader(StandalonePreparation.class).readValue(inputStream);
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Unable to create the provided exportable preparation into a function" + e);
         }
     }
 
