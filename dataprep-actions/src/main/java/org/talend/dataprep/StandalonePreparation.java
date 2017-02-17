@@ -15,6 +15,7 @@ package org.talend.dataprep;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.talend.dataprep.api.dataset.row.LightweightExportableDataSet;
 import org.talend.dataprep.api.preparation.PreparationMessage;
 import org.talend.dataquality.semantic.broadcast.BroadcastDocumentObject;
@@ -58,7 +59,7 @@ public class StandalonePreparation extends PreparationMessage {
     }
 
     public String getFilterOut() {
-        return filterOut.toString();
+        return filterOut == null ? StringUtils.EMPTY : filterOut.toString();
     }
 
     public void setFilterOut(ObjectNode filterOut) {
