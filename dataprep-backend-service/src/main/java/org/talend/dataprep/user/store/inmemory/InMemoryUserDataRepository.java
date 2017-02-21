@@ -39,6 +39,15 @@ public class InMemoryUserDataRepository<U extends UserData> implements UserDataR
     }
 
     /**
+     * @see UserDataRepository#getByEmail(String)
+     */
+    @Override
+    public U getByEmail(String email) {
+        // TODO
+        return null;
+    }
+
+    /**
      * @see UserDataRepository#save(UserData)
      */
     @Override

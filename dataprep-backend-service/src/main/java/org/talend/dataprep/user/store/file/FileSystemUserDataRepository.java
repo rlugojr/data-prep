@@ -87,6 +87,14 @@ public class FileSystemUserDataRepository implements UserDataRepository<UserData
     }
 
     /**
+     * @see UserDataRepository#getByEmail(String)
+     */
+    @Override
+    public UserData getByEmail(String email) {
+        return null;
+    }
+
+    /**
      * @see UserDataRepository#save(UserData)
      */
     @Override
