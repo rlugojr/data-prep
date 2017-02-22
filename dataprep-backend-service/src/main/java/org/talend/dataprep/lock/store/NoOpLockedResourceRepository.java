@@ -25,7 +25,7 @@ import org.talend.dataprep.lock.store.LockedResource.LockUserInfo;
  * No op implementation of the LockedResourceRepository.
  */
 @Component
-@ConditionalOnProperty(name = "lock.preparation.store", havingValue = "none", matchIfMissing = true)
+@ConditionalOnProperty(name = "lock.preparation.store.type", havingValue = "none", matchIfMissing = true)
 public class NoOpLockedResourceRepository implements LockedResourceRepository {
 
     /**

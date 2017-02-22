@@ -43,7 +43,8 @@ import org.talend.dataprep.preparation.store.PreparationRepository;
  * </ul>
  */
 @Configuration
-public class PreparationRepositoryConfiguration {
+public class
+PreparationRepositoryConfiguration {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PreparationRepositoryConfiguration.class);
 

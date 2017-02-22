@@ -45,7 +45,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  *
  * @see FileSystemPreparationRepositoryTest
  */
-@TestPropertySource(inheritLocations = false, inheritProperties = false, properties = { "preparation.store=file",
+@TestPropertySource(inheritLocations = false, inheritProperties = false, properties = { "preparation.store.type=file",
         "preparation.store.file.location=target/test/store/preparation" })
 public class FileSystemPreparationRepositoryTest extends PreparationRepositoryTest {
 

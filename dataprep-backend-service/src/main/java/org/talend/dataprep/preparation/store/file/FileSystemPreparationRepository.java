@@ -52,7 +52,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * File system implementation of preparation repository.
  */
 @Component
-@ConditionalOnProperty(name = "preparation.store", havingValue = "file")
+@ConditionalOnProperty(name = "preparation.store.type", havingValue = "file")
 public class FileSystemPreparationRepository extends ObjectPreparationRepository {
 
     /** This class' logger. */

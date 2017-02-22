@@ -28,7 +28,7 @@ import org.talend.dataprep.preparation.BasePreparationTest;
 import org.talend.dataprep.preparation.FixedIdPreparationContent;
 
 
-@TestPropertySource(properties={"dataset.metadata.store: in-memory", "preparation.store.remove.hours: 2"})
+@TestPropertySource(properties={"dataset.metadata.store.type: in-memory", "preparation.store.remove.hours: 2"})
 public class PreparationCleanerTest extends BasePreparationTest {
 
     @Autowired

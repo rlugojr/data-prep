@@ -25,7 +25,7 @@ import org.springframework.test.context.TestPropertySource;
 import org.talend.dataprep.api.preparation.Identifiable;
 import org.talend.dataprep.lock.store.LockedResource.LockUserInfo;
 
-@TestPropertySource(properties = { "lock.preparation.store=none" })
+@TestPropertySource(properties = { "lock.preparation.store.type=none" })
 public class NoOpLockedResourceRepositoryTest extends LockedResourceTestUtils {
 
     @Autowired
