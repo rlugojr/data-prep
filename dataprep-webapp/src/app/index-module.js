@@ -46,13 +46,11 @@ const app = angular.module(MODULE_NAME,
 		PLAYGROUND_MODULE, // routing: playground component
 		APP_MODULE, // bootstrap: app root
 	])
-
-	// Performance config
+// Performance config
 	.config(($httpProvider) => {
 		'ngInject';
 		$httpProvider.useApplyAsync(true);
 	})
-
 	// Translate config
 	.config(($translateProvider) => {
 		'ngInject';
@@ -86,7 +84,7 @@ window.fetchConfiguration = function fetchConfiguration() {
 				// Configure server api urls
 				.run((RestURLs) => {
 					'ngInject';
-					RestURLs.setServerUrl(config.serverUrl);
+					RestURLs.setConfig(config);
 				})
 				// Fetch dynamic configuration (supported encodings, ...)
 				.run((SettingsService, DatasetService) => {
