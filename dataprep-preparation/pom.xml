@@ -28,6 +28,7 @@
     </parent>
     <properties>
         <start-class>org.talend.dataprep.preparation.Application</start-class>
+        <stack.param.name>DataPrepPreparationFQIN</stack.param.name>
     </properties>
     <build>
         <plugins>
@@ -35,7 +36,14 @@
                 <groupId>com.spotify</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
                 <configuration>
-                    <skipDockerBuild>false</skipDockerBuild>
+                    <skipDocker>false</skipDocker>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <configuration>
+                    <skip>false</skip>
                 </configuration>
             </plugin>
         </plugins>

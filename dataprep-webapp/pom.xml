@@ -36,6 +36,28 @@
         <docker.user>1000</docker.user>
         <docker.path.dataprep>/data-prep</docker.path.dataprep>
     </properties>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.spotify</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <configuration>
+                        <imageName>${docker.image.name}</imageName>
+                        <dockerDirectory>${basedir}/docker</dockerDirectory>
+                        <forceTags>true</forceTags>
+                        <resources>
+                            <resource>
+                                <targetPath>/build</targetPath>
+                                <directory>${basedir}/build</directory>
+                                <include>**/*</include>
+                            </resource>
+                        </resources>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
     <profiles>
         <profile>
             <id>dev</id>
@@ -317,22 +339,14 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
             </activation>
+            <properties>
+                <docker.image.name>talend/${project.name}:${project.version}</docker.image.name>
+            </properties>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>com.spotify</groupId>
                         <artifactId>docker-maven-plugin</artifactId>
-                        <configuration>
-                            <imageName>talend/${project.name}:${project.version}</imageName>
-                            <dockerDirectory>${basedir}/docker</dockerDirectory>
-                            <resources>
-                                <resource>
-                                    <targetPath>/build</targetPath>
-                                    <directory>${basedir}/build</directory>
-                                    <include>**/*</include>
-                                </resource>
-                            </resources>
-                        </configuration>
                         <executions>
                             <execution>
                                 <phase>package</phase>
@@ -341,6 +355,40 @@
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>docker-ci</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <properties>
+                <docker.image.name>localhost:5000/talend/${project.name}:${project.version}-${git.branch.name}-${git.commit.id.abbrev}</docker.image.name>
+                <stack.param.name>DataPrepWebappFQIN</stack.param.name>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.spotify</groupId>
+                        <artifactId>docker-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>build</goal>
+                                    <goal>push</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <configuration>
+                            <skip>false</skip>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>

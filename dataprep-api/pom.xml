@@ -25,6 +25,9 @@
     <artifactId>dataprep-api</artifactId>
     <packaging>jar</packaging>
     <name>dataprep-api</name>
+    <properties>
+        <stack.param.name>DataPrepApiFQIN</stack.param.name>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>javax.mail</groupId>
@@ -66,7 +69,14 @@
                 <groupId>com.spotify</groupId>
                 <artifactId>docker-maven-plugin</artifactId>
                 <configuration>
-                    <skipDockerBuild>false</skipDockerBuild>
+                    <skipDocker>false</skipDocker>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <configuration>
+                    <skip>false</skip>
                 </configuration>
             </plugin>
         </plugins>
