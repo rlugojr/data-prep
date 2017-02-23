@@ -44,7 +44,7 @@ public class AuthenticatedTaskExecutor implements AsyncListenableTaskExecutor {
                     ctx.setAuthentication(authentication);
                     SecurityContextHolder.setContext(ctx);
                 }
-                runnable.run(); // NOSONAR not dealing with threads here but a runnable
+                    runnable.run(); // NOSONAR not dealing with threads here but a runnable
             } finally {
                 SecurityContextHolder.clearContext();
             }
