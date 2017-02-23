@@ -136,10 +136,6 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
             <build>
-                <pluginManagement>
-                    <plugins>
-                    </plugins>
-                </pluginManagement>
                 <plugins>
                     <plugin>
                         <groupId>pl.project13.maven</groupId>
