@@ -15,7 +15,6 @@ package org.talend.dataprep.transformation.actions.common;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 import org.talend.dataprep.api.action.ActionDefinition;
 import org.talend.dataprep.transformation.actions.category.ActionScope;
 
@@ -43,9 +42,5 @@ public interface InternalActionDefinition extends ActionDefinition {
      */
     // Only here for JSON serialization purposes.
     boolean isDynamic();
-
-    default String getDocUrl() {
-        return StringUtils.EMPTY;
-    }
 
 }

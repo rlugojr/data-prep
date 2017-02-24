@@ -101,6 +101,11 @@ public abstract class AbstractActionMetadata implements InternalActionDefinition
         return ActionsBundle.INSTANCE.actionDescription(this, Locale.ENGLISH, getName());
     }
 
+    @Override
+    public String getDocUrl() {
+        return ActionsBundle.INSTANCE.docUrl(this, Locale.ENGLISH, getName());
+    }
+
     /**
      * Defines the list of scopes this action belong to.
      * <p>

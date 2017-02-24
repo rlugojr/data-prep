@@ -31,6 +31,16 @@ public class ActionsBundleTest {
     }
 
     @Test
+    public void actionDocUrl() throws Exception {
+        assertEquals("https://help.talend.com/pages/viewpage.action?pageId=266307174&utm_medium=dpdesktop&utm_source=func", ActionsBundle.INSTANCE.docUrl(this, Locale.US, "replace_on_value"));
+    }
+
+    @Test
+    public void emptyActionDocUrl() throws Exception {
+        assertEquals("", ActionsBundle.INSTANCE.docUrl(this, Locale.US, "uppercase"));
+    }
+
+    @Test
     public void parameterLabel() throws Exception {
         assertEquals("Dataset name", ActionsBundle.INSTANCE.parameterLabel(this, Locale.US, "name"));
     }

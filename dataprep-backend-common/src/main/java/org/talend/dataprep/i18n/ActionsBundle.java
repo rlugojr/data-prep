@@ -42,6 +42,8 @@ public class ActionsBundle implements MessagesBundle {
 
     private static final String DESCRIPTION_SUFFIX = ".desc";
 
+    private static final String URL_SUFFIX = ".url";
+
     private static final String LABEL_SUFFIX = ".label";
 
     private static final String PARAMETER_PREFIX = "parameter.";
@@ -135,6 +137,19 @@ public class ActionsBundle implements MessagesBundle {
     public String actionDescription(Object action, Locale locale, String actionName, Object... values) {
         final String actionDescriptionKey = ACTION_PREFIX + actionName + DESCRIPTION_SUFFIX;
         return getMessage(action, locale, actionDescriptionKey, values);
+    }
+
+    /**
+     * Fetches action doc url at {@code action.<action_name>.url} in the dataprep actions resource bundle.
+     * If there is no doc for this action, an empty string is returned.
+     */
+    public String docUrl(Object action, Locale locale, String actionName) {
+        final String actionDocUrlKey = ACTION_PREFIX + actionName + URL_SUFFIX;
+        final ResourceBundle bundle = findBundle(action, locale);
+        if (bundle.containsKey(actionDocUrlKey)) {
+            return bundle.getString(actionDocUrlKey);
+        }
+        return StringUtils.EMPTY;
     }
 
     /**

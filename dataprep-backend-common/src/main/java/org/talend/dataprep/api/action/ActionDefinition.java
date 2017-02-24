@@ -52,6 +52,11 @@ public interface ActionDefinition extends Serializable {
     String getDescription();
 
     /**
+     * @return The action documentation url.
+     */
+    String getDocUrl();
+
+    /**
      * @return The list of parameters required for this Action to be executed.
      **/
     List<Parameter> getParameters();
