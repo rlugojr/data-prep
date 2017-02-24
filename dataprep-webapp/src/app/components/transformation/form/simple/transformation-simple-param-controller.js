@@ -17,10 +17,11 @@
  * @description Simple transformation parameter controller.
  * @requires data-prep.services.utils.service:ConverterService
  */
-export default function TransformSimpleParamCtrl(ConverterService) {
+export default function TransformSimpleParamCtrl(ConverterService, TextFormatService) {
 	'ngInject';
 
 	const vm = this;
+	vm.TextFormatService = TextFormatService;
 
     /**
      * @ngdoc method
@@ -50,6 +51,17 @@ export default function TransformSimpleParamCtrl(ConverterService) {
      */
 	const initInputTypes = function () {
 		vm.parameter.inputType = ConverterService.toInputType(vm.parameter.type);
+	};
+
+
+	/**
+	 * @ngdoc method
+	 * @name isBooleanType
+	 * @methodOf data-prep.transformation-form.controller:TransformSimpleParamsCtrl
+	 * @description check if it is a boolean input type
+	 */
+	vm.isBooleanType = () => {
+		return vm.parameter.type === 'boolean';
 	};
 
 	initParamValues();

@@ -30,12 +30,10 @@ import template from './datagrid.html';
  * @requires data-prep.datagrid.service:DatagridColumnService
  * @requires data-prep.datagrid.service:DatagridStyleService
  * @requires data-prep.datagrid.service:DatagridSizeService
- * @requires data-prep.datagrid.service:DatagridTooltipService
  * @requires data-prep.datagrid.service:DatagridExternalService
  * @restrict E
  */
-export default function Datagrid($timeout, state, DatagridGridService, DatagridColumnService, DatagridStyleService, DatagridSizeService,
-                                 DatagridTooltipService, DatagridExternalService) {
+export default function Datagrid($timeout, state, DatagridGridService, DatagridColumnService, DatagridStyleService, DatagridSizeService, DatagridExternalService) {
 	'ngInject';
 
 	return {
@@ -45,7 +43,6 @@ export default function Datagrid($timeout, state, DatagridGridService, DatagridC
 		controllerAs: 'datagridCtrl',
 		controller() {
 			this.state = state;
-			this.datagridTooltipService = DatagridTooltipService;
 			this.datagridHeight = '100%';
 		},
 
@@ -294,7 +291,7 @@ export default function Datagrid($timeout, state, DatagridGridService, DatagridC
 
                     // the tooltip ruler is used compute a cell text regardless of the font and zoom used.
                     // To do so, the text is put into an invisible span so that the span can be measured.
-					DatagridTooltipService.tooltipRuler = iElement.find('#tooltip-ruler').eq(0);
+					state.playground.grid.tooltipRuler = iElement.find('#tooltip-ruler').eq(0);
 				}
 			}
 

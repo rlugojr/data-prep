@@ -19,41 +19,21 @@
  * @requires data-prep.state.constant:state
  * @requires data-prep.lookup.service:LookupDatagridStyleService
  * @requires data-prep.lookup.service:LookupDatagridColumnService
- * @requires data-prep.lookup.service:LookupDatagridTooltipService
  */
-export default function LookupDatagridGridService($timeout, $window, state, StateService, LookupDatagridStyleService,
-    LookupDatagridColumnService, LookupDatagridTooltipService) {
+export default function LookupDatagridGridService($timeout, $window, state, DatagridGridService, DatagridTooltipService, StateService, LookupDatagridStyleService, LookupDatagridColumnService) {
 	'ngInject';
 
 	let grid = null;
 	let lastSelectedColumn;
 	const gridServices = [
+		DatagridTooltipService,
 		LookupDatagridColumnService,
 		LookupDatagridStyleService,
-		LookupDatagridTooltipService,
 	];
 
 	return {
 		initGrid,
 	};
-
-    /**
-     * @ngdoc method
-     * @name attachLongTableListeners
-     * @methodOf data-prep.lookup.service:LookupDatagridGridService
-     * @description Attaches listeners for data update to reRender the grid
-     */
-	function attachDataChangeListeners() {
-		state.playground.lookup.dataView.onRowCountChanged.subscribe(function () {
-			grid.updateRowCount();
-			grid.render();
-		});
-
-		state.playground.lookup.dataView.onRowsChanged.subscribe(function (e, args) {
-			grid.invalidateRows(args.rows);
-			grid.render();
-		});
-	}
 
     /**
      * @ngdoc method
@@ -120,7 +100,7 @@ export default function LookupDatagridGridService($timeout, $window, state, Stat
      */
 	function initGridServices() {
 		_.forEach(gridServices, function (service) {
-			service.init(grid);
+			service.init(grid, state.playground.lookup);
 		});
 	}
 
@@ -158,7 +138,7 @@ export default function LookupDatagridGridService($timeout, $window, state, Stat
 		grid = new Slick.Grid(elementId, state.playground.lookup.dataView, [{ id: 'tdpId' }], options);
 
         // listeners
-		attachDataChangeListeners();
+		DatagridGridService.attachLongTableListeners(state.playground.lookup);
 		attachCellListeners();
 		attachColumnListeners();
 		attachGridResizeListener();

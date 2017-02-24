@@ -37,5 +37,15 @@ export default function TransformColumnParamCtrl(state) {
 		}
 	}
 
+	/**
+	 * @ngdoc method
+	 * @name getLabelById
+	 * @methodOf data-prep.transformation-form.controller:TransformColumnParamCtrl
+	 * @description get Label by id
+	 */
+	vm.getLabelById = (id) => {
+		return _.find(vm.columns, { id }).name;
+	};
+
 	initDefaultValue();
 }

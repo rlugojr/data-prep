@@ -1,7 +1,7 @@
 describe('Recipe service', function () {
     'use strict';
 
-    var preparationDetails = function () {
+    let preparationDetails = function () {
         return {
             id: '627766216e4b3c99ee5c8621f32ac42f4f87f1b4',
             dataSetId: 'db6c4ad8-77da-4a30-b29f-ca552706b058',
@@ -242,7 +242,7 @@ describe('Recipe service', function () {
         };
     };
 
-    var initialCluster = function () {
+    let initialCluster = function () {
         return {
             titles: [
                 'We found these values',
@@ -331,7 +331,7 @@ describe('Recipe service', function () {
         };
     };
 
-    var expectedInitializedCluster = {
+    let expectedInitializedCluster = {
         titles: [
             'We found these values',
             'And we\'ll keep this value',
@@ -442,9 +442,11 @@ describe('Recipe service', function () {
         ],
     };
 
-    var filtersFromTree = [];
+    let filtersFromTree = [];
 
-    var stateMock;
+    let stateMock;
+
+    const steps = [{ inactive: false }, { inactive: false }, { inactive: true }, { inactive: true }];
 
     beforeEach(angular.mock.module('data-prep.services.recipe', function ($provide) {
         stateMock = {
@@ -738,10 +740,10 @@ describe('Recipe service', function () {
     });
 
     describe('early preview', () => {
-        var originalRecipe;
-        var column;
-        var transformation;
-        var params;
+        let originalRecipe;
+        let column;
+        let transformation;
+        let params;
 
         beforeEach(() => {
             //init recipe
@@ -875,5 +877,145 @@ describe('Recipe service', function () {
             // then
             expect(StateService.restoreRecipeBeforePreview).toHaveBeenCalled();
         }));
+    });
+
+    describe('step parameters', () => {
+        beforeEach(() => {
+            stateMock.playground.recipe = {
+                current: {
+                    steps,
+                    reorderedSteps: steps,
+                    lastActiveStep: steps[1],
+                },
+            }
+        });
+        it('should return that step has dynamic parameters when it has cluster', inject((RecipeService) => {
+            // given
+            const step = {
+                transformation: {
+                    cluster: {},
+                },
+            };
+
+            // then
+            expect(RecipeService.hasDynamicParams(step)).toBeTruthy();
+        }));
+
+        it('should return that step has NO dynamic parameters', inject((RecipeService) => {
+            // given
+            const step = {
+                transformation: {},
+            };
+
+            // then
+            expect(RecipeService.hasDynamicParams(step)).toBeFalsy();
+        }));
+
+        it('should return that step has static parameters when it has simple params', inject((RecipeService) => {
+            // given
+            const step = {
+                transformation: {
+                    parameters: [{}],
+                },
+            };
+
+            // then
+            expect(RecipeService.hasStaticParams(step)).toBeTruthy();
+        }));
+
+        it('should return that step has static parameters when it has choice params', inject((RecipeService) => {
+            // given
+            const step = {
+                transformation: {
+                    items: [{}],
+                },
+            };
+
+            // then
+            expect(RecipeService.hasStaticParams(step)).toBeTruthy();
+        }));
+
+        it('should return that step has NO static parameters', inject((RecipeService) => {
+            // given
+            const step = {
+                transformation: {},
+            };
+
+            // then
+            expect(RecipeService.hasStaticParams(step)).toBeFalsy();
+        }));
+    });
+
+    describe('filters', () => {
+        const filters = [
+            {
+                type: 'exact',
+                colId: '0000',
+                colName: 'name',
+                args: {
+                    phrase: '        AMC  ',
+                    caseSensitive: true,
+                },
+                value: '        AMC  ',
+            }, {
+                type: 'exact',
+                colId: '0000',
+                colName: 'id',
+                args: {
+                    phrase: '        AMC  ',
+                    caseSensitive: true,
+                },
+                value: '        AMC  ',
+            },
+        ];
+        it('should display all filter name on hover', inject((RecipeService) => {
+            // then
+            expect(RecipeService.getAllFiltersNames(filters)).toBe('(NAME, ID)');
+        }));
+    });
+
+    describe('knots', () => {
+        beforeEach(() => {
+            stateMock.playground.recipe = {
+                current: {
+                    steps,
+                    reorderedSteps: steps,
+                    lastActiveStep: steps[1],
+                },
+            }
+        });
+        describe('First/Last in the recipe', () => {
+            it('should return true if the step is the 1st in the recipe', inject((RecipeService) => {
+
+                // then
+                expect(RecipeService.isStartChain(steps[0])).toBe(true);
+            }));
+
+            it('should return false if the step is the 1st in the recipe', inject((RecipeService) => {
+                // then
+                expect(RecipeService.isStartChain(steps[1])).toBe(false);
+            }));
+
+            it('should return true if the step is the last in the recipe', inject((RecipeService) => {
+                // then
+                expect(RecipeService.isEndChain(steps[steps.length - 1])).toBe(true);
+            }));
+
+            it('should return false if the step is the last in the recipe', inject((RecipeService) => {
+                // then
+                expect(RecipeService.isEndChain(steps[0])).toBe(false);
+            }));
+        });
+        describe('Last Active', () => {
+            it('should return false when the step is not the last active in the recipe', inject((RecipeService) => {
+                // then
+                expect(RecipeService.isLastActive(steps[0])).toBe(false);
+            }));
+
+            it('should return true when the step is the last active in the recipe', inject((RecipeService) => {
+                // then
+                expect(RecipeService.isLastActive(steps[1])).toBe(true);
+            }));
+        });
     });
 });

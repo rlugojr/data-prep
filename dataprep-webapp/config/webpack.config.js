@@ -4,6 +4,7 @@ const SASS_DATA = require('./sass.conf');
 
 const path = require('path');
 const webpack = require('webpack');
+const DashboardPlugin = require('webpack-dashboard/plugin');
 const autoprefixer = require('autoprefixer');
 
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -11,7 +12,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const SassLintPlugin = require('sasslint-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
-const extractCSS = new ExtractTextPlugin('styles/[name]-[hash].css');
+const extractCSS = new ExtractTextPlugin({ filename: 'styles/[name]-[hash].css' });
 
 const INDEX_TEMPLATE_PATH = path.resolve(__dirname, '../src/index.html');
 const STYLE_PATH = path.resolve(__dirname, '../src/app/index.scss');
@@ -19,29 +20,47 @@ const INDEX_PATH = path.resolve(__dirname, '../src/app/index-module.js');
 const VENDOR_PATH = path.resolve(__dirname, '../src/vendor.js');
 const BUILD_PATH = path.resolve(__dirname, '../build');
 
+const CHUNKS_ORDER = ['vendor', 'style', 'app'];
+
 function getDefaultConfig(options) {
 	return {
-		entry: {
-			app: INDEX_PATH,
-			vendor: VENDOR_PATH,
-			style: STYLE_PATH,
-		},
-		output: {
-			path: BUILD_PATH,
-			filename: '[name]-[hash].js',
-		},
 		module: {
-			preLoaders: [],
-			loaders: [
-				{ test: /\.js$/, loaders: ['ng-annotate', 'babel?cacheDirectory'], exclude: /node_modules/ },
-				{ test: /\.(css|scss)$/, loader: extractCSS.extract(['css', 'postcss', 'resolve-url', 'sass?sourceMap']), exclude: /react-talend-/,},
-				{ test: /\.(css|scss)$/, loader: extractCSS.extract(['css?sourceMap&modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]', 'postcss', 'resolve-url', 'sass?sourceMap']),  include: /react-talend-/, }, //css moodules  local scope
-				{ test: /\.(png|jpg|jpeg|gif)$/, loader: 'url-loader', query: { mimetype: 'image/png' } },
-				{ test: /\.html$/, loaders: ['ngtemplate', 'html'], exclude: INDEX_TEMPLATE_PATH },
-				{ test: /\.woff(2)?(\?v=\d+\.\d+\.\d+)?$/,  loader: "url?name=/assets/fonts/[name].[ext]&limit=10000&mimetype=application/font-woff" },
-				{ test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,       loader: "url?name=/assets/fonts/[name].[ext]&limit=10000&mimetype=application/octet-stream" },
-				{ test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,       loader: "file?name=/assets/fonts/[name].[ext]" },
-				{ test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,       loader: "url?name=/assets/fonts/[name].[ext]&limit=10000&mimetype=image/svg+xml" }
+			rules: [
+				{
+					test: /\.js$/,
+					use: [
+						{ loader: 'ng-annotate-loader' },
+						{ loader: 'babel-loader', options: { cacheDirectory: true } },
+					],
+					exclude: /node_modules/,
+				},
+				{
+					test: /\.css$/,
+					use: extractCSS.extract(getCommonStyleLoaders()),
+					exclude: /react-talend-/,
+				},
+				{
+					test: /\.scss$/,
+					use: extractCSS.extract(getSassLoaders()),
+					exclude: /react-talend-/,
+				},
+				// css moodules local scope
+				{
+					test: /\.scss$/,
+					use: extractCSS.extract(getSassLoaders(true)),
+					include: /react-talend-/,
+				},
+				{ test: /\.(png|jpg|jpeg|gif)$/, loader: 'url-loader', options: { mimetype: 'image/png' } },
+				{
+					test: /\.html$/,
+					use: [
+						{ loader: 'ngtemplate-loader' },
+						{ loader: 'html-loader' },
+					],
+					exclude: INDEX_TEMPLATE_PATH,
+				},
+				{ test: /\.woff(2)?(\?v=\d+\.\d+\.\d+)?$/, loader: 'url-loader', options: { name: '/assets/fonts/[name].[ext]', limit: 10000, mimetype: 'application/font-woff' } },
+				{ test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, loader: 'url-loader', options: { name: '/assets/fonts/[name].[ext]', limit: 10000, mimetype: 'image/svg+xml' } },
 			]
 		},
 		plugins: [
@@ -49,27 +68,66 @@ function getDefaultConfig(options) {
 			new webpack.ProvidePlugin({
 				$: 'jquery',
 				jQuery: 'jquery',
-				'window.jQuery': 'jquery'
+				'window.jQuery': 'jquery',
+			}),
+			// for compatibility, needed for some loaders
+			new webpack.LoaderOptionsPlugin({
+				options: {
+					context: path.join(__dirname, '../src'),
+					output: {
+						path: BUILD_PATH,
+					},
+				}
 			})
 		],
-		sassLoader: {
-			data: SASS_DATA,
-		},
-		postcss: function () {
-			return [autoprefixer({ browsers: ['last 2 versions'] })];
-		},
 		cache: true,
 		devtool: options.devtool,
-		debug: options.debug
 	};
 }
 
+function getCommonStyleLoaders(enableModules) {
+	const cssOptions = enableModules ?
+		{ sourceMap: true, modules: true, importLoaders: 1, localIdentName: '[name]__[local]___[hash:base64:5]' } :
+		{};
+	return [
+		{ loader: 'css-loader', options: cssOptions },
+		{ loader: 'postcss-loader', options: { plugins: () => [autoprefixer({ browsers: ['last 2 versions'] })] } },
+		{ loader: 'resolve-url-loader' }
+	];
+}
+
+function getSassLoaders(enableModules) {
+	return getCommonStyleLoaders(enableModules).concat({ loader: 'sass-loader', options: { sourceMap: true, data: SASS_DATA } });
+}
+
+function addDashboardPlugin(config) {
+	config.plugins.push(new DashboardPlugin());
+}
+
 function addProdEnvPlugin(config) {
-	config.plugins.push(new webpack.DefinePlugin({
-		'process.env': {
-			NODE_ENV: JSON.stringify("production")
-		}
-	}));
+	config.plugins.push(
+		new webpack.DefinePlugin({
+			'process.env': {
+				NODE_ENV: JSON.stringify('production'),
+			},
+		})
+	);
+}
+
+function addCoverageConfig(config) {
+	config.module.rules.push({
+		test: /\.js$/,
+		enforce: 'pre',
+		loader: 'isparta-loader',
+		exclude: [/node_modules/, /\.spec\.js$/],
+		options: {
+			embedSource: true,
+			noAutoWrap: true,
+			babel: {
+				presets: ['es2015']
+			}
+		},
+	});
 }
 
 function addDevServerConfig(config) {
@@ -78,42 +136,24 @@ function addDevServerConfig(config) {
 		host: appConf.host,
 		watchOptions: {
 			aggregateTimeout: 300,
-			poll: 1000
+			poll: 1000,
 		},
+		compress: true,
 		inline: true,
-		progress: true,
 		contentBase: BUILD_PATH,
-		outputPath: BUILD_PATH
 	};
 }
 
-function addMinifyConfig(config) {
-	config.plugins.push(new webpack.optimize.UglifyJsPlugin({
-		compress: {
-			warnings: false
-		}
-	}));
-}
-
-function addStripCommentsConfig(config) {
-	config.module.preLoaders.push({ test: /\.js$/, loader: 'stripcomment', exclude: [/node_modules/, /\.spec\.js$/] });
-}
-
-function addTestConfig(config) {
-	config.isparta = {
-		embedSource: true,
-		noAutoWrap: true,
-		babel: {
-			presets: ['es2015']
-		}
+function addFilesConfig(config) {
+	config.entry = {
+		vendor: VENDOR_PATH,
+		style: STYLE_PATH,
+		app: INDEX_PATH,
 	};
-	config.module.preLoaders.push({ test: /\.js$/, loader: 'isparta', exclude: [/node_modules/, /\.spec\.js$/] });
-	config.externals = {
-		angular: 'angular'
+	config.output = {
+		path: BUILD_PATH,
+		filename: '[name]-[hash].js',
 	};
-	config.plugins.push(new webpack.ProvidePlugin({
-		angular: 'angular'
-	}));
 }
 
 function addPlugins(config, options) {
@@ -130,7 +170,7 @@ function addPlugins(config, options) {
 			{
 				from: 'src/assets/config/config.mine.json',
 				to: 'assets/config/config.json',
-				force: (options.env === 'dev')
+				force: (options.env === 'dev'),
 			},
 			{ from: 'src/i18n', to: 'i18n' },
 		]),
@@ -149,7 +189,19 @@ function addPlugins(config, options) {
 			rootModule: appConf.rootModule,
 			env: options.env,
 			template: INDEX_TEMPLATE_PATH,
-			inject: 'head'
+			inject: 'head',
+			// ensure loding order vendor/style/app
+			chunksSortMode: (a, b) => {
+				const aOrder = CHUNKS_ORDER.indexOf(a.names[0]);
+				const bOrder = CHUNKS_ORDER.indexOf(b.names[0]);
+				if (aOrder > bOrder) {
+					return 1;
+				}
+				if (aOrder < bOrder) {
+					return -1;
+				}
+				return 0;
+			}
 		}),
 
 		/*
@@ -159,7 +211,7 @@ function addPlugins(config, options) {
 		 *
 		 * See: https://webpack.github.io/docs/list-of-plugins.html#bannerplugin
 		 */
-		new webpack.BannerPlugin(getLicense()),
+		new webpack.BannerPlugin({ banner: getLicense() }),
 
 		/*
 		 * Plugin: webpack.optimize.CommonsChunkPlugin
@@ -174,12 +226,29 @@ function addPlugins(config, options) {
 	);
 }
 
+function addMinifyConfig(config) {
+	config.plugins.push(
+		new webpack.optimize.UglifyJsPlugin(),
+		new webpack.LoaderOptionsPlugin({ minimize: true })
+	);
+}
+
+function addStripCommentsConfig(config) {
+	config.module.rules.push({
+		test: /\.js$/,
+		enforce: 'pre',
+		use: 'stripcomment-loader',
+		exclude: [/node_modules/, /\.spec\.js$/],
+	});
+}
+
 function addLinterConfig(config) {
-	config.eslint = { configFile: path.resolve(__dirname, '../.eslintrc') };
-	config.module.preLoaders.push({
+	config.module.rules.push({
 		test: /src\/.*\.js$/,
-		exclude: /node_modules/,
+		enforce: 'pre',
 		loader: 'eslint-loader',
+		exclude: /node_modules/,
+		options: { configFile: path.resolve(__dirname, '../.eslintrc') },
 	});
 
 	// config.plugins.push(new SassLintPlugin({
@@ -189,26 +258,40 @@ function addLinterConfig(config) {
 
 /*
  {
- env: ('dev' | 'prod' | 'test'),     // the environment
- debug: (true | false),              // enable debug
+ coverage: (true | false)            // configure coverage instrumenter
+ dashboard: (true | false)           // enable webpack dashboard plugin
  devtool: 'inline-source-map',       // source map type
- devServer: (true | false),          // configure webpack-dev-server and plugins to generate app
+ devServer: (true | false),          // configure webpack-dev-server
+ entryOutput: (true | false),        // configure entry and output files and plugins to generate full app. For example, test with karma doesn't need that, as the files are managed by karma.
+ env: ('dev' | 'prod' | 'test'),     // the environment
  linter: (true | false),             // enable eslint and sass-lint
  minify: (true | false),             // enable minification/uglification
  stripComments: (true | false),      // remove comments
- test: (true | false)                // configure tests
  }
  */
 module.exports = (options) => {
 	const config = getDefaultConfig(options);
 
-	if (options.env === 'prod') {
-		addProdEnvPlugin(config);
+
+	if (options.coverage) {
+		addCoverageConfig(config);
+	}
+
+	if (options.dashboard) {
+		addDashboardPlugin(config);
 	}
 
 	if (options.devServer) {
 		addDevServerConfig(config);
+	}
+
+	if (options.entryOutput) {
+		addFilesConfig(config);
 		addPlugins(config, options);
+	}
+
+	if (options.env === 'prod') {
+		addProdEnvPlugin(config);
 	}
 
 	if (options.minify) {
@@ -217,10 +300,6 @@ module.exports = (options) => {
 
 	if (options.stripComments) {
 		addStripCommentsConfig(config);
-	}
-
-	if (options.test) {
-		addTestConfig(config);
 	}
 
 	if (options.linter) {

@@ -27,6 +27,7 @@ export default function TransformParams() {
 		templateUrl: template,
 		scope: {
 			parameters: '=',
+			isReadonly: '<',
 		},
 		bindToController: true,
 		controllerAs: 'paramsCtrl',

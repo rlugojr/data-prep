@@ -38,6 +38,8 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.util.ReflectionUtils;
 import org.talend.dataprep.api.dataset.ColumnMetadata;
 import org.talend.dataprep.api.dataset.DataSet;
 import org.talend.dataprep.api.dataset.DataSetGovernance.Certification;
@@ -1558,6 +1560,29 @@ public class DataSetServiceTest extends DataSetBaseTest {
             assertTrue(type.has("id"));
             assertTrue(type.has("label"));
             assertTrue(type.has("frequency"));
+        }
+    }
+
+    @Test
+    public void test_locally_imported_dataset_does_not_exceed_limit() throws  Exception{
+        DataSetService dataSetService = context.getBean(DataSetService.class);
+        long l = (Long) ReflectionTestUtils.getField(dataSetService, "maximumInputStreamSize");
+        try {
+            ReflectionTestUtils.setField(dataSetService, "maximumInputStreamSize", 2);
+            given() //
+                .body("abc") //
+                .queryParam("Content-Type", "text/csv") //
+                .queryParam("name", "tooLargeInputDataset") //
+            .when() //
+                .expect().statusCode(413).log().ifError() //
+                .post("/datasets") //
+            .then()
+                .body("code", equalTo("TDP_DSS_LOCAL_DATA_SET_INPUT_STREAM_TOO_LARGE"));
+            // Then
+            assertThat("(", not(is("[]"))); // There should be some exports available
+        }
+        finally{
+            ReflectionTestUtils.setField(dataSetService, "maximumInputStreamSize", l);
         }
     }
 

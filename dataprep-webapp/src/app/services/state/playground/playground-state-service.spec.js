@@ -51,6 +51,19 @@ describe('Playground state service', () => {
         spyOn(RecipeStateService, 'reset').and.returnValue();
     }));
 
+    describe('readonly mode', () => {
+        it('should set readonly mode in state', inject((playgroundState, PlaygroundStateService) => {
+            //given
+            expect(playgroundState.isReadOnly).toBe(false);
+
+            //when
+            PlaygroundStateService.setReadOnlyMode(true);
+
+            //then
+            expect(playgroundState.isReadOnly).toBe(true);
+        }));
+    });
+
     describe('dataset', () => {
         it('should set dataset metadata in state', inject((playgroundState, PlaygroundStateService) => {
             //given
@@ -496,6 +509,7 @@ describe('Playground state service', () => {
             playgroundState.isFetchingStats = true;
             playgroundState.isLoading = true;
             playgroundState.isSavingPreparation = true;
+            playgroundState.isReadOnly = true;
 
             //when
             PlaygroundStateService.reset();
@@ -509,6 +523,7 @@ describe('Playground state service', () => {
             expect(playgroundState.isFetchingStats).toBe(false);
             expect(playgroundState.isLoading).toBe(false);
             expect(playgroundState.isSavingPreparation).toBe(false);
+            expect(playgroundState.isReadOnly).toBe(false);
         }));
 
         it('should reset sub-states', inject((playgroundState, PlaygroundStateService, RecipeStateService, GridStateService, FilterStateService, LookupStateService, SuggestionsStateService, ParametersStateService) => {

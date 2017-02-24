@@ -10,9 +10,6 @@
  9 rue Pages 92150 Suresnes, France
 
  ============================================================================*/
-
-import _ from 'lodash';
-
 const CLUSTER_TYPE = 'CLUSTER';
 
 /**
@@ -31,7 +28,7 @@ const CLUSTER_TYPE = 'CLUSTER';
 export default class RecipeCtrl {
 
 	constructor($timeout, FilterAdapterService, LookupService, MessageService, ParametersService,
-		PlaygroundService, PreviewService, StateService, state, RecipeKnotService) {
+		PlaygroundService, PreviewService, StateService, state, RecipeKnotService, RecipeService) {
 		'ngInject';
 
 		this.$timeout = $timeout;
@@ -41,9 +38,11 @@ export default class RecipeCtrl {
 		this.ParametersService = ParametersService;
 		this.PlaygroundService = PlaygroundService;
 		this.PreviewService = PreviewService;
-		this.StateService = StateService;
-		this.state = state;
 		this.RecipeKnotService = RecipeKnotService;
+		this.RecipeService = RecipeService;
+		this.StateService = StateService;
+
+		this.state = state;
 		this.stepToBeDeleted = null;
 		this.showModal = {};
 
@@ -83,41 +82,6 @@ export default class RecipeCtrl {
 	//---------------------------------------------------------------------------------------------
 	// ------------------------------------------STEP KNOT DISPLAY----------------------------------------
 	//---------------------------------------------------------------------------------------------
-
-	/**
-	 * @ngdoc method
-	 * @name isStartChain
-	 * @methodOf data-prep.recipe.controller:RecipeCtrl
-	 * @description Test if step is the first element of the chain
-	 * @returns {boolean} true if step is the first step
-	 */
-	isStartChain(step) {
-		// DO NOT use StepUtilsService.isLastStep as it could use the recipe with the before preview steps
-		return step === this.state.playground.recipe.current.reorderedSteps[0];
-	}
-
-	/**
-	 * @ngdoc method
-	 * @name isEndChain
-	 * @methodOf data-prep.recipe.controller:RecipeCtrl
-	 * @description Test if step is the last element of the chain
-	 * @returns {boolean} true if step is the last step
-	 */
-	isEndChain(step) {
-		return step === this.state.playground.recipe.current.reorderedSteps[this.state.playground.recipe.current.reorderedSteps.length - 1];
-	}
-
-	/**
-	 * @ngdoc method
-	 * @name isLastActive
-	 * @methodOf data-prep.recipe.controller:RecipeCtrl
-	 * @description Test if step is the last active element of the chain
-	 * @returns {boolean} true if step is the last active step
-	 */
-	isLastActive(step) {
-		return this.state.playground.recipe.current.lastActiveStep === step;
-	}
-
 	/**
 	 * @ngdoc method
 	 * @name showTopLine
@@ -126,8 +90,8 @@ export default class RecipeCtrl {
 	 * @returns {boolean} true if the top line should be displayed
 	 */
 	showTopLine(step) {
-		return (!this.isStartChain(step) && !step.inactive)
-			|| (this._toBeActivated(step) && !this.isStartChain(step));
+		return (!this.RecipeService.isStartChain(step) && !step.inactive)
+			|| (this._toBeActivated(step) && !this.RecipeService.isStartChain(step));
 	}
 
 	/**
@@ -138,8 +102,8 @@ export default class RecipeCtrl {
 	 * @returns {boolean} true if the bottom line should be displayed
 	 */
 	showBottomLine(step) {
-		return (!this.isEndChain(step) && !step.inactive && !this.isLastActive(step))
-			|| (!this.isEndChain(step) && this._toBeActivated(step) && !this.isHoveredStep(step));
+		return (!this.RecipeService.isEndChain(step) && !step.inactive && !this.RecipeService.isLastActive(step))
+			|| (!this.RecipeService.isEndChain(step) && this._toBeActivated(step) && !this.isHoveredStep(step));
 	}
 
 	/**
@@ -450,7 +414,7 @@ export default class RecipeCtrl {
 	}
 
 	_toggleDynamicParams(step) {
-		this.showModal[step.transformation.stepId] = !!this.hasDynamicParams(step);
+		this.showModal[step.transformation.stepId] = !!this.RecipeService.hasDynamicParams(step);
 	}
 
 	_toggleSpecificParams(step) {
@@ -496,30 +460,7 @@ export default class RecipeCtrl {
 	 * @description Return if the step has parameters
 	 */
 	hasParameters(step) {
-		return !this._isSpecificParams(step) && (this.hasStaticParams(step) || this.hasDynamicParams(step));
-	}
-
-	/**
-	 * @ngdoc method
-	 * @name hasStaticParams
-	 * @methodOf data-prep.recipe.controller:RecipeCtrl
-	 * @param {object} step The step to test
-	 * @description Return if the step has static parameters
-	 */
-	hasStaticParams(step) {
-		return (step.transformation.parameters && step.transformation.parameters.length) ||
-			(step.transformation.items && step.transformation.items.length);
-	}
-
-	/**
-	 * @ngdoc method
-	 * @name hasDynamicParams
-	 * @methodOf data-prep.recipe.controller:RecipeCtrl
-	 * @param {object} step The step to test
-	 * @description Return if the step has dynamic parameters
-	 */
-	hasDynamicParams(step) {
-		return step.transformation.cluster;
+		return !this._isSpecificParams(step) && (this.RecipeService.hasStaticParams(step) || this.RecipeService.hasDynamicParams(step));
 	}
 
 	/**
@@ -549,16 +490,4 @@ export default class RecipeCtrl {
 			this.PreviewService.updatePreview(step, params);
 		};
 	}
-
-	/**
-	 * @ngdoc method
-	 * @name getAllFiltersNames
-	 * @methodOf data-prep.recipe.controller:RecipeCtrl
-	 * @param {array} stepFilters The step filters
-	 * @description Get all filters names
-	 */
-	getAllFiltersNames(stepFilters) {
-		return '(' + _.pluck(stepFilters, 'colName').join(', ').toUpperCase() + ')';
-	}
-
 }

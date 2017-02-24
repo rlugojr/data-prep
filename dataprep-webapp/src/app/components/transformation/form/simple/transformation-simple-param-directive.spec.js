@@ -11,14 +11,14 @@
 
   ============================================================================*/
 
-describe('Transformation simple params directive', function () {
+describe('Transformation simple params directive', () => {
     'use strict';
-    var scope;
-    var createElement;
+    let scope;
+    let createElement;
 
     beforeEach(angular.mock.module('data-prep.transformation-form'));
 
-    beforeEach(angular.mock.module('pascalprecht.translate', function ($translateProvider) {
+    beforeEach(angular.mock.module('pascalprecht.translate', ($translateProvider) => {
         $translateProvider.translations('en', {
             COLON: ': ',
         });
@@ -28,15 +28,15 @@ describe('Transformation simple params directive', function () {
     beforeEach(inject(function ($rootScope, $compile) {
         scope = $rootScope.$new();
 
-        createElement = function () {
-            var element = angular.element('<transform-simple-param parameter="parameter"></transform-simple-param>');
+        createElement = () => {
+            let element = angular.element('<transform-simple-param parameter="parameter" is-readonly="isReadonly"></transform-simple-param>');
             $compile(element)(scope);
             scope.$digest();
             return element;
         };
     }));
 
-    it('should render an action with a parameter', function () {
+    it('should render an action with a parameter', () => {
         //given
         scope.parameter =   {
             name: 'param1',
@@ -47,10 +47,54 @@ describe('Transformation simple params directive', function () {
         };
 
         //when
-        var element = createElement();
+        let element = createElement();
 
         //then
         expect(element.find('.param-name').text().trim()).toBe('Param 1:');
         expect(element.find('.param-input').find('input[type="text"]').length).toBe(1);
+    });
+
+    it('should render an action with a parameter in read only mode', () => {
+        //given
+        scope.parameter =   {
+            name: 'param1',
+            label: 'Param 1',
+            type: 'string',
+            inputType: 'text',
+            default: '.',
+            value: 'hello',
+        };
+
+        scope.isReadonly = true;
+
+        //when
+        let element = createElement();
+
+        //then
+        expect(element.find('.param-name').text().trim()).toBe('Param 1:');
+        expect(element.find('.param-input .param-input-label').eq(0).text().trim()).toBe('hello');
+
+    });
+
+    it('should render an action with a checkbox and a parameter in read only mode', () => {
+        //given
+        scope.parameter =   {
+            name: 'param1',
+            label: 'Param 1',
+            type: 'boolean',
+            inputType: 'text',
+            default: '.',
+            value: true,
+        };
+
+        scope.isReadonly = true;
+
+        //when
+        let element = createElement();
+
+        //then
+        expect(element.find('.param-name').length).toBe(0);
+        expect(element.find('.param-input').find('input[type="checkbox"]').length).toBe(1);
+        expect(element.find('.param-input span').eq(0).text().trim()).toBe('Param 1');
     });
 });

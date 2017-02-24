@@ -14,6 +14,8 @@ package org.talend.dataprep.preparation.service;
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.util.Collections.emptyList;
+import static java.util.Comparator.comparing;
+import static java.util.Comparator.reverseOrder;
 import static java.util.stream.Collectors.toList;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
@@ -130,7 +132,7 @@ public class PreparationService {
     private PreparationCleaner preparationCleaner;
 
     @Autowired
-    private StepDiffDelegate stepDiffDelegate;
+    private MetadataChangesOnActionsGenerator stepDiffDelegate;
 
     @Autowired
     private ReorderStepsUtils reorderStepsUtils;
@@ -203,6 +205,18 @@ public class PreparationService {
         return preparationRepository.list(Preparation.class) //
                 .map(p -> beanConversionService.convert(p, UserPreparation.class)) //
                 .sorted(getPreparationComparator(sort, order, p -> getDatasetMetadata(p.getDataSetId())));
+    }
+
+    /**
+     * List all preparation summaries.
+     *
+     * @return the preparation summaries, sorted by descending last modification date.
+     */
+    public Stream<PreparationSummary> listSummary() {
+        LOGGER.debug("Get list of preparations (summary).");
+        return preparationRepository.list(Preparation.class) //
+                .map(p -> beanConversionService.convert(p, PreparationSummary.class)) //
+                .sorted(comparing(PreparationSummary::getLastModificationDate, reverseOrder()));
     }
 
     /**
@@ -315,8 +329,8 @@ public class PreparationService {
         checkIfPreparationNameIsAvailable(destination, newName);
 
         // copy the Preparation
-        Preparation copy = new Preparation(UUID.randomUUID().toString(), original.getDataSetId(), original.getHeadId(),
-                original.getAppVersion());
+        Preparation copy = new Preparation(original);
+        copy.setId(UUID.randomUUID().toString());
         copy.setName(newName);
         final long now = System.currentTimeMillis();
         copy.setCreationDate(now);
@@ -576,7 +590,8 @@ public class PreparationService {
         LOGGER.debug("Adding action to preparation...");
         Preparation preparation = getPreparation(preparationId);
         List<Action> actions = getVersionedAction(preparationId, "head");
-        StepDiff actionCreatedColumns = stepDiffDelegate.getActionCreatedColumns(preparation.getRowMetadata(), buildActions(actions), buildActions(step.getActions()));
+        StepDiff actionCreatedColumns = stepDiffDelegate.computeCreatedColumns(preparation.getRowMetadata(),
+                buildActions(actions), buildActions(step.getActions()));
         step.setDiff(actionCreatedColumns);
         appendSteps(preparationId, Collections.singletonList(step));
         LOGGER.debug("Added action to preparation.");

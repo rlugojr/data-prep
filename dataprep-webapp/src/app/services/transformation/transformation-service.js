@@ -142,24 +142,27 @@ export default class TransformationService {
      * @returns {Promise} The process promise
      */
 	initTransformations(scope, entity) {
+		if (this.state.playground.isReadOnly) {
+			return this.$q.when([]);
+		}
 		this.StateService.setTransformationsLoading(true);
 
 		return this.fetchSuggestionsAndTransformations(scope, entity)
-            .then(([allSuggestions, { allCategories, allTransformations }]) => {
-	const adaptedCategories = this.TransformationUtilsService.adaptCategories(allSuggestions, allCategories);
-	const actions = {
-		allSuggestions,
-		allTransformations,
-		filteredTransformations: adaptedCategories,
-		allCategories: adaptedCategories,
-		searchActionString: '',
-	};
+			.then(([allSuggestions, { allCategories, allTransformations }]) => {
+				const adaptedCategories = this.TransformationUtilsService.adaptCategories(allSuggestions, allCategories);
+				const actions = {
+					allSuggestions,
+					allTransformations,
+					filteredTransformations: adaptedCategories,
+					allCategories: adaptedCategories,
+					searchActionString: '',
+				};
 
-	this.StateService.setTransformations(scope, actions);
-})
-            .finally(() => {
-	this.StateService.setTransformationsLoading(false);
-});
+				this.StateService.setTransformations(scope, actions);
+			})
+			.finally(() => {
+				this.StateService.setTransformationsLoading(false);
+			});
 	}
 
     /**

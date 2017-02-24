@@ -12,6 +12,7 @@
  ============================================================================*/
 
 import angular from 'angular';
+import ngSanitize from 'angular-sanitize';
 import TALEND_WIDGET_MODULE from '../../widgets/widget-module';
 import VALIDATION_MODULE from '../../validation/validation-module';
 import SERVICES_STATE_MODULE from '../../../services/state/state-module';
@@ -48,6 +49,7 @@ const MODULE_NAME = 'data-prep.transformation-form';
  */
 angular.module(MODULE_NAME,
 	[
+		ngSanitize,
 		TALEND_WIDGET_MODULE,
 		VALIDATION_MODULE,
 		SERVICES_STATE_MODULE,

@@ -16,9 +16,11 @@
  * @name data-prep.transformation-form.controller:TransformRegexParamCtrl
  * @description Regex transformation parameter controller.
  */
-export default function TransformRegexParamCtrl() {
-	const vm = this;
+export default function TransformRegexParamCtrl(TextFormatService) {
+	'ngInject';
 
+	const vm = this;
+	vm.TextFormatService = TextFormatService;
     /**
      * @ngdoc method
      * @name initParamValues

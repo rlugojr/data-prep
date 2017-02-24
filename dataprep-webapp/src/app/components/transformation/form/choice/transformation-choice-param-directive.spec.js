@@ -29,7 +29,7 @@ describe('Transformation choice params directive', () => {
         scope = $rootScope.$new();
 
         createElement = () => {
-            const element = angular.element('<transform-choice-param parameter="parameter"></transform-choice-param>');
+            const element = angular.element('<transform-choice-param parameter="parameter" is-readonly="isReadonly"></transform-choice-param>');
             $compile(element)(scope);
             scope.$digest();
             return element;
@@ -61,6 +61,30 @@ describe('Transformation choice params directive', () => {
         expect(element.find('.param-input').eq(0).find('option').eq(0).attr('value')).toBe('string:noParamChoice1');
         expect(element.find('.param-input').eq(0).find('option').eq(1).text()).toBe('noParamChoice2_label');
         expect(element.find('.param-input').eq(0).find('option').eq(1).attr('value')).toBe('string:noParamChoice2');
+    });
+
+    it('should render a simple select in readonly mode', () => {
+        //given
+        scope.parameter = {
+            name: 'myChoice',
+            label: 'my choice',
+            configuration: {
+                values: [
+                    { value: 'noParamChoice1', label: 'noParamChoice1' },
+                    { value: 'noParamChoice2', label: 'noParamChoice2_label' },
+                ],
+            },
+            value: 'noParamChoice2',
+        };
+
+        scope.isReadonly = true;
+
+        //when
+        const element = createElement();
+
+        //then
+        expect(element.find('.param-name').text().trim()).toBe('my choice:');
+        expect(element.find('.param-input-label').eq(0).text().trim()).toBe('noParamChoice2_label');
     });
 
     it('should render a simple radio', () => {

@@ -27,6 +27,8 @@ export default function TalendEditableRegex() {
 		templateUrl: template,
 		scope: {
 			value: '=ngModel',
+			isReadonly: '<',
+			transformText: '=',
 		},
 		bindToController: true,
 		controller: 'TalendEditableRegexCtrl',

@@ -152,9 +152,6 @@
   "CONFIRM": "Confirm",
   "REMOVE": "Remove",
 
-  "_comment": "Export",
-  "EXPORT_WITH_IGNORED_STEPS_WARN": "Actions on rows or an individual cell cannot be processed in a Big Data context and will be ignored.",
-
   "_comment": "Add datasets",
   "IMPORT_DATASET": "Add Dataset",
   "COLLECTING_DATA": "Collecting {{datasetName}} data. Please wait...",
@@ -254,6 +251,7 @@
   "ENDS_WITH": "Ends with",
   "REGEX": "RegEx",
   "TYPE_FORMAT_ERROR": "This must be a {{type}}",
+  "NONE": "None",
 
   "_comment": "Action panel",
   "FIND_FUNCTION": "Find a Function...",
@@ -348,6 +346,7 @@
   "_comment": "playground",
   "CHOOSE_PREPARATION_TO_APPLY": "Choose a preparation to apply to this dataset",
   "NO_COMPATIBLE_PREPARATIONS": "There are no compatible preparations with the dataset: {{name}}",
+  "READ_ONLY": "Read Only",
 
   "_comment": "Confirm Popup",
   "SAVE_CHANGE": "Do you want to save your changes?",

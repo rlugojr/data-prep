@@ -1,5 +1,4 @@
 // ============================================================================
-//
 // Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
@@ -84,7 +83,7 @@ public class OptimizedExportStrategyTest extends TransformationServiceBaseTest {
         exportParameters.setPreparationId("1234");
 
         // Then
-        optimizedExportStrategy.accept(exportParameters);
+        assertFalse(optimizedExportStrategy.accept(exportParameters));
     }
 
     @Test

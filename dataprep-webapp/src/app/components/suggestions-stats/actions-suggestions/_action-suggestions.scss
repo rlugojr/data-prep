@@ -10,99 +10,78 @@
   9 rue Pages 92150 Suresnes, France
 
   ============================================================================*/
+.actions-suggestions {
+	@include flex-column();
+	height: 100%;
 
-.suggestions-part {
+	.actions-scope {
+		flex-grow: 1;
+		flex-shrink: 1;
+		position: relative;
 
-	.actions-suggestions {
-		@include flex-column();
-		height: 100%;
+		.action-search-container {
+			box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.2);
 
-		.suggestions-title {
-			flex-basis: 58px;
-			flex-grow: 0;
-			flex-shrink: 0;
+			.action-search {
+				width: 94%;
+				height: 25px;
+				font-size: .9em;
+				font-weight: 500;
+				padding: 0 20px 0 5px;
+				margin: 5px 10px 5px 10px;
+				border-top: 1px solid transparent;
+				border-right: 1px solid transparent;
+				border-left: 1px solid transparent;
+				box-shadow: none;
 
-			background-color: #F1F1F1;
-			padding-right: 20px;
-
-			.title {
-				@include ellipsis(320px);
-				font-size: 1.2em;
-				font-weight: 600;
-				padding: 25px 10px 5px 10px;
-				text-transform: uppercase;
-			}
-		}
-
-		.actions-scope {
-			flex-grow: 1;
-			flex-shrink: 1;
-			position: relative;
-
-			.action-search-container {
-				box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.2);
-
-				.action-search {
-					width: 94%;
-					height: 25px;
-					font-size: .9em;
-					font-weight: 500;
-					padding: 0 20px 0 5px;
-					margin: 5px 10px 5px 10px;
-					border-top: 1px solid transparent;
-					border-right: 1px solid transparent;
-					border-left: 1px solid transparent;
-					box-shadow: none;
-
-					&::-ms-clear {
-						display: none;
-					}
+				&::-ms-clear {
+					display: none;
 				}
-
 			}
-		;
 
-			.action-suggestion-tab-items {
-				height: calc(100% - 75px);
-				overflow-y: auto;
-				overflow-x: hidden;
-				position: absolute;
-				width: 100%;
-			}
+		}
+	;
+
+		.action-suggestion-tab-items {
+			height: calc(100% - 75px);
+			overflow-y: auto;
+			overflow-x: hidden;
+			position: absolute;
+			width: 100%;
+		}
+	}
+
+	.filters-actions-form {
+		flex-basis: 30px;
+		flex-grow: 0;
+		flex-shrink: 0;
+
+		&.ng-enter {
+			@include animation(fadeIn 0.25s);
 		}
 
-		.filters-actions-form {
-			flex-basis: 30px;
-			flex-grow: 0;
-			flex-shrink: 0;
+		&.ng-leave {
+			@include animation(fadeOut 0.25s);
+		}
 
-			&.ng-enter {
-				@include animation(fadeIn 0.25s);
-			}
+		background-color: #DDDDDD;
+		right: 10px;
+		padding: 5px;
 
-			&.ng-leave {
-				@include animation(fadeOut 0.25s);
-			}
+		input {
+			margin-left: 0.7em;
+			margin-right: 0;
+		}
+		label {
+			display: inline-block;
+			cursor: pointer;
+			vertical-align: middle;
+			font-weight: 600;
+			font-size: 0.8em;
+		}
 
-			background-color: #DDDDDD;
-			right: 10px;
-			padding: 5px;
-
-			input {
-				margin-left: 0.7em;
-				margin-right: 0;
-			}
-			label {
-				display: inline-block;
-				cursor: pointer;
-				vertical-align: middle;
-				font-weight: 600;
-				font-size: 0.8em;
-			}
-
-			.filters-actions-form-span {
-				cursor: default;
-			}
+		.filters-actions-form-span {
+			cursor: default;
 		}
 	}
 }

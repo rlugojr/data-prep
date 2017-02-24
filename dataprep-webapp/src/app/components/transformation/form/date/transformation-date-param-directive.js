@@ -29,6 +29,7 @@ export default function TransformDateParam() {
 		scope: {
 			parameter: '=',
 			label: '@',
+			isReadonly: '<',
 		},
 		require: '^?form',
 		bindToController: true,

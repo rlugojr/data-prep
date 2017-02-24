@@ -18,6 +18,7 @@ export const playgroundState = {
 	preparation: null,
 	preparationName: '',
 	sampleType: 'HEAD',
+	isReadOnly: false,
 };
 
 export function PlaygroundStateService(RecipeStateService, recipeState,
@@ -51,6 +52,7 @@ export function PlaygroundStateService(RecipeStateService, recipeState,
 		updateDatasetRecord,
 		updateDatasetStatistics,
 		setSampleType,
+		setReadOnlyMode,
 
         // parameters
 		toggleDatasetParameters,
@@ -116,6 +118,10 @@ export function PlaygroundStateService(RecipeStateService, recipeState,
     //--------------------------------------------------------------------------------------------------------------
     // --------------------------------------------------PLAYGROUND--------------------------------------------------
     //--------------------------------------------------------------------------------------------------------------
+	function setReadOnlyMode(bool) {
+		playgroundState.isReadOnly = bool;
+	}
+
 	function setSampleType(type) {
 		playgroundState.sampleType = type;
 	}
@@ -240,6 +246,7 @@ export function PlaygroundStateService(RecipeStateService, recipeState,
 		playgroundState.lookupData = null;
 		playgroundState.preparation = null;
 		playgroundState.sampleType = 'HEAD';
+		playgroundState.isReadOnly = false;
 
 		RecipeStateService.reset();
 		FilterStateService.reset();

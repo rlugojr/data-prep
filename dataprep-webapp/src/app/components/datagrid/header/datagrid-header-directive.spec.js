@@ -144,7 +144,7 @@ describe('Datagrid header directive', () => {
 		createElement();
 
 		//then
-		expect(element.find('.grid-header-title').text()).toBe('MostPopulousCity');
+		expect(element.find('.grid-header-title').text().trim()).toBe('MostPopulousCity');
 		expect(element.find('.grid-header-type').text()).toBe('city');
 	});
 
@@ -153,7 +153,7 @@ describe('Datagrid header directive', () => {
 		createElement();
 
 		//then
-		expect(element.find('.grid-header-title').text()).toBe('MostPopulousCity');
+		expect(element.find('.grid-header-title').text().trim()).toBe('MostPopulousCity');
 		expect(element.find('.grid-header-type').text()).toBe('text');
 	});
 

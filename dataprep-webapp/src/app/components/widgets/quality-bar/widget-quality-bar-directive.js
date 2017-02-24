@@ -41,6 +41,7 @@ export default function QualityBar($timeout) {
 			quality: '<',
 			isTrusted: '<',
 			hasMenu: '<',
+			onClick: '=',
 		},
 		transclude: {
 			'valid-quality-bar-menu': '?validMenuItems',

@@ -59,10 +59,21 @@
                             <Icon name="'talend-trash'"/>
                         </a>
 
-                        <span class="filter-icon"
-                              data-icon="q" ng-if="step.filters.length"
-                              title="{{'FILTERS_APPLIED' | translate}} {{$ctrl.getAllFiltersNames(step.filters)}}">
-                        </span>
+                        <a  ng-if="step.filters.length"
+                            class="filter-icon"
+                            title="{{'FILTERS_APPLIED' | translate}} {{$ctrl.RecipeService.getAllFiltersNames(step.filters)}}">
+                            <Icon name="'talend-filter'"/>
+                        </a>
+
+                        <recipe-knot class="step-trigger"
+                                     inactive="step.inactive"
+                                     on-hover-start="$ctrl.stepHoverStart(step)"
+                                     on-hover-end="$ctrl.stepHoverEnd(step)"
+                                     show-bottom-line="!$ctrl.isDragStart && $ctrl.showBottomLine(step)"
+                                     show-top-line="!$ctrl.isDragStart && $ctrl.showTopLine(step)"
+                                     to-be-switched="$ctrl.toBeSwitched(step)"
+                                     toggle-step="$ctrl.toggleStep(step)">
+                        </recipe-knot>
                     </trigger>
 
                     <content ng-if="$ctrl.hasParameters(step) || step.filters.length" class="step-details">
@@ -75,7 +86,7 @@
 
                         </div>
                         <div class="step-parameters-list" ng-if="step.transformation.name !== 'lookup'">
-                            <transform-form ng-if="$ctrl.hasStaticParams(step)"
+                            <transform-form ng-if="$ctrl.RecipeService.hasStaticParams(step)"
                                             transformation="step.transformation"
                                             on-submit="$ctrl.stepUpdateClosure(step)(params)"
                                             on-submit-hover-on="$ctrl.previewUpdateClosure(step)(params)"
@@ -96,15 +107,6 @@
                         </div>
                     </content>
                 </sc-accordion-item>
-                <recipe-knot class="step-trigger"
-                             inactive="step.inactive"
-                             on-hover-start="$ctrl.stepHoverStart(step)"
-                             on-hover-end="$ctrl.stepHoverEnd(step)"
-                             show-bottom-line="!$ctrl.isDragStart && $ctrl.showBottomLine(step)"
-                             show-top-line="!$ctrl.isDragStart && $ctrl.showTopLine(step)"
-                             to-be-switched="$ctrl.toBeSwitched(step)"
-                             toggle-step="$ctrl.toggleStep(step)">
-                </recipe-knot>
             </div>
         </li>
     </sc-accordion>

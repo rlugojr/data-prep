@@ -62,21 +62,24 @@
              ng-style="qualityBarCtrl.width.isVariableValid && {'flex-basis': qualityBarCtrl.width.valid + '%'}"
              ng-class="{'fixed-width': !qualityBarCtrl.width.isVariableValid, 'not-fixed-width': qualityBarCtrl.width.isVariableValid, 'no-transition': qualityBarCtrl.blockTransition}"
              ng-show="qualityBarCtrl.quality.valid > 0"
-             title="{{ qualityBarCtrl.quality.valid }} {{::'VALID_RECORDS' | translate}} ({{ qualityBarCtrl.percent.valid }}%)">
+             title="{{ qualityBarCtrl.quality.valid }} {{::'VALID_RECORDS' | translate}} ({{ qualityBarCtrl.percent.valid }}%)"
+             ng-click="qualityBarCtrl.onClick ? qualityBarCtrl.onClick('valid_records') : angular.noop()">
         </div>
 
         <div class="empty-partition"
              ng-style="qualityBarCtrl.width.isVariableEmpty && {'flex-basis': qualityBarCtrl.width.empty + '%'}"
              ng-class="{'fixed-width': !qualityBarCtrl.width.isVariableEmpty, 'not-fixed-width': qualityBarCtrl.width.isVariableEmpty, 'no-transition': qualityBarCtrl.blockTransition}"
              ng-show="qualityBarCtrl.quality.empty > 0"
-             title="{{ qualityBarCtrl.quality.empty }} {{::'EMPTY_RECORDS' | translate}} ({{ qualityBarCtrl.percent.empty }}%)">
+             title="{{ qualityBarCtrl.quality.empty }} {{::'EMPTY_RECORDS' | translate}} ({{ qualityBarCtrl.percent.empty }}%)"
+             ng-click="qualityBarCtrl.onClick ? qualityBarCtrl.onClick('empty_records') : angular.noop()">
         </div>
 
         <div class="invalid-partition"
              ng-style="qualityBarCtrl.width.isVariableInvalid && {'flex-basis': qualityBarCtrl.width.invalid + '%'}"
              ng-class="{'fixed-width': !qualityBarCtrl.width.isVariableInvalid, 'not-fixed-width': qualityBarCtrl.width.isVariableInvalid, 'no-transition': qualityBarCtrl.blockTransition}"
              ng-show="qualityBarCtrl.quality.invalid > 0"
-             title="{{ qualityBarCtrl.quality.invalid }} {{::'INVALID_RECORDS' | translate}} ({{ qualityBarCtrl.percent.invalid }}%)">
+             title="{{ qualityBarCtrl.quality.invalid }} {{::'INVALID_RECORDS' | translate}} ({{ qualityBarCtrl.percent.invalid }}%)"
+             ng-click="qualityBarCtrl.onClick ? qualityBarCtrl.onClick('invalid_records') : angular.noop()">
         </div>
     </div>
 </div>

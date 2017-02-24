@@ -1,5 +1,4 @@
 // ============================================================================
-//
 // Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
@@ -12,6 +11,9 @@
 // ============================================================================
 
 package org.talend.dataprep.cache;
+
+import org.talend.dataprep.metrics.Timed;
+import org.talend.dataprep.metrics.VolumeMetered;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -33,10 +35,11 @@ public interface ContentCache {
     /**
      * Check whether a cached content exists for given <code>preparationId</code> at step <code>stepId</code> for a
      * specific sample size.
-     * 
+     *
      * @param key content cache key.
      * @return <code>true</code> if cache holds content for given parameters, <code>false</code> otherwise.
      */
+    @Timed
     boolean has(ContentCacheKey key);
 
     /**
@@ -47,6 +50,7 @@ public interface ContentCache {
      * @throws IllegalArgumentException If no cache can be found for given parameters.
      * @see #has(ContentCacheKey)
      */
+    @VolumeMetered
     InputStream get(ContentCacheKey key);
 
     /**
@@ -57,6 +61,7 @@ public interface ContentCache {
      * @param timeToLive The {@link TimeToLive TTL} for the new cache entry.
      * @return A {@link OutputStream output stream} to be used to write content in cache entry
      */
+    @VolumeMetered
     OutputStream put(ContentCacheKey key, TimeToLive timeToLive);
 
     /**
@@ -72,6 +77,7 @@ public interface ContentCache {
      *
      * @param key content cache key.
      */
+    @Timed
     void evict(ContentCacheKey key);
 
     /**
@@ -83,6 +89,7 @@ public interface ContentCache {
      * @param key partial content cache key.
      * @see ContentCacheKey#getMatcher()
      */
+    @Timed
     void evictMatch(ContentCacheKey key);
 
     /**
@@ -99,11 +106,13 @@ public interface ContentCache {
      * @param to A destination content cache key.
      * @param toTimeToLive The {@link TimeToLive TTL} for the destination cache key.
      */
+    @Timed
     void move(ContentCacheKey from, ContentCacheKey to, TimeToLive toTimeToLive);
 
     /**
      * Removes all content cached by this {@link ContentCache cache}.
      */
+    @Timed
     void clear();
 
     /**

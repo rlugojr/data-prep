@@ -13,34 +13,25 @@
 package org.talend.dataprep.api.service;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.PUT;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 import static org.talend.daikon.exception.ExceptionContext.build;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayDeque;
-import java.util.Queue;
 
 import org.apache.commons.lang.StringUtils;
-import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
-import org.talend.dataprep.api.dataset.DataSetMetadata;
 import org.talend.dataprep.api.folder.Folder;
 import org.talend.dataprep.api.service.api.EnrichedPreparation;
-import org.talend.dataprep.api.service.command.folder.CreateChildFolder;
-import org.talend.dataprep.api.service.command.folder.FolderChildrenList;
-import org.talend.dataprep.api.service.command.folder.FolderTree;
-import org.talend.dataprep.api.service.command.folder.GetFolder;
-import org.talend.dataprep.api.service.command.folder.RemoveFolder;
-import org.talend.dataprep.api.service.command.folder.RenameFolder;
-import org.talend.dataprep.api.service.command.folder.SearchFolders;
+import org.talend.dataprep.api.service.command.folder.*;
 import org.talend.dataprep.api.service.command.preparation.PreparationListByFolder;
 import org.talend.dataprep.command.CommandHelper;
 import org.talend.dataprep.command.GenericCommand;
@@ -51,17 +42,16 @@ import org.talend.dataprep.exception.error.APIErrorCodes;
 import org.talend.dataprep.metrics.Timed;
 import org.talend.dataprep.preparation.service.UserPreparation;
 import org.talend.dataprep.security.SecurityProxy;
+import org.talend.dataprep.util.SortAndOrderHelper;
+import org.talend.dataprep.util.SortAndOrderHelper.Order;
+import org.talend.dataprep.util.SortAndOrderHelper.Sort;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.netflix.hystrix.HystrixCommand;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import reactor.core.Cancellation;
 import reactor.core.publisher.Flux;
-import org.talend.dataprep.util.SortAndOrderHelper;
-import org.talend.dataprep.util.SortAndOrderHelper.Order;
-import org.talend.dataprep.util.SortAndOrderHelper.Sort;
 
 @RestController
 public class FolderAPI extends APIService {
@@ -207,55 +197,94 @@ public class FolderAPI extends APIService {
                 writeFluxToJsonArray(folders, "folders", generator);
                 // Preparation list
                 final PreparationListByFolder listPreparations = getCommand(PreparationListByFolder.class, id, sort, order);
-                final Queue<DataSetMetadata> dataSetMetadata = new ArrayDeque<>();
-                final Publisher<DataSetMetadata> dataSetMetadataPublisher = Flux.fromIterable(dataSetMetadata);
 
-                final Flux<EnrichedPreparation> preparations = Flux
+                final Flux<UserPreparation> preparations = Flux
                         .from(CommandHelper.toPublisher(UserPreparation.class, mapper, listPreparations)) // From preparation list
-                        .doOnNext(preparation -> {
+                        .map(preparation -> {
+                            UserPreparation ep;
                             if (preparation.getDataSetId() == null) {
-                                dataSetMetadata.offer(null); // No data set metadata to get from preparation.
+                                ep = preparation;
                             } else {
                                 // get the dataset metadata
                                 try {
                                     securityProxy.asTechnicalUser(); // because dataset are not shared
-                                    dataSetMetadata.offer(getCommand(DataSetGetMetadata.class, preparation.getDataSetId()).execute());
+                                    ep = new EnrichedPreparation(preparation, getCommand(DataSetGetMetadata.class, preparation.getDataSetId()).execute());
                                 } catch (Exception e) {
-                                    dataSetMetadata.offer(null);
+                                    ep = preparation;
                                     LOG.debug("error reading dataset metadata {} : {}", preparation.getId(), e);
                                 } finally {
                                     securityProxy.releaseIdentity();
                                 }
                             }
-                        })
-                        .zipWith(dataSetMetadataPublisher, EnrichedPreparation::new); // Zip preparations and discovered metadata
+                            return ep;
+                        });
                 writeFluxToJsonArray(preparations, "preparations", generator);
                 generator.writeEndObject();
+            } catch (EOFException e) {
+                LOG.debug("Output stream has been closed before finishing preparation writing.", e);
             } catch (IOException e) {
                 throw new TDPException(APIErrorCodes.UNABLE_TO_LIST_FOLDER_ENTRIES, e, build().put("destination", id));
             }
         };
     }
 
-    private static <T> Cancellation writeFluxToJsonArray(Flux<T> flux, String arrayElement, JsonGenerator generator) {
-        return flux.doOnSubscribe(subscription -> {
+    private static <T> void writeFluxToJsonArray(Flux<T> flux, String arrayElement, JsonGenerator generator) {
+        flux.subscribe(new WriteJsonArraySubscriber<>(generator, arrayElement));
+    }
+
+    private static class WriteJsonArraySubscriber<T> implements Subscriber<T> {
+
+        private final JsonGenerator generator;
+
+        private final String arrayElement;
+
+        private Subscription subscription;
+
+        public WriteJsonArraySubscriber(JsonGenerator generator, String arrayElement) {
+            this.generator = generator;
+            this.arrayElement = arrayElement;
+        }
+
+        @Override
+        public void onSubscribe(Subscription s) {
             try {
                 generator.writeArrayFieldStart(arrayElement);
+            } catch (EOFException eofe) {
+                LOG.debug("JsonGenerator was closed before finish streaming.", eofe);
+                subscription.cancel();
             } catch (IOException e) {
                 LOG.error("Unable to write content.", e);
             }
-        }).doOnComplete(() -> {
+            subscription = s;
+            s.request(Long.MAX_VALUE);
+        }
+
+        @Override
+        public void onNext(T aLong) {
+            try {
+                generator.writeObject(aLong);
+            } catch (EOFException eofe) {
+                LOG.debug("JsonGenerator was closed before finish streaming.", eofe);
+                subscription.cancel();
+            } catch (IOException e) {
+                LOG.error("Unable to write content.", e);
+            }
+        }
+
+        @Override
+        public void onError(Throwable t) {
+            onComplete();
+        }
+
+        @Override
+        public void onComplete() {
             try {
                 generator.writeEndArray();
+            } catch (EOFException eofe) {
+                LOG.debug("JsonGenerator was closed before finish streaming.", eofe);
             } catch (IOException e) {
                 LOG.error("Unable to write content.", e);
             }
-        }).subscribe(o -> {
-            try {
-                generator.writeObject(o);
-            } catch (IOException e) {
-                LOG.error("Unable to write content.", e);
-            }
-        });
+        }
     }
 }

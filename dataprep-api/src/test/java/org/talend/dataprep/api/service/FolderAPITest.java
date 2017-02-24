@@ -15,15 +15,8 @@ package org.talend.dataprep.api.service;
 
 import static com.jayway.restassured.RestAssured.given;
 import static java.util.stream.Collectors.toList;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
 import static org.talend.dataprep.api.folder.FolderContentType.DATASET;
 
 import java.io.IOException;
@@ -167,6 +160,32 @@ public class FolderAPITest extends ApiServiceTestBase {
             // check for owner
             assertTrue(preparation.has("owner"));
         }
+    }
+
+    /**
+     * See https://jira.talendforge.org/browse/TDP-3456
+     */
+    @Test
+    public void listPreparationsByFolder_shouldListMoreThan32Preparations_TDP3456() throws Exception {
+        // given
+        int numberOfPreparations = 33;
+        for (int preparationId = 0; preparationId < numberOfPreparations; preparationId++) {
+            createPreparationFromFile("dataset/dataset.csv", "preparation " + preparationId, "text/csv", home.getId());
+        }
+
+        // when
+        final Response response = given() //
+                .when()//
+                .expect().statusCode(200).log().ifError() //
+                .get("/api/folders/{id}/preparations", home.getId());
+
+        // then
+        assertThat(response.getStatusCode(), is(200));
+        final JsonNode rootNode = mapper.readTree(response.asInputStream());
+
+        final JsonNode preparations = rootNode.get("preparations");
+        assertNotNull(preparations);
+        assertEquals(numberOfPreparations, preparations.size());
     }
 
     @Test
@@ -365,27 +384,6 @@ public class FolderAPITest extends ApiServiceTestBase {
 
     private FolderEntry createFolderEntry(final FolderEntry folderEntry, String folderId) throws JsonProcessingException {
         return folderRepository.addFolderEntry(folderEntry, folderId);
-    }
-
-    private void removeFolderEntry(final String contentId) {
-        final Response response = given() //
-                .queryParam("path", "/beer") //
-                .pathParam("contentType", DATASET) //
-                .pathParam("id", contentId) //
-                .delete("/api/folders/entries/{contentType}/{id}");
-
-        assertThat(response.getStatusCode(), is(200));
-    }
-
-    private List<FolderEntry> getFolderEntries(final String path) throws IOException {
-        final Response response = given() //
-                .queryParam("path", path) //
-                .queryParam("contentType", DATASET) //
-                .get("/api/folders/entries");
-
-        assertThat(response.getStatusCode(), is(200));
-        return mapper.readValue(response.asString(), new TypeReference<List<FolderEntry>>() {
-        });
     }
 
     private Folder getFolder(final String parentId, final String name) throws IOException {

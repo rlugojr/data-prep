@@ -357,4 +357,24 @@ describe('Datagrid header controller', () => {
 			expect(ctrl.newName).toBe('Original name');
 		});
 	});
+
+	describe('filter', () => {
+		it('should add filter',
+			inject(() => {
+				// given
+				const ctrl = createController();
+				ctrl.column = {
+					id: 'id1',
+					name: 'col1'
+				};
+				spyOn(ctrl.filterManagerService, 'addFilter');
+
+				// when
+				ctrl.addFilter('valid_records');
+
+				//then
+				expect(ctrl.filterManagerService.addFilter).toHaveBeenCalledWith('valid_records', 'id1', 'col1');
+			})
+		);
+	});
 });

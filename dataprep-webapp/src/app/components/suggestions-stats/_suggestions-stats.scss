@@ -11,9 +11,10 @@
 
   ============================================================================*/
 
-#suggestions-stats-details {
+.suggestions-stats-details {
 	border-left: 2px solid $super-light-gray;
-	height: calc(100vh - 51px);
+	display: flex;
+	flex-direction: column;
 
 	.loading-container {
 		position: relative;

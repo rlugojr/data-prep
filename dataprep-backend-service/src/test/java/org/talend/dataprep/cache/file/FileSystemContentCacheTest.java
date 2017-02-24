@@ -1,15 +1,14 @@
-//  ============================================================================
+// ============================================================================
+// Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
-//  Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+// This source code is available under agreement available at
+// https://github.com/Talend/data-prep/blob/master/LICENSE
 //
-//  This source code is available under agreement available at
-//  https://github.com/Talend/data-prep/blob/master/LICENSE
+// You should have received a copy of the agreement
+// along with this program; if not, write to Talend SA
+// 9 rue Pages 92150 Suresnes, France
 //
-//  You should have received a copy of the agreement
-//  along with this program; if not, write to Talend SA
-//  9 rue Pages 92150 Suresnes, France
-//
-//  ============================================================================
+// ============================================================================
 
 package org.talend.dataprep.cache.file;
 
@@ -42,9 +41,12 @@ public class FileSystemContentCacheTest {
     /** The content cache to test. */
     private FileSystemContentCache cache;
 
+    private FileSystemContentCacheJanitor janitor;
+
     @Before
     public void setUp() throws Exception {
         cache = new FileSystemContentCache(TEST_DIRECTORY);
+        janitor = new FileSystemContentCacheJanitor(TEST_DIRECTORY);
     }
 
     @After
@@ -149,7 +151,7 @@ public class FileSystemContentCacheTest {
         }
 
         // when the janitor is called
-        cache.janitor();
+        janitor.janitor();
 
         // then, none of the cache entries should be removed
         for (ContentCacheKey key : keys) {
@@ -174,7 +176,7 @@ public class FileSystemContentCacheTest {
         for (ContentCacheKey key : keys) {
             cache.evict(key);
         }
-        cache.janitor();
+        janitor.janitor();
 
         // then no file in the cache should be left
         Files.walkFileTree(Paths.get(TEST_DIRECTORY), new SimpleFileVisitor<Path>() {
@@ -202,7 +204,7 @@ public class FileSystemContentCacheTest {
         }
 
         // when eviction is performed and the janitor is called
-        cache.janitor();
+        janitor.janitor();
 
         // then, none of the cache entries should be removed
         for (ContentCacheKey key : keys) {
@@ -217,7 +219,7 @@ public class FileSystemContentCacheTest {
         }
 
         // when eviction is performed and the janitor is called
-        cache.janitor();
+        janitor.janitor();
         Files.walkFileTree(Paths.get(TEST_DIRECTORY), new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {

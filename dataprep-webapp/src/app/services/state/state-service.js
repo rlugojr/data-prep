@@ -71,6 +71,7 @@ export function StateService(RouteStateService, routeState,
 		updateDatasetStatistics: PlaygroundStateService.updateDatasetStatistics,
 		updateDatasetRecord: PlaygroundStateService.updateDatasetRecord,
 		setCurrentSampleType: PlaygroundStateService.setSampleType,
+		setPlaygroundReadOnlyMode: PlaygroundStateService.setReadOnlyMode,
 
 		// playground - dataset parameters
 		toggleDatasetParameters: PlaygroundStateService.toggleDatasetParameters,

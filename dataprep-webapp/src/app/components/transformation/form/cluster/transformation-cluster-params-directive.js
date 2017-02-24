@@ -1,15 +1,15 @@
 /*  ============================================================================
 
-  Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+ Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 
-  This source code is available under agreement available at
-  https://github.com/Talend/data-prep/blob/master/LICENSE
+ This source code is available under agreement available at
+ https://github.com/Talend/data-prep/blob/master/LICENSE
 
-  You should have received a copy of the agreement
-  along with this program; if not, write to Talend SA
-  9 rue Pages 92150 Suresnes, France
+ You should have received a copy of the agreement
+ along with this program; if not, write to Talend SA
+ 9 rue Pages 92150 Suresnes, France
 
-  ============================================================================*/
+ ============================================================================*/
 
 import template from './transformation-cluster-params.html';
 
@@ -29,52 +29,53 @@ export default function TransformClusterParams($timeout) {
 		templateUrl: template,
 		scope: {
 			details: '=',
+			isReadonly: '<',
 		},
 		bindToController: true,
 		controllerAs: 'clusterParamsCtrl',
 		controller: 'TransformClusterParamsCtrl',
 		link(scope, iElement, iAttrs, ctrl) {
-            /**
-             * @ngdoc property
-             * @name allActivationCheckboxes
-             * @propertyOf data-prep.transformation-form.directive:TransformClusterParams
-             * @description [PRIVATE] Each element contains
-             */
+			/**
+			 * @ngdoc property
+			 * @name allActivationCheckboxes
+			 * @propertyOf data-prep.transformation-form.directive:TransformClusterParams
+			 * @description [PRIVATE] Each element contains
+			 */
 			const allActivationCheckboxes = [];
 
-            /**
-             * @ngdoc method
-             * @name updateStyles
-             * @methodOf data-prep.transformation-form.directive:TransformClusterParams
-             * @description [PRIVATE] Refresh the cluster styles with the new provided active flags
-             */
+			/**
+			 * @ngdoc method
+			 * @name updateStyles
+			 * @methodOf data-prep.transformation-form.directive:TransformClusterParams
+			 * @description [PRIVATE] Refresh the cluster styles with the new provided active flags
+			 */
 			function updateStyles(activationValues) {
 				_.chain(allActivationCheckboxes)
-                    .zip(activationValues)
-                    .forEach((zipItem) => {
-	const item = zipItem[0];
-	const checked = zipItem[1];
+					.zip(activationValues)
+					.forEach((zipItem) => {
+						const item = zipItem[0];
+						const checked = zipItem[1];
 
-	if (item.lastState !== checked) {
-		if (checked) {
-			item.row.removeClass('disabled');
-		}
-		else {
-			item.row.addClass('disabled');
-		}
+						if (item.lastState !== checked) {
+							if (checked) {
+								item.row.removeClass('disabled');
+							}
+							else {
+								item.row.addClass('disabled');
+							}
 
-		item.inputs.prop('disabled', !checked);
-		item.selects.prop('disabled', !checked);
-		item.lastState = checked;
-	}
-})
-                    .value();
+							item.inputs.prop('disabled', ctrl.isReadonly || !checked);
+							item.selects.prop('disabled', !checked);
+							item.lastState = checked;
+						}
+					})
+					.value();
 			}
 
 			$timeout(() => {
 				const clustersRows = iElement.find('.cluster-body >.cluster-line');
 
-                // attach change listener on each row enable/disable checkbox
+				// attach change listener on each row enable/disable checkbox
 				clustersRows.each((index) => {
 					const row = clustersRows.eq(index);
 					const rowInputs = row.find('input:not(.cluster-activation)');
@@ -89,14 +90,14 @@ export default function TransformClusterParams($timeout) {
 					};
 				});
 
-                // refresh style on cluster active flag change
+				// refresh style on cluster active flag change
 				scope.$watchCollection(
-                    () => _.map(ctrl.details.clusters, 'active'),
-                    (activationValues) => {
-	ctrl.refreshToggleCheckbox();
-	updateStyles(activationValues);
-}
-                );
+					() => _.map(ctrl.details.clusters, 'active'),
+					(activationValues) => {
+						ctrl.refreshToggleCheckbox();
+						updateStyles(activationValues);
+					}
+				);
 			}, 0, false);
 		},
 	};

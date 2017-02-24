@@ -13,21 +13,36 @@
   ~ ============================================================================
   -->
 
-<div class="editable-regex">
-    <talend-dropdown force-side="left">
-        <button class="dropdown-action" type="button">{{editableRegexCtrl.getTypeKey()}}</button>
-        <ul class="dropdown-menu">
-            <li ng-repeat="type in ::editableRegexCtrl.types track by $index"
-                ng-click="editableRegexCtrl.setSelectedType(type)"
-                class="regex-type-item">
-                <div class="regex-type-item-key">{{::type.key}}</div>
-                <div class="regex-type-item-label">{{::type.label}}</div>
-            </li>
-        </ul>
-    </talend-dropdown>
+<div class="editable-regex" ng-switch="!!editableRegexCtrl.isReadonly">
+    <div ng-switch-when="false">
+        <talend-dropdown force-side="left">
+            <button class="dropdown-action" type="button">{{editableRegexCtrl.getTypeKey()}}</button>
+            <ul class="dropdown-menu">
+                <li ng-repeat="type in ::editableRegexCtrl.types track by $index"
+                    ng-click="editableRegexCtrl.setSelectedType(type)"
+                    class="regex-type-item">
+                    <span class="regex-type-item-key">{{::type.key}}</span>
+                    <span class="regex-type-item-label">{{::type.label}}</span>
+                </li>
+            </ul>
+        </talend-dropdown>
 
-    <input type="text"
-           ng-model="editableRegexCtrl.value.token"
-           ng-trim="false"
-           ng-model-options="{debounce: { 'default': 300, 'blur': 0 }}"/>
+        <input type="text"
+               ng-model="editableRegexCtrl.value.token"
+               ng-trim="false"
+               ng-model-options="{debounce: { 'default': 300, 'blur': 0 }}"/>
+    </div>
+    <div ng-switch-when="true">
+        <span title="{{editableRegexCtrl.getTypeLabel()}}" ng-bind="editableRegexCtrl.getTypeKey()"></span>
+        <span ng-switch="editableRegexCtrl.value.token ===''">
+             <span ng-switch-when="true" class="label-none">{{'NONE' | translate}}</span>
+             <span ng-switch-when="false">
+                  <span ng-switch="!!editableRegexCtrl.transformText">
+                     <span ng-switch-when="true"
+                           ng-bind-html="editableRegexCtrl.transformText(editableRegexCtrl.value.token)"></span>
+                     <span ng-switch-when="false" ng-bind="editableRegexCtrl.value.token"></span>
+                  </span>
+             </span>
+        </span>
+    </div>
 </div>

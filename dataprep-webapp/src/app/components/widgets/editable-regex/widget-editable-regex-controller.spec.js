@@ -11,15 +11,15 @@
 
   ============================================================================*/
 
-describe('Editable regex widget controller', function () {
+describe('Editable regex widget controller', () => {
     'use strict';
 
-    var scope;
-    var createController;
+    let scope;
+    let createController;
 
     beforeEach(angular.mock.module('talend.widget'));
 
-    beforeEach(angular.mock.module('pascalprecht.translate', function ($translateProvider) {
+    beforeEach(angular.mock.module('pascalprecht.translate', ($translateProvider) => {
         $translateProvider.translations('en', {
             EQUALS: 'Equals',
             CONTAINS: 'Contains',
@@ -30,10 +30,10 @@ describe('Editable regex widget controller', function () {
         $translateProvider.preferredLanguage('en');
     }));
 
-    beforeEach(inject(function ($rootScope, $controller) {
+    beforeEach(inject(($rootScope, $controller) => {
         scope = $rootScope.$new();
-        createController = function () {
-            var ctrlFn = $controller('TalendEditableRegexCtrl', {
+        createController = () => {
+            let ctrlFn = $controller('TalendEditableRegexCtrl', {
                 $scope: scope,
             }, true);
             ctrlFn.instance.value = scope.value;
@@ -41,9 +41,9 @@ describe('Editable regex widget controller', function () {
         };
     }));
 
-    it('should init types array', function () {
+    it('should init types array', () => {
         //when
-        var ctrl = createController();
+        let ctrl = createController();
 
         //then
         expect(ctrl.types.length).toBe(5);
@@ -54,9 +54,9 @@ describe('Editable regex widget controller', function () {
         expect(ctrl.types[4].label).toBe('RegEx');
     });
 
-    it('should return the initialized operator key', function () {
+    it('should return the initialized operator key', () => {
         //when
-        var ctrl = createController();
+        let ctrl = createController();
 
         //then
         expect(ctrl.value).toEqual({
@@ -65,31 +65,45 @@ describe('Editable regex widget controller', function () {
         });
     });
 
-    it('should return the current operator key', function () {
+    it('should return the current operator key', () => {
         scope.value = {
             token: '',
             operator: 'starts_with',
         };
 
         //when
-        var ctrl = createController();
-        var key = ctrl.getTypeKey();
+        let ctrl = createController();
+        let key = ctrl.getTypeKey();
 
         //then
         expect(key).toBe('>');
     });
 
-    it('should update regex type', function () {
+    it('should update regex type', () => {
         scope.value = {
             token: '',
             operator: 'starts_with',
         };
 
         //when
-        var ctrl = createController();
+        let ctrl = createController();
         ctrl.setSelectedType({ operator: 'regex' });
 
         //then
         expect(ctrl.value.operator).toBe('regex');
+    });
+
+    it('should return the current operator label', () => {
+        scope.value = {
+            token: '',
+            operator: 'starts_with',
+        };
+
+        //when
+        let ctrl = createController();
+        let label = ctrl.getTypeLabel();
+
+        //then
+        expect(label).toBe('Starts With');
     });
 });

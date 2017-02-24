@@ -29,7 +29,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import org.talend.dataprep.api.action.ActionDefinition;
-import org.talend.dataprep.api.dataset.DataSetMetadata;
 import org.talend.dataprep.api.preparation.*;
 import org.talend.dataprep.api.share.Owner;
 import org.talend.dataprep.conversions.BeanConversionService;
@@ -65,6 +64,7 @@ public class PreparationConversions {
                         .register(fromBean(Preparation.class) //
                         .toBeans(PreparationMessage.class, UserPreparation.class, PersistentPreparation.class) //
                                 .using(PreparationMessage.class, this::toPreparationMessage) //
+                                .using(PreparationSummary.class, this::toStudioPreparation) //
                                 .using(UserPreparation.class, (source, target) -> toUserPreparation(target)) //
                         .build()
                 );
@@ -73,10 +73,38 @@ public class PreparationConversions {
             return bean;
         }
 
-        private UserPreparation toUserPreparation(UserPreparation target) {
-            final Security security = applicationContext.getBean(Security.class);
-
+        private PreparationSummary toStudioPreparation(Preparation source, PreparationSummary target) {
             if (target.getOwner() == null) {
+                final Security security = applicationContext.getBean(Security.class);
+                Owner owner = new Owner(security.getUserId(), security.getUserDisplayName(), StringUtils.EMPTY);
+                target.setOwner(owner);
+            }
+
+            final PreparationRepository preparationRepository = applicationContext.getBean(PreparationRepository.class);
+            final ActionRegistry actionRegistry = applicationContext.getBean(ActionRegistry.class);
+
+            // Allow distributed run
+            // Get preparation actions
+            PreparationActions prepActions = preparationRepository.get(source.getHeadId(), PreparationActions.class);
+            if (prepActions != null) {
+                List<Action> actions = prepActions.getActions();
+                boolean allowDistributedRun = true;
+                for (Action action : actions) {
+                    final ActionDefinition actionDefinition = actionRegistry.get(action.getName());
+                    if (actionDefinition.getBehavior().contains(ActionDefinition.Behavior.FORBID_DISTRIBUTED)) {
+                        allowDistributedRun = false;
+                        break;
+                    }
+                }
+                target.setAllowDistributedRun(allowDistributedRun);
+            }
+
+            return target;
+        }
+
+        private UserPreparation toUserPreparation(UserPreparation target) {
+            if (target.getOwner() == null) {
+                final Security security = applicationContext.getBean(Security.class);
                 Owner owner = new Owner(security.getUserId(), security.getUserDisplayName(), StringUtils.EMPTY);
                 target.setOwner(owner);
             }

@@ -15,14 +15,22 @@
 
 <div class="param">
 
-    <div class="param-row">
+    <div ng-class="{'param-row' : dateParamCtrl.parameter.type === 'boolean'}">
         <div class="param-name" ng-if="::(dateParamCtrl.label !== 'false')">
             {{::dateParamCtrl.parameter.label}}:
         </div>
 
-        <talend-datetime-picker ng-model="dateParamCtrl.parameter.value"
-                                is-date-time>
-        </talend-datetime-picker>
+        <div class="param-input" ng-switch="!!dateParamCtrl.isReadonly">
+            <div ng-switch-when="true">
+                <span class="param-input-label" ng-if="dateParamCtrl.parameter.value !== ''" ng-bind="dateParamCtrl.parameter.value"></span>
+                <span class="param-input-label-none" ng-if="dateParamCtrl.parameter.value === ''" translate-once="NONE"></span>
+            </div>
+            <div ng-switch-when="false">
+                <talend-datetime-picker ng-model="dateParamCtrl.parameter.value"
+                                        is-date-time>
+                </talend-datetime-picker>
+            </div>
+        </div>
 
         <div class="param-error error"
              ng-if="parentForm.$error.isDateTimeValidation"

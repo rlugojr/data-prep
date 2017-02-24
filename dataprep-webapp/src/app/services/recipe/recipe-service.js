@@ -32,6 +32,14 @@ export default function RecipeService(state, StateService, StepUtilsService, Pre
 		// append step preview
 		earlyPreview,
 		cancelEarlyPreview,
+
+		// utils
+		isStartChain,
+		isEndChain,
+		isLastActive,
+		hasStaticParams,
+		hasDynamicParams,
+		getAllFiltersNames,
 	};
 
 	//--------------------------------------------------------------------------------------------------------------
@@ -215,5 +223,76 @@ export default function RecipeService(state, StateService, StepUtilsService, Pre
 	 */
 	function cancelEarlyPreview() {
 		StateService.restoreRecipeBeforePreview();
+	}
+
+	//--------------------------------------------------------------------------------------------------------------
+	// -----------------------------------------------------UTILS--------------------------------------------------
+	//--------------------------------------------------------------------------------------------------------------
+	/**
+	 * @ngdoc method
+	 * @name isStartChain
+	 * @methodOf data-prep.services.recipe.service:RecipeService
+	 * @description Test if step is the first element of the chain
+	 * @returns {boolean} true if step is the first step
+	 */
+	function isStartChain(step) {
+		// DO NOT use StepUtilsService.isLastStep as it could use the recipe with the before preview steps
+		return step === state.playground.recipe.current.reorderedSteps[0];
+	}
+
+	/**
+	 * @ngdoc method
+	 * @name isEndChain
+	 * @methodOf data-prep.services.recipe.service:RecipeService
+	 * @description Test if step is the last element of the chain
+	 * @returns {boolean} true if step is the last step
+	 */
+	function isEndChain(step) {
+		return step === state.playground.recipe.current.reorderedSteps[state.playground.recipe.current.reorderedSteps.length - 1];
+	}
+
+	/**
+	 * @ngdoc method
+	 * @name isLastActive
+	 * @methodOf data-prep.services.recipe.service:RecipeService
+	 * @description Test if step is the last active element of the chain
+	 * @returns {boolean} true if step is the last active step
+	 */
+	function isLastActive(step) {
+		return state.playground.recipe.current.lastActiveStep === step;
+	}
+
+	/**
+	 * @ngdoc method
+	 * @name hasStaticParams
+	 * @methodOf data-prep.services.recipe.service:RecipeService
+	 * @param {object} step The step to test
+	 * @description Return if the step has static parameters
+	 */
+	function hasStaticParams(step) {
+		return (step.transformation.parameters && step.transformation.parameters.length) ||
+			(step.transformation.items && step.transformation.items.length);
+	}
+
+	/**
+	 * @ngdoc method
+	 * @name hasDynamicParams
+	 * @methodOf data-prep.services.recipe.service:RecipeService
+	 * @param {object} step The step to test
+	 * @description Return if the step has dynamic parameters
+	 */
+	function hasDynamicParams(step) {
+		return step.transformation.cluster;
+	}
+
+	/**
+	 * @ngdoc method
+	 * @name getAllFiltersNames
+	 * @methodOf data-prep.services.recipe.service:RecipeService
+	 * @param {array} stepFilters The step filters
+	 * @description Get all filters names
+	 */
+	function getAllFiltersNames(stepFilters) {
+		return '(' + _.pluck(stepFilters, 'colName').join(', ').toUpperCase() + ')';
 	}
 }

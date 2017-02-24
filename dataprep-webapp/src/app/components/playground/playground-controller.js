@@ -11,8 +11,7 @@
 
  ============================================================================*/
 
-import { HOME_DATASETS_ROUTE, HOME_PREPARATIONS_ROUTE } from '../../index-route';
-
+import { PLAYGROUND_PREPARATION_ROUTE } from '../../index-route';
 /**
  * @ngdoc controller
  * @name data-prep.playground.controller:PlaygroundCtrl
@@ -26,10 +25,10 @@ import { HOME_DATASETS_ROUTE, HOME_PREPARATIONS_ROUTE } from '../../index-route'
  * @requires data-prep.services.lookup.service:LookupService
  * @requires data-prep.services.utils.service:MessageService
  */
-export default function PlaygroundCtrl($timeout, $state, $stateParams, state, StateService,
+export default function PlaygroundCtrl($state, $stateParams, state, StateService,
                                        PlaygroundService, DatasetService, PreparationService,
                                        PreviewService, FilterManagerService,
-                                       OnboardingService, LookupService, MessageService) {
+                                       OnboardingService, LookupService) {
 	'ngInject';
 
 	const vm = this;
@@ -68,7 +67,7 @@ export default function PlaygroundCtrl($timeout, $state, $stateParams, state, St
 	 * @methodOf data-prep.playground.controller:PlaygroundCtrl
 	 * @description Toggle preparation picker modal
 	 */
-	vm.showPreparationPicker = function showPreparationPicker() {
+	vm.showPreparationPicker = () => {
 		vm.displayPreparationPicker = true;
 	};
 
@@ -79,7 +78,7 @@ export default function PlaygroundCtrl($timeout, $state, $stateParams, state, St
 	 * @methodOf data-prep.playground.controller:PlaygroundCtrl
 	 * @description Apply the preparation steps to the current preparation
 	 */
-	vm.applySteps = function applySteps(preparationId) {
+	vm.applySteps = (preparationId) => {
 		return PlaygroundService.copySteps(preparationId)
 			.then(() => {
 				vm.displayPreparationPicker = false;
@@ -95,11 +94,11 @@ export default function PlaygroundCtrl($timeout, $state, $stateParams, state, St
 	 * @methodOf data-prep.playground.controller:PlaygroundCtrl
 	 * @description Change the preparation name
 	 */
-	vm.confirmPrepNameEdition = function confirmPrepNameEdition(name) {
+	vm.confirmPrepNameEdition = (name) => {
 		const cleanName = name.trim();
 		if (!vm.changeNameInProgress && cleanName) {
 			changeName(cleanName)
-				.then(preparation => $state.go('playground.preparation', { prepid: preparation.id }));
+				.then(preparation => $state.go(PLAYGROUND_PREPARATION_ROUTE, { prepid: preparation.id }));
 		}
 	};
 
@@ -126,7 +125,7 @@ export default function PlaygroundCtrl($timeout, $state, $stateParams, state, St
 	 * @methodOf data-prep.playground.controller:PlaygroundCtrl
 	 * @description show hides lookup panel and populates its grid
 	 */
-	vm.toggleLookup = function toggleLookup() {
+	vm.toggleLookup = () => {
 		if (state.playground.lookup.visibility) {
 			StateService.setLookupVisibility(false);
 		}
@@ -147,7 +146,7 @@ export default function PlaygroundCtrl($timeout, $state, $stateParams, state, St
 	 *     playground close.
 	 * @returns {boolean} True if the playground can be closed (no implicit preparation), False otherwise
 	 */
-	vm.beforeClose = function beforeClose() {
+	vm.beforeClose = () => {
 		const isDraft = state.playground.preparation && state.playground.preparation.draft;
 		if (isDraft) {
 			if (state.playground.recipe.current.steps.length) {
@@ -158,7 +157,7 @@ export default function PlaygroundCtrl($timeout, $state, $stateParams, state, St
 			}
 		}
 		else {
-			vm.close();
+			PlaygroundService.close();
 		}
 	};
 
@@ -168,8 +167,8 @@ export default function PlaygroundCtrl($timeout, $state, $stateParams, state, St
 	 * @methodOf data-prep.playground.controller:PlaygroundCtrl
 	 * @description Discard implicit preparation save. This trigger a preparation delete.
 	 */
-	vm.discardSaveOnClose = function discardSaveOnClose() {
-		PreparationService.delete(state.playground.preparation).then(vm.close);
+	vm.discardSaveOnClose = () => {
+		PreparationService.delete(state.playground.preparation).then(PlaygroundService.close);
 	};
 
 	/**
@@ -178,7 +177,7 @@ export default function PlaygroundCtrl($timeout, $state, $stateParams, state, St
 	 * @methodOf data-prep.playground.controller:PlaygroundCtrl
 	 * @description Save implicit preparation with provided name. The playground is then closed.
 	 */
-	vm.confirmSaveOnClose = function confirmSaveOnClose() {
+	vm.confirmSaveOnClose = () => {
 		vm.saveInProgress = true;
 		StateService.setIsSavingPreparation(true);
 		let operation;
@@ -195,23 +194,11 @@ export default function PlaygroundCtrl($timeout, $state, $stateParams, state, St
 
 		return operation
 			.then(() => {
-				vm.close();
+				PlaygroundService.close();
 			})
 			.finally(() => {
 				StateService.setIsSavingPreparation(false);
 			});
-	};
-
-	/**
-	 * @ngdoc method
-	 * @name close
-	 * @methodOf data-prep.playground.controller:PlaygroundCtrl
-	 * @description Playground close callback. It reset the playground and redirect to the previous page
-	 */
-	vm.close = function close() {
-		$timeout.cancel(vm.fetchStatsTimeout);
-		$timeout(StateService.resetPlayground, 500, false);
-		$state.go(state.route.previous, state.route.previousOptions);
 	};
 
 	//--------------------------------------------------------------------------------------------------------------
@@ -224,162 +211,20 @@ export default function PlaygroundCtrl($timeout, $state, $stateParams, state, St
 	 * @description Change the dataset parameters
 	 * @param {object} parameters The new dataset parameters
 	 */
-	vm.changeDatasetParameters = function changeDatasetParameters(parameters) {
+	vm.changeDatasetParameters = (parameters) => {
 		StateService.setIsSendingDatasetParameters(true);
 		PlaygroundService.changeDatasetParameters(parameters)
 			.then(StateService.hideDatasetParameters)
 			.finally(StateService.setIsSendingDatasetParameters.bind(null, false));
 	};
 
-	//------------------------------------------------------------------------------------------------------
-	// ----------------------------------------------STATS REFRESH-------------------------------------------
-	//------------------------------------------------------------------------------------------------------
-	/**
-	 * @ngdoc method
-	 * @name shouldFetchStatistics
-	 * @methodOf data-prep.playground.controller:PlaygroundCtrl
-	 * @description Check if we have the statistics or we have to fetch them
-	 */
-	function shouldFetchStatistics() {
-		const columns = state.playground.data.metadata.columns;
-
-		return !columns || !columns.length ||                   // no columns
-			!columns[0].statistics.frequencyTable.length;   // no frequency table implies no async stats computed
-	}
-
-	/**
-	 * @ngdoc method
-	 * @name fetchStatistics
-	 * @methodOf data-prep.playground.controller:PlaygroundCtrl
-	 * @description Fetch the statistics. If the update fails (no statistics yet) a retry is triggered after 1s
-	 */
-	function fetchStatistics() {
-		StateService.setIsFetchingStats(true);
-		PlaygroundService.updateStatistics()
-			.then(() => StateService.setIsFetchingStats(false))
-			.catch(() => {
-				vm.fetchStatsTimeout = $timeout(fetchStatistics, 1500, false);
-			});
-	}
-
 	//--------------------------------------------------------------------------------------------------------------
 	// ------------------------------------------------INIT----------------------------------------------------------
 	//--------------------------------------------------------------------------------------------------------------
-	/**
-	 * @ngdoc method
-	 * @name errorGoBack
-	 * @description go back to homePage when errors occur
-	 */
-	function errorGoBack(errorDisplay, errorOptions) {
-		if (errorDisplay) {
-			MessageService.error('PLAYGROUND_FILE_NOT_FOUND_TITLE', 'PLAYGROUND_FILE_NOT_FOUND', errorOptions);
-		}
-		$state.go(state.route.previous, state.route.previousOptions);
-	}
-
-	/**
-	 * @ngdoc method
-	 * @name loadPreparation
-	 * @description open a preparation
-	 */
-	function loadPreparation(preparation) {
-		PlaygroundService.load(preparation)
-			.then(() => {
-				if (shouldFetchStatistics()) {
-					fetchStatistics();
-				}
-			})
-			.catch(() => errorGoBack(true, { type: 'preparation' }));
-	}
-
-	/**
-	 * @ngdoc method
-	 * @name loadDataset
-	 * @description open a dataset
-	 */
-	function loadDataset(dataset) {
-		PlaygroundService.initPlayground(dataset)
-			.then(() => {
-				if (shouldFetchStatistics()) {
-					fetchStatistics();
-				}
-			})
-			.catch(() => errorGoBack(true, { type: 'dataset' }));
-	}
-
-	/**
-	 * @ngdoc method
-	 * @name shouldReloadPreparation
-	 * @description Check if the preparation should be reloaded.
-	 * The preparation is not reloaded if (and) :
-	 * - the current playground preparation is the one we want
-	 * - the route param "reload" is not set explicitly to false
-	 */
-	function shouldReloadPreparation() {
-		const currentPrep = state.playground.preparation;
-		if (!currentPrep || $stateParams.prepid !== currentPrep.id) {
-			return true;
-		}
-
-		return $stateParams.reload !== false;
-	}
-
 	if ($stateParams.prepid) {
-		StateService.setPreviousRoute(
-			HOME_PREPARATIONS_ROUTE,
-			{ folderId: state.inventory.folder.metadata.id }
-		);
-		if (!shouldReloadPreparation()) {
-			return;
-		}
-
-		StateService.setIsLoadingPlayground(true);
-		PlaygroundService.startLoader();
-		PreparationService.getDetails($stateParams.prepid)
-			.then((preparation) => {
-				loadPreparation(preparation);
-				return preparation;
-			})
-			.then(preparation => DatasetService.getMetadata(preparation.dataSetId))
-			.then(dataset => StateService.setCurrentDataset(dataset))
-			.catch(() => {
-				PlaygroundService.stopLoader();
-				return errorGoBack(false);
-			});
+		PlaygroundService.initPreparation();
 	}
 	else if ($stateParams.datasetid) {
-		StateService.setPreviousRoute(HOME_DATASETS_ROUTE);
-		StateService.setIsLoadingPlayground(true);
-		PlaygroundService.startLoader();
-		DatasetService.getMetadata($stateParams.datasetid)
-			.then(loadDataset)
-			.catch(() => {
-				PlaygroundService.stopLoader();
-				return errorGoBack(false);
-			});
+		PlaygroundService.initDataset();
 	}
 }
-
-/**
- * @ngdoc property
- * @name hasActiveStep
- * @propertyOf data-prep.playground.controller:PlaygroundCtrl
- * @description checks if there is at least 1 active step, by checking the 1st step in the recipe
- * It is bound to the status of the 1st step in the state
- * @type boolean
- */
-Object.defineProperty(
-	PlaygroundCtrl.prototype,
-	'hasActiveStep',
-	{
-		enumerable: true,
-		configurable: false,
-		get() {
-			const firstStep = this.state.playground.recipe.current.steps[0];
-			return firstStep && !firstStep.inactive;
-		},
-
-		set: () => {
-		},
-	}
-);

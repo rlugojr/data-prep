@@ -169,7 +169,12 @@ public enum DataSetErrorCodes implements ErrorCode {
     /**
      * Error thrown when an error occurs while adding or updating a dataset.
      */
-    NOT_A_TCOMP_DATASET(BAD_REQUEST.value());
+    NOT_A_TCOMP_DATASET(BAD_REQUEST.value()),
+    /**
+     *
+     */
+    LOCAL_DATA_SET_INPUT_STREAM_TOO_LARGE(PAYLOAD_TOO_LARGE.value(), "size")
+    ;
 
     /**
      * The http status to use.

@@ -1,5 +1,4 @@
 // ============================================================================
-//
 // Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
@@ -37,7 +36,6 @@ import com.jayway.restassured.response.Response;
  * Unit/integration tests for the FolderService
  */
 public class FolderServiceTest extends BasePreparationTest {
-
 
     @Test
     public void shouldListChildren() throws Exception {

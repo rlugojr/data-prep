@@ -11,12 +11,12 @@
 
   ============================================================================*/
 
-describe('Transformation column param directive', function () {
+describe('Transformation column param directive', () => {
     'use strict';
-    var scope;
-    var createElement;
+    let scope;
+    let createElement;
 
-    var stateMock = {
+    let stateMock = {
         playground: {
             // available dataset/preparation columns
             data: {
@@ -35,7 +35,7 @@ describe('Transformation column param directive', function () {
         },
     };
 
-    beforeEach(angular.mock.module('data-prep.transformation-form', function ($provide) {
+    beforeEach(angular.mock.module('data-prep.transformation-form', ($provide) => {
 
         // set the selected column to the first one
         stateMock.playground.grid.selectedColumns = [stateMock.playground.data.metadata.columns[0]];
@@ -46,15 +46,15 @@ describe('Transformation column param directive', function () {
     beforeEach(inject(function ($rootScope, $compile) {
         scope = $rootScope.$new();
 
-        createElement = function () {
-            var element = angular.element('<transform-column-param parameter="parameter"></transform-column-param>');
+        createElement = () => {
+            let element = angular.element('<transform-column-param parameter="parameter" is-readonly="isReadonly"></transform-column-param>');
             $compile(element)(scope);
             scope.$digest();
             return element;
         };
     }));
 
-    it('should render an action with a column parameter', function () {
+    it('should render an action with a column parameter', () => {
         //given
         scope.parameter = {
             name: 'selected_column',
@@ -67,10 +67,32 @@ describe('Transformation column param directive', function () {
         };
 
         //when
-        var element = createElement();
+        let element = createElement();
 
         //then
         expect(element.find('.param-name').text().trim()).toBe('The Column to concatenate:');
         expect(element.find('.param-input').find('option').length).toBe(stateMock.playground.data.metadata.columns.length);
+    });
+
+    it('should render an action with a column parameter in readonly mode', () => {
+        //given
+        scope.parameter = {
+            name: 'selected_column',
+            type: 'column',
+            implicit: false,
+            canBeBlank: false,
+            description: 'Combine the content of this column with the current one',
+            label: 'The Column to concatenate',
+            default: '',
+            value: '0001',
+        };
+        scope.isReadonly = true;
+
+        //when
+        let element = createElement();
+
+        //then
+        expect(element.find('.param-name').text().trim()).toBe('The Column to concatenate:');
+        expect(element.find('.param-input-label').text().trim()).toBe('first name');
     });
 });

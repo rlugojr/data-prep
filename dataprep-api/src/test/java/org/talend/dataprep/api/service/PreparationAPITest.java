@@ -13,6 +13,7 @@
 package org.talend.dataprep.api.service;
 
 import static com.jayway.restassured.RestAssured.*;
+import static java.util.Collections.emptyMap;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasSize;
@@ -112,6 +113,18 @@ public class PreparationAPITest extends ApiServiceTestBase {
         assertThat(longFormat.getList("id").get(0), is(preparationId));
         assertThat(longFormat.getList("actions").size(), is(1));
         assertThat(((List) longFormat.getList("actions").get(0)).size(), is(0));
+
+        // when : summary format
+        final JsonPath summaryFormat = when().get("/api/preparations/?format=summary").jsonPath();
+
+        // then
+        assertThat(summaryFormat.getList("id").size(), is(1));
+        assertThat(summaryFormat.getList("id").get(0), is(preparationId));
+        assertThat(summaryFormat.getList("name").size(), is(1));
+        assertThat(summaryFormat.getList("name").get(0), is("testPreparation"));
+        assertThat(summaryFormat.getList("owner").size(), is(1));
+        assertThat(summaryFormat.getList("lastModificationDate").size(), is(1));
+        assertThat(summaryFormat.getList("allowDistributedRun").size(), is(1));
     }
 
     @Test
@@ -317,7 +330,7 @@ public class PreparationAPITest extends ApiServiceTestBase {
                 .preparationId(preparationId)
                 .stepId("step1")
                 .format(JSON)
-                .parameters("")
+                .parameters(emptyMap())
                 .sourceType(FILTER)
                 .build();
         try (final OutputStream entry = contentCache.put(metadataKey, PERMANENT)) {

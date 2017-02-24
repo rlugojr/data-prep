@@ -62,8 +62,8 @@ export default function DatagridHeaderCtrl($scope, state,
 	 * @methodOf data-prep.datagrid-header.controller:DatagridHeaderCtrl
 	 * @description Get transformations from REST call
 	 */
-	vm.initTransformations = function initTransformations() {
-		if (!vm.transformations && !vm.initTransformationsInProgress) {
+	vm.initTransformations = () => {
+		if (!state.playground.isReadOnly && !vm.transformations && !vm.initTransformationsInProgress) {
 			vm.transformationsRetrieveError = false;
 			vm.initTransformationsInProgress = true;
 
@@ -90,7 +90,7 @@ export default function DatagridHeaderCtrl($scope, state,
 	 * @methodOf data-prep.datagrid-header.controller:DatagridHeaderCtrl
 	 * @description update the new column name
 	 */
-	vm.updateColumnName = function updateColumnName() {
+	vm.updateColumnName = () => {
 		const params = {
 			new_column_name: vm.newName,
 			scope: 'column',
@@ -111,7 +111,7 @@ export default function DatagridHeaderCtrl($scope, state,
 	 * @methodOf data-prep.datagrid-header.controller:DatagridHeaderCtrl
 	 * @description Check if the new name is correct for column name change
 	 */
-	vm.nameHasChanged = function nameHasChanged() {
+	vm.nameHasChanged = () => {
 		return vm.newName && originalName !== vm.newName;
 	};
 
@@ -123,7 +123,7 @@ export default function DatagridHeaderCtrl($scope, state,
 	 * @description Set isEditMode to provided value
 	 * @param {boolean} bool The new edit mode value
 	 */
-	vm.setEditMode = function setEditMode(bool) {
+	vm.setEditMode = (bool) => {
 		vm.isEditMode = bool;
 
 		if (bool) {
@@ -138,8 +138,18 @@ export default function DatagridHeaderCtrl($scope, state,
 	 * @methodOf data-prep.datagrid-header.controller:DatagridHeaderCtrl
 	 * @description Reset newName with the original name
 	 */
-	vm.resetColumnName = function resetColumnName() {
+	vm.resetColumnName = () => {
 		vm.newName = originalName;
+	};
+
+	/**
+	 * @ngdoc method
+	 * @name addFilter
+	 * @methodOf data-prep.datagrid-header.controller:DatagridHeaderCtrl
+	 * @description add filter
+	 */
+	vm.addFilter = (type) => {
+		vm.filterManagerService.addFilter(type, vm.column.id, vm.column.name);
 	};
 
 	/**

@@ -27,6 +27,7 @@ export default function TransformColumnParam() {
 		templateUrl: template,
 		scope: {
 			parameter: '=',
+			isReadonly: '<',
 		},
 		bindToController: true,
 		controllerAs: 'columnParamCtrl',

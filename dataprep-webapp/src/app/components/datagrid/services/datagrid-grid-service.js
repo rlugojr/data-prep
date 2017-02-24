@@ -12,6 +12,7 @@
  ============================================================================*/
 
 import angular from 'angular';
+import SingleColumnResizePlugin from '../plugins/single-column-resize-plugin';
 import { COLUMN_INDEX_ID } from './datagrid-column-service';
 
 /**
@@ -57,12 +58,12 @@ export default class DatagridGridService {
      * @methodOf data-prep.datagrid.service:DatagridGridService
      * @description Attaches listeners for data update to reRender the grid
      */
-	_attachLongTableListeners() {
-		this.state.playground.grid.dataView.onRowCountChanged.subscribe(() => {
+	attachLongTableListeners(grid) {
+		grid.dataView.onRowCountChanged.subscribe(() => {
 			this.grid.updateRowCount();
 			this.grid.render();
 		});
-		this.state.playground.grid.dataView.onRowsChanged.subscribe((e, args) => {
+		grid.dataView.onRowsChanged.subscribe((e, args) => {
 			this.grid.invalidateRows(args.rows);
 			this.grid.render();
 		});
@@ -142,7 +143,7 @@ export default class DatagridGridService {
      */
 	_initGridServices() {
 		_.forEach(this.gridServices, (service) => {
-			service.init(this.grid);
+			service.init(this.grid, this.state.playground.grid);
 		});
 	}
 
@@ -158,9 +159,10 @@ export default class DatagridGridService {
         // create grid
 		const options = {
 			autoEdit: false,
-			editable: true,
+			editable: !this.state.playground.isReadOnly,
 			enableAddRow: false,
 			enableCellNavigation: true,
+			enableColumnReorder: !this.state.playground.isReadOnly,
 			enableTextSelectionOnCells: false,
 			syncColumnCellResize: false,
 			frozenColumn: 0,
@@ -168,9 +170,10 @@ export default class DatagridGridService {
 			asyncEditorLoadDelay: 150,
 		};
 		this.grid = new Slick.Grid(elementId, this.state.playground.grid.dataView, [{ id: 'tdpId' }], options);
+		SingleColumnResizePlugin.patch(this.grid);
 
         // listeners
-		this._attachLongTableListeners();
+		this.attachLongTableListeners(this.state.playground.grid);
 		this._attachGridStateListeners();
 
         // init other services

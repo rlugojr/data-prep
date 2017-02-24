@@ -42,6 +42,7 @@ export default function TransformForm() {
 			onSubmitHoverOn: '&',
 			onSubmitHoverOff: '&',
 			isTransformationInProgress: '<',
+			isReadonly: '<',
 		},
 		bindToController: true,
 		controllerAs: 'formCtrl',

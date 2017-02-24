@@ -61,6 +61,7 @@ const PlaygroundHeader = {
 		parametersVisible: '<',
 		preparationPicker: '<',
 		preview: '<',
+		isReadonly: '<',
 	},
 };
 

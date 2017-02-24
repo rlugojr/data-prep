@@ -28,6 +28,11 @@ $switch-border-background: darken($base-background-color, 9%);
 $switch-shadow: 0 2px 5px transparentize(black, 0.6);
 $slide-action-background: $base-background-color;
 
+$navigation-border: 1px;
+$navigation-height: 50px;
+$navigation-all-height: ($navigation-height + $navigation-border);
+$playground-height: '100vh - ' + ($navigation-all-height);
+
 @mixin slidable-action-bar {
 	.action {
 		background: $slide-action-background;
@@ -122,16 +127,23 @@ $slide-action-background: $base-background-color;
 		}
 
 		.steps-header {
-			display: flex;
+			display: inline-block;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+
 			border-bottom: 1px solid $shadow-gray;
 			padding: $padding-normal $padding-smaller $padding-normal $padding-large;
 
 			talend-editable-text {
 				width: 100%;
+				.edition-text-input {
+					width: 95%;
+				}
 			}
 
 			.steps-header-preparation-text {
-				@include ellipsis(85%);
+				@include ellipsis(95%);
 				font-size: 1.2em;
 				font-weight: 600;
 				text-transform: uppercase;
@@ -150,10 +162,7 @@ $slide-action-background: $base-background-color;
 //-----------------------------------------------------BODY--------------------------------------------------
 //-----------------------------------------------------------------------------------------------------------
 .playground-container {
-	$navigation-border: 1px;
-	$navigation-height: 50px;
-	$navigation-all-height: ($navigation-height + $navigation-border);
-	$playground-height: '100vh - ' + $navigation-all-height;
+	$playground-suggestions-stats-details: '100vh - ' + (2*$navigation-height + $navigation-border);
 
 	height: 100vh;
 	@include flex-column();
@@ -176,6 +185,50 @@ $slide-action-background: $base-background-color;
 		@include recipe-layout();
 		@include playground-center-layout();
 		@include suggestions-layout();
+
+		.playground-suggestions {
+			.suggestions-title {
+				height: $navigation-height;
+				background-color: #F1F1F1;
+
+				.title {
+					@include ellipsis(320px);
+					font-size: 1.2em;
+					font-weight: 600;
+					padding: 15px 15px 15px 10px;
+					text-transform: uppercase;
+				}
+			}
+
+			.suggestions-stats-details {
+				@include calc('height', $playground-height);
+
+				.suggestions-stats-content {
+					@include calc('height', $playground-suggestions-stats-details);
+					width: 330px;
+
+					.stat-detail-tab-items {
+						width: 330px;
+					}
+				}
+			}
+		}
+
+		sc-accordion-item {
+			.trigger-container {
+				padding: 0 10px;
+
+				step-description {
+					padding: 10px 0;
+				}
+			}
+
+			.content-container {
+				background-color: #fafafa;
+				box-shadow: inset 0 10px 5px -10px rgba(0, 0, 0, 0.25), inset 0 -10px 5px -10px rgba(0, 0, 0, 0.25);
+				width: 330px;
+			}
+		}
 	}
 }
 

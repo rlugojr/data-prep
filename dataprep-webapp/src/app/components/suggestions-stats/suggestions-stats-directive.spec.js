@@ -11,31 +11,61 @@
 
   ============================================================================*/
 
-describe('Suggestions stats directive', function () {
+describe('Suggestions stats directive', () => {
     'use strict';
 
-    var scope;
-    var createElement;
-    var element;
+    let scope;
+    let createElement;
+    let element;
+    let stateMock;
 
-    beforeEach(angular.mock.module('data-prep.suggestions-stats'));
+    beforeEach(angular.mock.module('data-prep.suggestions-stats', ($provide) => {
+        stateMock = {
+            playground: {
+                grid: {},
+            }
+        };
+        $provide.constant('state', stateMock);
+    }));
 
-    beforeEach(inject(function ($rootScope, $compile, $timeout) {
+    beforeEach(inject(($rootScope, $compile, $timeout) => {
         scope = $rootScope.$new();
-        createElement = function () {
-            element = angular.element('<suggestions-stats></suggestions-stats>');
+        createElement = () => {
+            element = angular.element(
+                '<suggestions-stats>' +
+                '   <sc-splitter class="suggestions-stats-content" orientation="vertical">' +
+                '       <sc-split-first-pane id="help-suggestions">' +
+                '           <actions-suggestions class="suggestions-part"></actions-suggestions>' +
+                '               </sc-split-first-pane>' +
+                '       <sc-split-second-pane id="help-stats">' +
+                '           <stats-details class="stats-part"></stats-details>' +
+                '       </sc-split-second-pane>' +
+                '   </sc-splitter>' +
+                '</suggestions-stats>');
             $compile(element)(scope);
             scope.$digest();
             $timeout.flush();
         };
     }));
 
-    afterEach(function () {
+    afterEach(() => {
         scope.$destroy();
         element.remove();
     });
 
-    it('should render suggestions/stats splitter', inject(function () {
+    it('should set column name in title', () => {
+        //given
+        stateMock.playground.grid.selectedColumns = [{ name: 'Col 1' }];
+
+        //when
+        createElement();
+
+        //then
+        expect(element.find('.title').text().trim()).toBe('Col 1');
+    });
+
+
+    it('should render suggestions/stats splitter', inject(() => {
         //when
         createElement();
 

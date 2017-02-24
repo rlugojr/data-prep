@@ -29,13 +29,13 @@ import org.talend.dataprep.api.folder.Folder;
 import org.talend.dataprep.api.preparation.*;
 import org.talend.dataprep.exception.json.JsonErrorCodeDescription;
 import org.talend.dataprep.metrics.Timed;
+import org.talend.dataprep.util.SortAndOrderHelper;
+import org.talend.dataprep.util.SortAndOrderHelper.Order;
+import org.talend.dataprep.util.SortAndOrderHelper.Sort;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.talend.dataprep.util.SortAndOrderHelper;
-import org.talend.dataprep.util.SortAndOrderHelper.Order;
-import org.talend.dataprep.util.SortAndOrderHelper.Sort;
 
 @RestController
 @Api(value = "preparations", basePath = "/preparations", description = "Operations on preparations")
@@ -97,6 +97,18 @@ public class PreparationController {
             @ApiParam(value = "Sort key (by name or date).") @RequestParam(defaultValue = "lastModificationDate") Sort sort,
             @ApiParam(value = "Order for sort key (desc or asc).") @RequestParam(defaultValue = "desc") Order order) {
         return preparationService.listAll(sort, order);
+    }
+
+    /**
+     * List all preparation summaries.
+     *
+     * @return the preparation summaries, sorted by descending last modification date.
+     */
+    @RequestMapping(value = "/preparations/summaries", method = GET)
+    @ApiOperation(value = "List all preparations", notes = "Returns the list of preparations summaries the current user is allowed to see. Creation date is always displayed in UTC time zone.")
+    @Timed
+    public Stream<PreparationSummary> listSummary() {
+        return preparationService.listSummary();
     }
 
     /**

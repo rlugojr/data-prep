@@ -31,7 +31,8 @@
     </prerequisites>
     <properties>
         <docker.registry.name>registry.datapwn.com</docker.registry.name>
-        <docker.tools.image.name>${docker.registry.name}/talend/data-prep-webapp-tools:1.8</docker.tools.image.name>
+        <docker.tools.image.version>1.8</docker.tools.image.version>
+        <docker.tools.image.name>${docker.registry.name}/talend/data-prep-webapp-tools:${docker.tools.image.version}</docker.tools.image.name>
         <docker.user>1000</docker.user>
         <docker.path.dataprep>/data-prep</docker.path.dataprep>
     </properties>

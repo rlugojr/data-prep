@@ -144,7 +144,7 @@ describe('Quality bar directive', () => {
     describe('without menu', () => {
         beforeEach(inject(($compile) => {
             createElement = () => {
-                const html = '<quality-bar quality="quality" has-menu="hasMenu" is-trusted="true" enter-animation="false"></quality-bar>';
+                const html = '<quality-bar quality="quality" has-menu="hasMenu" is-trusted="true" enter-animation="false" on-click="onclick"></quality-bar>';
                 element = $compile(html)(scope);
                 scope.$digest();
 
@@ -168,6 +168,69 @@ describe('Quality bar directive', () => {
 
             // then
             expect(element.find('.valid-partition').eq(0)[0].hasAttribute('talend-dropdown')).toBe(false);
+        }));
+
+        it('should call onclick callback for valid selection', inject(($timeout) => {
+            // given
+            scope.quality = {
+                valid: 10,
+                invalid: 20,
+                empty: 70,
+            };
+            scope.hasMenu = false;
+            scope.onclick = () => {};
+            spyOn(scope, 'onclick');
+            createElement();
+
+            // when
+            scope.$digest();
+            $timeout.flush(300);
+            element.find('.valid-partition').eq(0).click();
+
+            // then
+            expect(scope.onclick).toHaveBeenCalledWith('valid_records');
+        }));
+
+        it('should call onclick callback for empty selection', inject(($timeout) => {
+            // given
+            scope.quality = {
+                valid: 10,
+                invalid: 20,
+                empty: 70,
+            };
+            scope.hasMenu = false;
+            scope.onclick = () => {};
+            spyOn(scope, 'onclick');
+            createElement();
+
+            // when
+            scope.$digest();
+            $timeout.flush(300);
+            element.find('.empty-partition').eq(0).click();
+
+            // then
+            expect(scope.onclick).toHaveBeenCalledWith('empty_records');
+        }));
+
+        it('should call onclick callback for invalid selection', inject(($timeout) => {
+            // given
+            scope.quality = {
+                valid: 10,
+                invalid: 20,
+                empty: 70,
+            };
+            scope.hasMenu = false;
+            scope.onclick = () => {};
+            spyOn(scope, 'onclick');
+            createElement();
+
+            // when
+            scope.$digest();
+            $timeout.flush(300);
+            element.find('.invalid-partition').eq(0).click();
+
+            // then
+            expect(scope.onclick).toHaveBeenCalledWith('invalid_records');
         }));
     });
     describe('with valid menu', () => {

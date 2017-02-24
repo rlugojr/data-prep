@@ -3,6 +3,7 @@
 const argv = require('yargs').argv;
 const webpack = require('webpack');
 const SASS_DATA = require('./config/sass.conf');
+const webpackConfig = require('./config/webpack.config.test');
 
 module.exports = function (config) {
 	config.set({
@@ -11,12 +12,10 @@ module.exports = function (config) {
 
 		// frameworks to use
 		// available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-		frameworks: ['jasmine' ],
+		frameworks: ['jasmine'],
 
 		// list of files/patterns to load in the browser
-		files: [
-			{ pattern: './spec.bundle.js', watched: false },
-		],
+		files: ['./spec.bundle.js'],
 
 		// files to exclude
 		exclude: [],
@@ -27,37 +26,7 @@ module.exports = function (config) {
 			'./spec.bundle.js': ['webpack'],
 		},
 
-		webpack: {
-			devtool: 'inline-source-map',
-			module: {
-				preLoaders: [
-					{ test: /\.js$/, loader: 'isparta', exclude: [/node_modules/, /\.spec\.js$/] }
-				],
-				loaders: [
-					{ test: /\.js$/, loaders: ['ng-annotate', 'babel'], exclude: /node_modules/ },
-					{ test: /\.(css|scss)$/, loaders: ['style', 'css', 'sass'] },
-					{ test: /\.(png|jpg|jpeg|gif)$/, loader: 'url-loader', query: { mimetype: 'image/png' } },
-					{ test: /\.html$/, loaders: ['ngtemplate', 'html'] },
-				],
-			},
-			plugins: [
-				new webpack.ProvidePlugin({
-					$: 'jquery',
-					jQuery: 'jquery',
-					'window.jQuery': 'jquery',
-				})
-			],
-			sassLoader: {
-				data: SASS_DATA,
-			},
-			isparta: {
-				embedSource: true,
-				noAutoWrap: true,
-				babel: {
-					presets: ['es2015']
-				}
-			}
-		},
+		webpack: webpackConfig,
 
 		webpackServer: {
 			noInfo: true // prevent console spamming when running in Karma!

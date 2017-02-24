@@ -43,6 +43,7 @@ export default function TransformSimpleParam() {
 			editableSelect: '=',
 			parameter: '=',
 			label: '@',
+			isReadonly: '<',
 		},
 		require: '^?form',
 		bindToController: true,

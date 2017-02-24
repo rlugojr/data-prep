@@ -1,15 +1,15 @@
 /*  ============================================================================
 
-  Copyright (C) 2006-2016 Talend Inc. - www.talend.com
+ Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 
-  This source code is available under agreement available at
-  https://github.com/Talend/data-prep/blob/master/LICENSE
+ This source code is available under agreement available at
+ https://github.com/Talend/data-prep/blob/master/LICENSE
 
-  You should have received a copy of the agreement
-  along with this program; if not, write to Talend SA
-  9 rue Pages 92150 Suresnes, France
+ You should have received a copy of the agreement
+ along with this program; if not, write to Talend SA
+ 9 rue Pages 92150 Suresnes, France
 
-  ============================================================================*/
+ ============================================================================*/
 
 import template from './transformation-choice-param.html';
 
@@ -29,33 +29,36 @@ export default function TransformChoiceParam($rootScope, $compile) {
 		templateUrl: template,
 		scope: {
 			parameter: '=',
+			isReadonly: '<',
 		},
 		bindToController: true,
 		controllerAs: 'choiceParamCtrl',
 		controller: 'TransformChoiceParamCtrl',
 		link: (scope, iElement, iAttrs, ctrl) => {
-			_.chain(ctrl.parameter.configuration.values)
-                .filter(function (optionValue) {
-	return optionValue.parameters && optionValue.parameters.length;
-})
-                .forEach(function (optionValue) {
-	const isolatedScope = $rootScope.$new(true);
-	isolatedScope.parameter = ctrl.parameter;
-	isolatedScope.optionValue = optionValue;
+			ctrl.parameter.configuration.values
+				.filter((optionValue) => {
+					return optionValue.parameters && optionValue.parameters.length;
+				})
+				.forEach((optionValue) => {
+					const isolatedScope = $rootScope.$new(true);
+					isolatedScope.parameter = ctrl.parameter;
+					isolatedScope.optionValue = optionValue;
+					isolatedScope.isReadonly = ctrl.isReadonly;
 
-	const template = '<transform-params ' +
-                        'parameters="optionValue.parameters" ' +
-                        'ng-if="parameter.value === optionValue.value" ' +
-                        '></transform-params>';
-	$compile(template)(isolatedScope, function (cloned) {
-		iElement.append(cloned);
-	});
+					const template =
+						`<transform-params
+							parameters="optionValue.parameters"
+							ng-if="parameter.value === optionValue.value"
+							is-readonly="isReadonly">
+						</transform-params>`;
+					$compile(template)(isolatedScope, (cloned) => {
+						iElement.append(cloned);
+					});
 
-	scope.$on('$destroy', () => {
-		isolatedScope.$destroy();
-	});
-})
-                .value();
+					scope.$on('$destroy', () => {
+						isolatedScope.$destroy();
+					});
+				});
 		},
 	};
 }

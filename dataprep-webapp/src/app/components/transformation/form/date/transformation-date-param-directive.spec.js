@@ -11,25 +11,25 @@
 
   ============================================================================*/
 
-describe('Transformation date param directive', function () {
+describe('Transformation date param directive', () => {
     'use strict';
-    var scope;
-    var createElement;
+    let scope;
+    let createElement;
 
     beforeEach(angular.mock.module('data-prep.transformation-form'));
 
-    beforeEach(inject(function ($rootScope, $compile) {
+    beforeEach(inject(($rootScope, $compile) => {
         scope = $rootScope.$new();
 
-        createElement = function () {
-            var element = angular.element('<transform-date-param parameter="parameter"></transform-date-param>');
+        createElement = () => {
+            let element = angular.element('<transform-date-param parameter="parameter" is-readonly="isReadonly"></transform-date-param>');
             $compile(element)(scope);
             scope.$digest();
             return element;
         };
     }));
 
-    it('should render an action with parameter', function () {
+    it('should render an action with parameter', () => {
         //given
         scope.parameter = {
             name: 'param1',
@@ -39,10 +39,29 @@ describe('Transformation date param directive', function () {
         };
 
         //when
-        var element = createElement();
+        let element = createElement();
 
         //then
         expect(element.find('.param-name').text().trim()).toBe('Param 1:');
         expect(element.find('.datetimepicker').val()).toBe('02/01/2012 10:00:12');
+    });
+
+    it('should render an action with parameter in readonly mode', () => {
+        //given
+        scope.parameter = {
+            name: 'param1',
+            label: 'Param 1',
+            type: 'date',
+            default: '02/01/2012 10:00:12',
+            value: '02/01/2012 10:00:12',
+        };
+        scope.isReadonly = true;
+
+        //when
+        let element = createElement();
+
+        //then
+        expect(element.find('.param-name').text().trim()).toBe('Param 1:');
+        expect(element.find('.param-input-label').text().trim()).toBe('02/01/2012 10:00:12');
     });
 });

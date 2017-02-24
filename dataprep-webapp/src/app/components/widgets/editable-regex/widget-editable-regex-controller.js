@@ -79,11 +79,23 @@ export default function TalendEditableRegexCtrl($translate) {
      * @ngdoc method
      * @name getTypeKey
      * @methodOf talend.widget.controller:EditableRegexCtrl
-     * @description Change selected type and trigger model update
+     * @description get the current type key
      * @return {String} the type key
      */
 	vm.getTypeKey = function getTypeKey() {
 		const currentType = _.find(vm.types, { operator: vm.value.operator });
 		return currentType.key;
+	};
+
+	/**
+	 * @ngdoc method
+	 * @name getTypeLabel
+	 * @methodOf talend.widget.controller:EditableRegexCtrl
+	 * @description get the current type label
+	 * @return {String} the type label
+	 */
+	vm.getTypeLabel = function getTypeLabel() {
+		const currentType = _.find(vm.types, { operator: vm.value.operator });
+		return currentType.label;
 	};
 }

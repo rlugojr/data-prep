@@ -25,11 +25,13 @@ export default function TransformChoiceParamCtrl() {
      * @methodOf data-prep.transformation-form.controller:TransformChoiceParamCtrl
      * @description [PRIVATE] Init choice element default value (either the parameter default value or the first value in the select)
      */
-	const initParamValues = function () {
+	const initParamValues = () => {
 		if (!vm.parameter.value && (vm.parameter.configuration.values.length > 0)) {
             // init with the default value
 			if (vm.parameter.default) {
-				const defaultValue = _.find(vm.parameter.configuration.values, { value: vm.parameter.default });
+				const defaultValue = vm.parameter.configuration.values.filter((item) => {
+					return item.value === vm.parameter.default;
+				})[0];
 				vm.parameter.value = defaultValue.value;
 			}
             // or with the first value in the list
@@ -37,6 +39,18 @@ export default function TransformChoiceParamCtrl() {
 				vm.parameter.value = vm.parameter.configuration.values[0].value;
 			}
 		}
+	};
+
+	/**
+	 * @ngdoc method
+	 * @name getLabelByValue
+	 * @methodOf data-prep.transformation-form.controller:TransformChoiceParamCtrl
+	 * @description get label to display by value
+	 */
+	vm.getLabelByValue = (value) => {
+		return vm.parameter.configuration.values.filter((item) => {
+			return item.value === value;
+		})[0].label;
 	};
 
 	initParamValues();

@@ -218,6 +218,7 @@ describe('Playground directive', () => {
 			//given
 			stateMock.playground.preparation = { id: '3e41168465e15d4' };
 			stateMock.playground.dataset = metadata;
+			stateMock.playground.isReadOnly = false;
 
 			//when
 			createElement();
@@ -225,6 +226,19 @@ describe('Playground directive', () => {
 			//then
 			const title = element.find('.steps-header').eq(0).find('talend-editable-text');
 			expect(title.length).toBe(1);
+		});
+
+		it('should render editable text on preparation title on readonly mode', () => {
+			//given
+			stateMock.playground.preparation = { id: '3e41168465e15d4' };
+			stateMock.playground.dataset = metadata;
+			stateMock.playground.isReadOnly = true;
+
+			//when
+			createElement();
+
+			//then
+			expect(element.find('.steps-header-preparation-text').length).toBe(1);
 		});
 	});
 

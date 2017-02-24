@@ -1,5 +1,4 @@
 // ============================================================================
-//
 // Copyright (C) 2006-2016 Talend Inc. - www.talend.com
 //
 // This source code is available under agreement available at
@@ -40,13 +39,14 @@ import org.talend.dataprep.cache.ContentCache;
 import org.talend.dataprep.cache.ContentCacheKey;
 import org.talend.dataprep.exception.TDPException;
 import org.talend.dataprep.exception.error.CommonErrorCodes;
+import org.talend.dataprep.metrics.Timed;
+import org.talend.dataprep.metrics.VolumeMetered;
 
 /**
  * File system cache implementation.
  */
 @Component
 @ConditionalOnProperty(name = "service.cache", havingValue = "file")
-@EnableScheduling
 public class FileSystemContentCache implements ContentCache {
 
     /**
@@ -147,6 +147,7 @@ public class FileSystemContentCache implements ContentCache {
     }
 
     @Override
+    @Timed
     public boolean has(ContentCacheKey key) {
         final Path path = computeEntryPath(key, null);
         final File[] files = path.getParent().toFile().listFiles();
@@ -170,6 +171,7 @@ public class FileSystemContentCache implements ContentCache {
     }
 
     @Override
+    @VolumeMetered
     public InputStream get(ContentCacheKey key) {
         final Path path = findEntry(key);
         if (path == null) {
@@ -184,6 +186,7 @@ public class FileSystemContentCache implements ContentCache {
     }
 
     @Override
+    @VolumeMetered
     public OutputStream put(ContentCacheKey key, TimeToLive timeToLive) {
         try {
             final Path path = computeEntryPath(key, timeToLive);
@@ -202,6 +205,7 @@ public class FileSystemContentCache implements ContentCache {
     }
 
     @Override
+    @Timed
     public void evict(ContentCacheKey key) {
 
         final Path path = computeEntryPath(key, null);
@@ -223,6 +227,7 @@ public class FileSystemContentCache implements ContentCache {
     }
 
     @Override
+    @Timed
     public void evictMatch(ContentCacheKey key) {
         final Path path = computeEntryPath(key, null);
         final Path parent = path.getParent();
@@ -244,6 +249,7 @@ public class FileSystemContentCache implements ContentCache {
     }
 
     @Override
+    @Timed
     public void move(ContentCacheKey from, ContentCacheKey to, TimeToLive toTimeToLive) {
         if (StringUtils.equals(from.getKey(), to.getKey())) {
             return; // Move to itself -> no op.
@@ -263,6 +269,7 @@ public class FileSystemContentCache implements ContentCache {
     }
 
     @Override
+    @Timed
     public void clear() {
         try {
             FileUtils.deleteDirectory(Paths.get(location).toFile());
@@ -271,46 +278,6 @@ public class FileSystemContentCache implements ContentCache {
         }
     }
 
-    /**
-     * A clean up process that starts a minute after the previous ended.
-     */
-    @Scheduled(fixedDelay = 60000)
-    public void janitor() {
-        if (!Paths.get(location).toFile().exists()) {
-            LOGGER.debug("No cache content to clean.");
-            return;
-        }
-        final long start = System.currentTimeMillis();
-        final AtomicLong deletedCount = new AtomicLong();
-        final AtomicLong totalCount = new AtomicLong();
-        LOGGER.debug("Janitor process started @ {}.", start);
-        try {
-            final BiConsumer<Path, String> deleteOld = (file, suffix) -> {
-                try {
-                    final long time = Long.parseLong(suffix);
-                    if (time < start) {
-                        try {
-                            Files.delete(file);
-                            deletedCount.incrementAndGet();
-                        } catch (NoSuchFileException e) {
-                            LOGGER.debug("Ignored delete issue for '{}'.", file.getFileName(), e);
-                        } catch (IOException e) {
-                            LOGGER.warn("Unable to delete '{}'.", file.getFileName());
-                            LOGGER.debug("Unable to delete '{}'.", file.getFileName(), e);
-                        }
-                    }
-                } catch (NumberFormatException e) {
-                    LOGGER.debug("Ignore file '{}'", file);
-                }
-                totalCount.incrementAndGet();
-            };
-            Files.walkFileTree(Paths.get(location), new FileSystemVisitor(deleteOld));
-        } catch (IOException e) {
-            LOGGER.error("Unable to clean up cache", e);
-        }
-        LOGGER.debug("Janitor process ended @ {} ({}/{} files successfully deleted).", System.currentTimeMillis(), deletedCount,
-                totalCount);
-    }
 
     private BiConsumer<Path, String> getEvictionConsumer(final Predicate<String> keyMatcher) {
         return (file, suffix) -> {
@@ -323,41 +290,6 @@ public class FileSystemContentCache implements ContentCache {
                 LOGGER.error("Unable to evict {}.", file.getFileName(), e);
             }
         };
-    }
-
-    private class FileSystemVisitor extends SimpleFileVisitor<Path> {
-
-        private final BiConsumer<Path, String> consumer;
-
-        private final boolean skipPermanent;
-
-        FileSystemVisitor(final BiConsumer<Path, String> consumer) {
-            this(consumer, true);
-        }
-
-        FileSystemVisitor(final BiConsumer<Path, String> consumer, final boolean skipPermanent) {
-            this.consumer = consumer;
-            this.skipPermanent = skipPermanent;
-        }
-
-        @Override
-        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            final String fileName = file.toFile().getName();
-            // Ignore "." files (hidden files like MacOS).
-            if (fileName.startsWith(".")) {
-                return FileVisitResult.CONTINUE;
-            }
-            final String suffix = StringUtils.substringAfterLast(fileName, ".");
-            // Ignore NFS files (may happen in local mode when NFS is used).
-            if (suffix.startsWith("nfs")) {
-                return FileVisitResult.CONTINUE;
-            }
-            if (this.skipPermanent && StringUtils.isEmpty(suffix)) {
-                return FileVisitResult.CONTINUE;
-            }
-            consumer.accept(file, suffix);
-            return super.visitFile(file, attrs);
-        }
     }
 
 }

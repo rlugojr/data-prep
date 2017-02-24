@@ -11,16 +11,16 @@
 
   ============================================================================*/
 
-describe('Editable regex widget directive', function () {
+describe('Editable regex widget directive', () => {
     'use strict';
 
-    var scope;
-    var element;
-    var createElement;
+    let scope;
+    let element;
+    let createElement;
 
     beforeEach(angular.mock.module('talend.widget'));
 
-    beforeEach(angular.mock.module('pascalprecht.translate', function ($translateProvider) {
+    beforeEach(angular.mock.module('pascalprecht.translate', ($translateProvider) => {
         $translateProvider.translations('en', {
             EQUALS: 'Equals',
             CONTAINS: 'Contains',
@@ -31,24 +31,24 @@ describe('Editable regex widget directive', function () {
         $translateProvider.preferredLanguage('en');
     }));
 
-    beforeEach(inject(function ($rootScope, $compile) {
+    beforeEach(inject(($rootScope, $compile) => {
         scope = $rootScope.$new();
-        createElement = function () {
+        createElement = () => {
             element = angular.element('<form name="myTestForm">' +
-                '   <talend-editable-regex ng-model="value"></talend-editable-regex>' +
+                '<talend-editable-regex ng-model="value" is-readonly="isReadonly"></talend-editable-regex>' +
                 '</form>');
             $compile(element)(scope);
             scope.$digest();
         };
     }));
 
-    afterEach(function () {
+    afterEach(() => {
         scope.$destroy();
         element.remove();
     });
 
-    describe('init', function () {
-        it('should render regex types', function () {
+    describe('init', () => {
+        it('should render regex types', () => {
             //when
             createElement();
 
@@ -66,7 +66,24 @@ describe('Editable regex widget directive', function () {
             expect(element.find('.dropdown-menu > li > .regex-type-item-label').eq(4).text()).toBe('RegEx');
         });
 
-        it('should render regex input', function () {
+        it('should render regex types in readonly mode', () => {
+            //given
+            scope.isReadonly = true;
+            scope.value = {
+                token: 't',
+                operator: 'starts_with',
+            };
+
+            //when
+            createElement();
+
+            //then
+            expect(element.find('.editable-regex > div > span').length).toBe(2);
+            expect(element.find('.editable-regex > div > span').eq(0).text().trim()).toBe('>');
+            expect(element.find('.editable-regex > div > span').eq(1).text().trim()).toBe('t');
+        });
+
+        it('should render regex input', () => {
             //when
             createElement();
 
@@ -75,8 +92,8 @@ describe('Editable regex widget directive', function () {
         });
     });
 
-    describe('trim', function () {
-        it('should not trim input content', function () {
+    describe('trim', () => {
+        it('should not trim input content', () => {
             //then
             expect(element.find('input').attr('ng-trim')).toBe('false');
         });

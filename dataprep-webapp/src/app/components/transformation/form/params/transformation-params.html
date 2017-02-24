@@ -18,27 +18,32 @@
 
     <transform-simple-param
             ng-switch-when="simple"
-            parameter="parameter">
+            parameter="parameter"
+            is-readonly="paramsCtrl.isReadonly">
     </transform-simple-param>
 
     <transform-regex-param
             ng-switch-when="regex"
-            parameter="parameter">
+            parameter="parameter"
+            is-readonly="paramsCtrl.isReadonly">
     </transform-regex-param>
 
     <transform-choice-param
             ng-switch-when="select"
-            parameter="parameter">
+            parameter="parameter"
+            is-readonly="paramsCtrl.isReadonly">
     </transform-choice-param>
 
     <transform-date-param
             ng-switch-when="date"
-            parameter="parameter">
+            parameter="parameter"
+            is-readonly="paramsCtrl.isReadonly">
     </transform-date-param>
 
     <transform-column-param
             ng-switch-when="column"
-            parameter="parameter">
+            parameter="parameter"
+            is-readonly="paramsCtrl.isReadonly">
     </transform-column-param>
 
 </div>

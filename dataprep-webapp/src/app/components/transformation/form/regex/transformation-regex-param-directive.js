@@ -27,6 +27,7 @@ export default function TransformRegexParam() {
 		templateUrl: template,
 		scope: {
 			parameter: '=',
+			isReadonly: '<',
 		},
 		bindToController: true,
 		controllerAs: 'regexParamCtrl',

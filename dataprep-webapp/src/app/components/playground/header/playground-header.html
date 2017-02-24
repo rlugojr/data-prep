@@ -36,10 +36,14 @@
                 </li>
             </ul>
 
-            <history-control id="help-history" class="navbar-right""></history-control>
+            <history-control
+                    id="help-history"
+                    class="navbar-right"
+                    ng-if="!$ctrl.isReadonly">
+            </history-control>
 
             <ul class="nav navbar-nav navbar-right">
-                <li>
+                <li  ng-if="!$ctrl.isReadonly">
                     <a id="playground-onboarding-icon"
                        translate-once-title="ONBOARDING"
                        ng-click="$ctrl.onOnboarding()">
@@ -67,7 +71,7 @@
                 <li id="documentation-search-container">
                     <documentation-search></documentation-search>
                 </li>
-                <li>
+                <li  ng-if="!$ctrl.isReadonly">
                     <a id="playground-gear-icon"
                        ng-click="$ctrl.onParameters()"
                        ng-class="{pressed: $ctrl.parametersVisible}"
@@ -82,7 +86,7 @@
                         <icon name="'talend-dataprep'" />
                     </a>
                 </li>
-                <li>
+                <li  ng-if="!$ctrl.isReadonly">
                     <a id="playground-lookup-icon"
                        ng-click="$ctrl.onLookup()"
                        ng-class="{pressed: $ctrl.lookupVisible}"

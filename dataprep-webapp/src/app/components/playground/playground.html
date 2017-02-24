@@ -27,9 +27,10 @@
                        on-feedback="playgroundCtrl.openFeedbackForm()"
                        on-close="playgroundCtrl.beforeClose()"
                        on-preparation-picker="playgroundCtrl.showPreparationPicker()"
+                       is-readonly="playgroundCtrl.state.playground.isReadOnly"
     ></playground-header>
-
-    <div class="playground" ng-if="!playgroundCtrl.state.playground.isLoading">
+    <div class="playground"
+         ng-if="!playgroundCtrl.state.playground.isLoading">
         <talend-slidable class="playground-recipe slide-hide"
                          visible="playgroundCtrl.state.playground.recipe.visible"
                          side="left">
@@ -40,9 +41,9 @@
                                       placeholder="ENTER_PREPARATION_NAME"
                                       text="playgroundCtrl.state.playground.preparationName"
                                       text-class="steps-header-preparation-text"
-                                      text-title="{{playgroundCtrl.state.playground.preparationName}}"></talend-editable-text>
+                                      text-title="{{playgroundCtrl.state.playground.preparationName}}">
+                </talend-editable-text>
             </div>
-
             <!-- Recipe -->
             <recipe id="help-recipe" ng-if="playgroundCtrl.state.playground.data"></recipe>
         </talend-slidable>
@@ -83,7 +84,16 @@
         <talend-slidable class="playground-suggestions"
                          visible="true"
                          side="right">
-            <suggestions-stats></suggestions-stats>
+            <suggestions-stats>
+                <sc-splitter class="suggestions-stats-content" orientation="vertical">
+                    <sc-split-first-pane id="help-suggestions">
+                        <actions-suggestions class="suggestions-part"></actions-suggestions>
+                    </sc-split-first-pane>
+                    <sc-split-second-pane id="help-stats">
+                        <stats-details class="stats-part"></stats-details>
+                    </sc-split-second-pane>
+                </sc-splitter>
+            </suggestions-stats>
         </talend-slidable>
     </div>
 </div>
